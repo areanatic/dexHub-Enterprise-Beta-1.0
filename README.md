@@ -7,152 +7,157 @@
   <img src="https://img.shields.io/badge/100%25-local-green" alt="Local">
 </p>
 
-<p align="center">
-  <strong>An AI development team that follows your methodology.<br>Not a chatbot. A structured system.</strong>
-</p>
+# DexHub
+
+**A structured AI development platform.** 43 specialized agents, 45 guided workflows, 12 knowledge packs — running locally in your IDE. No cloud, no API keys.
 
 ---
 
-## Quick Start
+## Install
 
 ```bash
 git clone https://github.com/areanatic/dexhub-ea-beta.git
 cd dexhub-ea-beta
 ```
 
-Open in VS Code with GitHub Copilot, type **`@dex-master hi`** — done.
+Open in VS Code with GitHub Copilot. Type `@dex-master hi`. Done.
+
+Works with any AI-capable IDE (Copilot, Cursor, Windsurf, etc.).
 
 ---
 
-## Why DexHub?
+## What It Is
 
-| | Generic AI Chat | DexHub |
-|--|----------------|--------|
-| **Approach** | One AI, all tasks | 43 specialized agents, each with a role |
-| **Process** | "Write me a PRD" | Guided 45-step workflows with templates |
-| **Knowledge** | Forgets every session | Preserves decisions, chronicles, context |
-| **Structure** | Free-form output anywhere | Organized workspace with file routing |
-| **Consistency** | Different output every time | Guardrails enforce format and quality |
-| **Extensibility** | Prompt engineering | Build your own agents, workflows, skills |
+DexHub is a **knowledge meta-layer** that sits on top of your repository. It carries structured agents, proven workflows, and institutional knowledge — so your AI doesn't just chat, it follows your methodology.
 
----
-
-## What You Get
-
-### 43 AI Agents
-
-Each agent has a defined role, persona, and methodology:
-
-| Role | What it does |
-|------|-------------|
-| **Business Analyst** | Product briefs, requirements gathering, market research |
-| **Solution Architect** | System design, architecture decisions, technology selection |
-| **Developer** | Story implementation, code review, technical execution |
-| **UX Expert** | User research, UX specs, wireframe guidance |
-| **Test Architect** | Test strategy, ATDD, CI/CD quality gates |
-| **Product Manager** | Product strategy, roadmaps, stakeholder alignment |
-| **Scrum Master** | Sprint planning, user stories, retrospectives |
-| **Product Owner** | Acceptance criteria, backlog management |
-| **Brainstorming Coach** | Structured ideation with 300+ creative frameworks |
-| **Innovation Strategist** | Trend analysis, business model innovation |
-| **Dex Builder** | Create your own custom agents and workflows |
-
-Plus: Design Thinking Coach, Storyteller, Creative Problem Solver, 3 Game Development agents, 3 Integration Onboarding agents, and 18 meta-agents for brownfield analysis (codebase, patterns, tech debt, APIs, dependencies).
-
-### 45 Guided Workflows
-
-Step-by-step processes across the full development lifecycle:
-
-| Phase | What happens |
-|-------|-------------|
-| **Analysis** | Brainstorming, market research, product briefs, user research |
-| **Planning** | PRDs, technical specs, UX specs, game design docs |
-| **Solutioning** | Architecture design, technology selection, solution specs |
-| **Implementation** | Story creation, code execution, code review, retrospectives |
-| **Testing** | Framework generation, coverage analysis, quality gates |
-
-### 12 Knowledge Packs (Skills)
-
-Lazy-loaded knowledge that agents access on demand:
-
-| Skill | What it provides |
-|-------|-----------------|
-| **DexHub Core** | Agent activation protocol, menu system |
-| **Architecture** | Platform directory structure, module system |
-| **Guardrails** | Safety rules, file routing, output policies |
-| **Chronicle** | Session documentation system |
-| **Platform Awareness** | IDE differences, capabilities, limitations |
-| **Integrations** | Setup guides for Jira, GitHub, Figma |
-| + 6 more | Design system patterns, accessibility, components |
-
-### Enterprise Integrations
-
-Guided setup wizards — no hardcoded URLs, works with any organization:
-
-| Integration | What you get |
-|-------------|-------------|
-| **Atlassian** (Jira + Confluence) | Search issues, read pages, create content via MCP |
-| **GitHub Enterprise** | Repos, PRs, issues, actions via MCP |
-| **Figma** | Read design files, extract components, analyze layouts |
-
-Type `@atlassian-onboarding`, `@github-onboarding`, or `@figma-onboarding` to set up.
+| What | How |
+|------|-----|
+| **43 Agents** | Each with a defined role, persona, and expertise |
+| **45 Workflows** | Step-by-step processes with templates and checklists |
+| **12 Knowledge Packs** | Lazy-loaded domain knowledge (skills) |
+| **3 MCP Integrations** | Jira, GitHub Enterprise, Figma |
+| **Private Workspace** | myDex/ — your data stays local, never synced |
+| **7 Guardrails** | Enforced output quality and file organization |
 
 ---
 
-## How It Works
+## Features
+
+### Agents
+
+| Category | Agents | Examples |
+|----------|--------|----------|
+| **Development** | 14 | Business Analyst, Architect, Developer, UX, PM, Scrum Master, Product Owner |
+| **Testing** | 2 | Test Engineer Architect (TEA), TestArch Pro |
+| **Innovation** | 5 | Brainstorming Coach, Design Thinking, Innovation Strategist, Storyteller, Problem Solver |
+| **Builder** | 1 | Dex Builder — create your own agents and workflows |
+| **Integration** | 3 | Atlassian Onboarding, GitHub Onboarding, Figma Onboarding |
+| **Meta-Analysis** | 18 | Codebase Analyzer, Pattern Detector, Tech Debt Auditor, API Documenter, ... |
+
+Every agent has a `.agent.md` file for Copilot integration (46 total) and a full definition in `.dexCore/`.
+
+### Workflows
+
+Guided step-by-step processes across the development lifecycle:
+
+| Phase | Workflows | What you get |
+|-------|-----------|-------------|
+| **Analysis** | Brainstorming, Market Research, Product Brief, User Research | Structured ideation and discovery outputs |
+| **Planning** | PRD, Technical Spec, UX Spec, Game Design Doc | Templated planning documents |
+| **Solutioning** | Architecture Design, Technology Selection | Decision records and solution specs |
+| **Implementation** | Story Creation, Dev Story, Code Review, Retrospective | Traceable implementation artifacts |
+| **Testing** | Framework Generation, Coverage Analysis, Quality Gates | Automated test strategy |
+
+### Integrations
+
+Setup wizards that guide you through connecting your tools:
 
 ```
-You → IDE (Copilot/Cursor/etc.) → DexHub (.dexCore/)
-                                      |
-                            +---------+---------+
-                            |         |         |
-                         Agents   Workflows   Skills
-                         (43)      (45)       (12)
-                            |         |         |
-                            +----+----+----+----+
-                                 |              |
-                              myDex/        Integrations
-                           (your private     (Jira, GitHub,
-                            workspace)        Figma)
+@atlassian-onboarding   → Jira + Confluence via MCP
+@github-onboarding      → GitHub Enterprise via MCP
+@figma-onboarding       → Figma design files via MCP + REST
 ```
 
-**Architecture:**
+No hardcoded URLs — the wizard asks for your instance and configures everything.
+
+### Knowledge Packs (Skills)
+
+Agents load domain knowledge on demand:
+
+| Skill | Content |
+|-------|---------|
+| Core | Agent activation protocol, menu system |
+| Architecture | Platform structure, module system |
+| Guardrails | Safety rules, file routing policies |
+| Platform Awareness | IDE differences and capabilities |
+| Integrations | Setup guides and troubleshooting |
+| Chronicle | Session documentation system |
+| + 6 domain-specific | Design systems, accessibility, components, patterns |
+
+---
+
+## Architecture
 
 ```
-.dexCore/              The framework (read-only, versioned)
-  core/                DexMaster orchestrator + integrations
-  dxm/                 14 agents + 30 workflows (development methodology)
-  dis/                 5 agents + 4 workflows (innovation suite)
-  dxb/                 Builder tools (create agents/workflows/skills)
-  _cfg/                Manifests, config, agent registry
-  _dev/                Dev-Mode: validator, dashboard, templates
+.dexCore/                    The framework (versioned, portable)
+  core/                      DexMaster + integrations (Jira, GitHub, Figma)
+  dxm/                       Development methodology (14 agents, 30+ workflows)
+  dis/                       Innovation suite (5 agents, 4 workflows)
+  dxb/                       Builder (create agents, workflows, skills)
+  _cfg/                      Manifests, config, agent registry
+  _dev/                      Dev-Mode (validator, dashboard, templates)
 
 .github/
-  agents/              46 Copilot agent definitions (.agent.md)
-  skills/              12 knowledge packs (lazy-loaded)
-  copilot-instructions.md
+  agents/                    46 Copilot agent files (.agent.md)
+  skills/                    12 knowledge packs
+  copilot-instructions.md    IDE behavior configuration
 
-myDex/                 Your private workspace (100% local, gitignored)
-  projects/            Structured per-project workspaces
-  inbox/               Drop files for analysis
-  drafts/              Work in progress
-  export/              Finished deliverables
+myDex/                       Your workspace (local, gitignored)
+  projects/                  Structured per-project workspaces
+  inbox/ → drafts/ → export/ File pipeline
 ```
 
-**Key design decisions:**
-- **Plain markdown** — agents and workflows are markdown files, portable to any LLM
-- **Zero cloud** — everything runs locally in your IDE, no API keys needed
-- **Modular** — add/remove modules (DXM, DIS, DXB) independently
-- **Guardrails** — 7 safety rules enforce output quality and file organization
-- **Extensible** — build custom agents with `@dex-builder`, add skills, create workflows
+**Design principles:**
+- **Plain markdown** — portable to any LLM, no vendor lock-in
+- **Modular** — add or remove modules (DXM, DIS, DXB) independently
+- **Extensible** — build custom agents with `@dex-builder`, add knowledge packs, create workflows
+- **Zero cloud** — everything runs in your IDE, your data stays on your machine
+
+---
+
+## Use Cases
+
+**Brownfield Analysis** — Point DexHub at an existing codebase. The 18 meta-agents analyze architecture, patterns, tech debt, APIs, dependencies, and test coverage. Get structured reports instead of ad-hoc AI guesses.
+
+**Structured Product Development** — Start with `@analyst` for a product brief, hand off to `@architect` for system design, then `@dev` implements story by story with `@tea` validating quality gates. Each step produces templated, traceable artifacts.
+
+**Knowledge Preservation** — DexHub's chronicle system captures decisions, session logs, and project context. When someone new joins, the institutional knowledge is already structured in the repository — not lost in chat history.
+
+**Enterprise Tool Integration** — Connect Jira, Confluence, GitHub Enterprise, and Figma through guided setup wizards. Agents can search issues, read design files, and create documentation without leaving your IDE.
+
+**Custom Agent Development** — Use `@dex-builder` to create agents for your domain. Define a persona, connect workflows, add knowledge packs. Your custom agents follow the same guardrails and quality standards as built-in ones.
+
+---
+
+## Community & Extensibility
+
+DexHub is designed for contribution and exchange:
+
+- **Fork and extend** — add agents, workflows, skills for your domain
+- **Branch and version** — each feature branch carries its own agent/workflow changes
+- **Share via Git** — your extensions are markdown files in a Git repo, shareable like any code
+- **Dev-Mode** — type `Start Dev-Mode` to access the development meta-layer (validator, dashboard, templates)
+- **validate.sh** — 168 automated checks verify structural integrity
+
+The architecture follows a **registry pattern**: manifests track all agents, workflows, and files. New components register themselves. Removing a module means removing a folder.
 
 ---
 
 ## Quality
 
 ```bash
-# Run 168 automated checks
-bash .dexCore/_dev/tools/validate.sh
+bash .dexCore/_dev/tools/validate.sh    # 168 automated checks
+python tests/validate_profile_schema.py  # Profile schema validation
 ```
 
 ---
@@ -161,10 +166,14 @@ bash .dexCore/_dev/tools/validate.sh
 
 **Enterprise Beta 0.1.0** — `.version` file is the single source of truth.
 
+Versioning: `EB-MAJOR.MINOR.PATCH` (Semantic Versioning)
+
 ---
 
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
 
-Created by [Arash Zamani](https://github.com/areanatic).
+Copyright 2025-2026 Arash Zamani. "DexHub" is a trademark — see [NOTICE](NOTICE).
+
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
