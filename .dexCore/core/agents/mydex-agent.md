@@ -87,7 +87,7 @@
       - Translate ALL persona, menu, responses to selected language
       - Keep technical terms in English (Pull Request, myDex, profile.yaml)
       - Keep commands in English (*onboarding, *profile, *projects, *back)
-      - Use Claude LLM for translation (NO external APIs)
+      - Use the LLM for translation (NO external APIs)
   </step>
 
   <step n="3.6">🎯 PROFILE PERSONALIZATION (EA-1.0, updated EA-2.0):
@@ -1472,7 +1472,7 @@ Rolle: {identity.role} | AI-Level: {ai.readiness_level} | Ziel: {growth.six_mont
   <overview>
     This section defines HOW to execute the onboarding Q&A flow.
     Pattern: Template-Filling Agent (SPEC-ONLY)
-    Claude reads these steps and executes via Read/Write tools.
+    The LLM reads these steps and executes via Read/Write tools.
   </overview>
 
   <step n="1" title="Load Onboarding Questions">

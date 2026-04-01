@@ -67,7 +67,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/18] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/18] Cross-Platform Consistency (Instructions cross-check (copilot-instructions.md)${NC}"
 
 # GREETING action — check key phrase exists in both
 if grep -q 'Display the.*EXACTLY as defined' .github/copilot-instructions.md && \
@@ -78,21 +78,21 @@ else
 fi
 
 # AGENT-REQUEST action
-CLAUDE_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
+INST_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
 COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
-if [ -n "$CLAUDE_AR" ] && [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
+if [ -n "$INST_AR" ] && [ "$INST_AR" = "$COPILOT_AR" ]; then
   pass "AGENT-REQUEST action identical"
 else
   fail "AGENT-REQUEST action mismatch"
 fi
 
 # Agent Resolution rule
-CLAUDE_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
+INST_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
 COPILOT_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
-if [ "$CLAUDE_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
+if [ "$INST_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
   pass "Agent Resolution rule in both files"
 else
-  fail "Agent Resolution missing (CLAUDE=$CLAUDE_RES, COPILOT=$COPILOT_RES)"
+  fail "Agent Resolution missing (INSTRUCTIONS=$INST_RES, COPILOT=$COPILOT_RES)"
 fi
 
 # G4 Anti-Overplanning
@@ -179,9 +179,9 @@ fi
 
 # F-012: DexMemory
 if grep -q 'DexMemory' .github/copilot-instructions.md; then
-  pass "F-012: DexMemory referenced in CLAUDE.md"
+  pass "F-012: DexMemory referenced in instructions"
 else
-  fail "F-012: DexMemory missing from CLAUDE.md"
+  fail "F-012: DexMemory missing from instructions"
 fi
 
 if [ -d "myDex/.dex/chronicle" ] && [ -d "myDex/.dex/decisions" ]; then
@@ -523,23 +523,23 @@ fi
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
 echo -e "\n${BOLD}[17/18] Guardrail Pattern Enforcement${NC}"
 
-# Check G3 enforcement in CLAUDE.md
+# Check G3 enforcement in instructions
 if grep -q "Root-Forbidden" .github/copilot-instructions.md && grep -q "Smart Routing" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G3: Root-Forbidden + Smart Routing in CLAUDE.md"
+  pass "G3: Root-Forbidden + Smart Routing in instructions"
 else
-  fail "G3: Missing Root-Forbidden enforcement in CLAUDE.md"
+  fail "G3: Missing Root-Forbidden enforcement in instructions"
 fi
 
 # Check G5 consent pattern
 if grep -q "WAIT for explicit" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G5: Consent pattern (WAIT for explicit) in CLAUDE.md"
+  pass "G5: Consent pattern in instructions"
 else
   fail "G5: Consent pattern missing"
 fi
 
 # Check G6 no hallucinated paths
 if grep -q "Verify with file system" .github/copilot-instructions.md 2>/dev/null || grep -q "verify.*file system" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G6: No hallucinated paths rule in CLAUDE.md"
+  pass "G6: No hallucinated paths rule in instructions"
 else
   warn "G6: Hallucinated paths rule may be missing"
 fi

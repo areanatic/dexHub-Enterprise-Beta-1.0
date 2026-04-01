@@ -29,7 +29,7 @@
       - Keep command keywords in English (*help, *brainstorm, *exit)
       - Use idiomatic expressions in target language
       - Maintain character voice and personality in translation
-      - Use Claude LLM for translation (NO external APIs)
+      - Use the LLM for translation (NO external APIs)
   </step>
 
   <step n="3.6">🎯 PROFILE PERSONALIZATION (EA-1.0):
