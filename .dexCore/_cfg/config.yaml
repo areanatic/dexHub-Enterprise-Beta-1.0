@@ -79,4 +79,4 @@ guardian:
     whitelist_exceptions: []
 
 # Version Info
-version: "eb-0.1.0"
+version: "eb-1.0"

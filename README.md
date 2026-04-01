@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
-  <img src="https://img.shields.io/badge/version-EB--0.1.0-orange" alt="Version">
+  <img src="https://img.shields.io/badge/version-EB--1.0-orange" alt="Version">
   <img src="https://img.shields.io/badge/agents-43-blueviolet" alt="Agents">
   <img src="https://img.shields.io/badge/workflows-45-blueviolet" alt="Workflows">
   <img src="https://img.shields.io/badge/skills-12-blueviolet" alt="Skills">
@@ -314,7 +314,7 @@ python .dexCore/_dev/tools/validate_profile_schema.py myDex/.dex/config/profile.
 
 ## Version
 
-**Enterprise Beta 0.1.0** — `.version` file is the single source of truth.
+**Enterprise Beta 1.0** — `.version` file is the single source of truth.
 
 Versioning: `EB-MAJOR.MINOR.PATCH` (Semantic Versioning)
 

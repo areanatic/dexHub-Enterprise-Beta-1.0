@@ -2,7 +2,7 @@
 
 > Development changelog for DexHub Enterprise Beta
 
-## [EB-0.1.0] — 2026-04-01
+## [EB-1.0] — 2026-04-01
 
 ### Initial Enterprise Beta Release
 
