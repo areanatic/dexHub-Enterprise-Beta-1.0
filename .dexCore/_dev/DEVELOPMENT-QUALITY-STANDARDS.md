@@ -45,7 +45,7 @@ Schema Definition → Producer implements → Consumer implements → Integratio
 - [ ] Both producer and consumer MUST reference same schema version
 - [ ] Breaking changes REQUIRE version bump
 
-**Reference:** `~/.claude/learnings/schema-first-development.md`
+**Reference:** `docs/learnings/schema-first-development.md`
 
 ---
 
@@ -79,7 +79,7 @@ contract:
 - [ ] Both MUST fail loudly with clear error messages
 - [ ] Schema version MUST be checked
 
-**Reference:** `~/.claude/learnings/producer-consumer-contract.md`
+**Reference:** `docs/learnings/producer-consumer-contract.md`
 
 ---
 
@@ -122,7 +122,7 @@ tests/
 - [ ] Test MUST cover edge cases (missing data, invalid formats)
 - [ ] CI/CD MUST run integration tests on every commit
 
-**Reference:** `~/.claude/learnings/integration-testing-mandatory.md`
+**Reference:** `docs/learnings/integration-testing-mandatory.md`
 
 ---
 
@@ -162,7 +162,7 @@ tests/
 - [ ] NO merge without integration test
 - [ ] NO assumptions - verify files exist
 
-**Reference:** `~/.claude/learnings/definition-of-done.md`
+**Reference:** `docs/learnings/definition-of-done.md`
 
 ---
 
@@ -193,7 +193,7 @@ validator.validate(schema_path)
 - [ ] Fail fast if dependencies missing
 - [ ] Log what was expected vs what exists
 
-**Reference:** `~/.claude/learnings/trust-but-verify.md`
+**Reference:** `docs/learnings/trust-but-verify.md`
 
 ---
 
@@ -205,7 +205,6 @@ validator.validate(schema_path)
 
 **Before Ending Session:**
 1. Save critical decisions to `.dexCore/_dev/CRITICAL-DECISIONS.md`
-2. Update `.claude/session-registry.json` with session summary
 3. Document assumptions made during session
 4. List files created/modified
 5. Note pending work and dependencies
@@ -218,12 +217,11 @@ validator.validate(schema_path)
 5. Understand context before proceeding
 
 **For DexHub:**
-- Session logs: `.claude/sessions/{topic}-{date}.md`
+- Session logs: `sessions/{topic}-{date}.md`
 - Critical decisions: `.dexCore/_dev/CRITICAL-DECISIONS.md`
 - Memory Bridge: For complex multi-session work
-- Session Registry: `.claude/session-registry.json`
 
-**Reference:** `~/.claude/learnings/cross-session-continuity.md`
+**Reference:** `docs/learnings/cross-session-continuity.md`
 
 ---
 
@@ -549,12 +547,12 @@ Time (proper) < Time (rework)
 ## RELATED DOCUMENTATION
 
 **Universal Patterns:**
-- `~/.claude/learnings/schema-first-development.md`
-- `~/.claude/learnings/producer-consumer-contract.md`
-- `~/.claude/learnings/integration-testing-mandatory.md`
-- `~/.claude/learnings/cross-session-continuity.md`
-- `~/.claude/learnings/trust-but-verify.md`
-- `~/.claude/learnings/definition-of-done.md`
+- `docs/learnings/schema-first-development.md`
+- `docs/learnings/producer-consumer-contract.md`
+- `docs/learnings/integration-testing-mandatory.md`
+- `docs/learnings/cross-session-continuity.md`
+- `docs/learnings/trust-but-verify.md`
+- `docs/learnings/definition-of-done.md`
 
 **DexHub Specific:**
 - `.dexCore/_dev/learnings/PROFILE-SCHEMA-MISMATCH-2025-11-16.md` (root cause analysis)
@@ -567,7 +565,7 @@ Time (proper) < Time (rework)
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-11-16 | Initial creation after Profile Schema Mismatch incident | Claude Code + Arash Zamani |
+| 1.0 | 2025-11-16 | Initial creation after Profile Schema Mismatch incident | IDE + Arash Zamani |
 
 ---
 

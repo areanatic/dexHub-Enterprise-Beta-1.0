@@ -33,7 +33,7 @@
 >
 > **Reference:**
 > - Implementation Plan: `.dexCore/_dev/roadmap/V1.1.2-MYDEX-ONBOARDING.md`
-> - Pattern Documentation: `.claude/learnings/template-filling-agent-pattern-v1.md`
+> - Pattern Documentation: `docs/learnings/template-filling-agent-pattern-v1.md`
 > - Questions Database: `myDex/.dex/config/onboarding-questions.yaml`
 > - Profile Schema: `myDex/.dex/config/profile.yaml.example`
 >

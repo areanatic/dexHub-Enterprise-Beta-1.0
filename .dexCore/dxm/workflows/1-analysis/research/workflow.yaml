@@ -94,8 +94,8 @@ recommended_inputs:
     - research_question: "Initial research question or topic"
     - context_docs: "Background documents for context"
 
-# Claude Code integration points
-claude_code_enhancements:
+# IDE integration points
+IDE_enhancements:
   - injection_point: "research-subagents"
   - available_subagents:
       - market-researcher: "Deep market intelligence gathering"

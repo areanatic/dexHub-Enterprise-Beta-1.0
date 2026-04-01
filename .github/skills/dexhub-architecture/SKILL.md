@@ -40,9 +40,8 @@ description: "DexHub file structure, module layout, silo architecture, and devel
 ├── agents/                   ← 18 .agent.md files (Copilot auto-discovers)
 └── skills/                   ← 10+ Skills (lazy-loaded knowledge)
 
-.claude/                      ← Claude Code Integration (dev-only)
-├── CLAUDE.md                 ← Claude Code instructions
-├── skills/                   ← Claude Code skills (testing)
+├── IDE-instructions.md                 ← IDE instructions
+├── skills/                   ← IDE skills (testing)
 └── settings.json             ← Hooks (post-write-check)
 
 myDex/                        ← User Workspace (gitignored sensitive data)

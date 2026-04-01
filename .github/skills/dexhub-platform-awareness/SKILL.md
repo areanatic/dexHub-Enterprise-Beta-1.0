@@ -1,6 +1,6 @@
 ---
 name: dexhub-platform-awareness
-description: "Platform differences between GitHub Copilot and Claude Code. Use when discussing platform capabilities, limitations, workarounds, or cross-platform strategy."
+description: "Platform differences between GitHub Copilot and IDE. Use when discussing platform capabilities, limitations, workarounds, or cross-platform strategy."
 ---
 
 # DexHub Platform Awareness
@@ -9,14 +9,14 @@ DexHub runs on two platforms with different capabilities. Understanding these di
 
 ## Platform Comparison
 
-| Capability | GitHub Copilot | Claude Code |
+| Capability | GitHub Copilot | IDE |
 |-----------|---------------|-------------|
 | File system access | Via agent mode only | Full access |
 | PDF/image reading | No (text-based only) | Yes (multimodal) |
 | Session memory | Stateless (no persistence between chats) | Stateless (but DexMemory workaround) |
 | Tool execution | Agent mode with approval | Full terminal access |
 | Model routing | Via .agent.md `model:` field | Via model selection |
-| Skills/knowledge | Lazy-loaded via .github/skills/ | Via CLAUDE.md + .claude/skills/ |
+| Skills/knowledge | Lazy-loaded via .github/skills/ | Via project-level configuration |
 | .agent.md files | Native Copilot Agents | Not used |
 | MCP tools | Via Copilot Extensions | Via MCP servers |
 | Streaming | Native | Native |
@@ -41,13 +41,13 @@ DexHub runs on two platforms with different capabilities. Understanding these di
 
 ## Dual-Platform Strategy
 
-DexHub is designed **Copilot-first** but developed in **Claude Code**:
+DexHub is designed **Copilot-first** but developed in **IDE**:
 - **Copilot** = Production target (where users work)
-- **Claude Code** = Development playground (where we build)
+- **IDE** = Development playground (where we build)
 - **Skills** = Cross-platform knowledge (works on both)
 - **.agent.md** = Copilot-only (agent routing)
-- **CLAUDE.md** = Claude Code-only (orchestration)
+- **IDE-specific config** = IDE-only (orchestration)
 
 ## Key Rule
 
-Never assume a feature works on both platforms. If it was only tested in Claude Code, it is UNVALIDATED for Copilot. Always note which platform a feature was tested on.
+Never assume a feature works on both platforms. If it was only tested in IDE, it is UNVALIDATED for Copilot. Always note which platform a feature was tested on.

@@ -19,7 +19,7 @@
 
 **Skills:**
 - 12 lazy-loaded knowledge packs
-- Platform Awareness skill (Claude Code vs Copilot)
+- Platform Awareness skill (IDE vs Copilot)
 
 **Integrations:**
 - Atlassian MCP (Jira + Confluence)

@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/agents-43-blueviolet" alt="Agents">
   <img src="https://img.shields.io/badge/workflows-45-blueviolet" alt="Workflows">
   <img src="https://img.shields.io/badge/skills-12-blueviolet" alt="Skills">
-  <img src="https://img.shields.io/badge/platform-Copilot_%7C_Claude_Code-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/platform-Copilot_%7C_Any_AI_IDE-blue" alt="Platform">
 </p>
 
 <p align="center">
@@ -37,12 +37,12 @@ cd dexhub-ea-beta
 2. Type `@dex-master hi`
 3. Pick from the interactive menu
 
-**For Claude Code (Terminal):**
-1. `cd dexhub-ea-beta && claude`
+**For Any AI-capable IDE (Terminal):**
+1. `cd dexhub-ea-beta && your-ai-tool`
 2. Type `hi`
 3. Pick from the interactive menu
 
-**Requirements:** Git + (GitHub Copilot Business/Enterprise OR Claude Code)
+**Requirements:** Git + (GitHub Copilot Business/Enterprise OR Any AI-capable IDE)
 
 ---
 
@@ -145,7 +145,7 @@ Versioning: `EB-MAJOR.MINOR.PATCH` (Semantic Versioning)
 | Platform | Support | Notes |
 |----------|---------|-------|
 | **GitHub Copilot** (VS Code) | Full | 46 `.agent.md` files, 12 skills, model routing |
-| **Claude Code** (Terminal) | Full | Via `CLAUDE.md` + `.dexCore/` |
+| **Any AI-capable IDE** (Terminal) | Full | Via `.dexCore/` agent definitions |
 | **Other LLMs** | Partial | Agent definitions are plain markdown — portable |
 
 ---

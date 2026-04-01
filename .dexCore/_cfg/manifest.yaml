@@ -7,6 +7,5 @@ modules:
   - dis
   - meta-agents
 ides:
-  - claude-code
-  - codex
   - github-copilot
+  - ai-ide-generic

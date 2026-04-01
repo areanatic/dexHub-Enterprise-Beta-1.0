@@ -22,8 +22,8 @@ recommended_inputs:
   - bug_report: "Bug description or issue ticket"
   - feature_request: "Brief feature description"
 
-# Claude Code integration points
-claude_code_enhancements:
+# IDE integration points
+IDE_enhancements:
   - injection_point: "tech-spec-subagents"
   - available_subagents:
       - technical-evaluator: "Technology assessment and feasibility"

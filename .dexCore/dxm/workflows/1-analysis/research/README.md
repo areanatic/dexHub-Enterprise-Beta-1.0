@@ -133,7 +133,6 @@ research/
 ├── template-technical.md          # Technical evaluation template
 ├── checklist.md                   # Universal validation criteria
 ├── README.md                      # This file
-└── claude-code/                   # Claude Code enhancements (optional)
     ├── injections.yaml            # Integration configuration
     └── sub-agents/                # Specialized research agents
         ├── dxm-market-researcher.md
@@ -348,7 +347,7 @@ The workflow leverages multiple data sources:
 - Patent databases
 - Benchmarking studies
 
-## Claude Code Enhancements
+## IDE Enhancements
 
 ### Available Subagents
 
@@ -359,7 +358,7 @@ The workflow leverages multiple data sources:
 5. **dxm-user-researcher** - Customer insights and personas
 6. **dxm-technical-evaluator** - Technology assessment
 
-These are automatically invoked during workflow execution if Claude Code integration is configured.
+These are automatically invoked during workflow execution if IDE integration is configured.
 
 ## Troubleshooting
 
@@ -418,7 +417,7 @@ Add to `workflow.yaml` `frameworks` section under appropriate research type.
   - Consolidated competitive, user, domain under market with focus variants
   - Router-based instruction loading
   - Template selection by research type
-  - Enhanced Claude Code subagent support
+  - Enhanced IDE subagent support
 
 - **v1.0.0** - Initial market research only implementation
   - Single-purpose market research workflow
