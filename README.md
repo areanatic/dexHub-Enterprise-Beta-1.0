@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/100%25-local-green" alt="Local">
 </p>
 
-# DexHub Beta 1.0
+# DexHub Enterprise Beta 1.0
 
 An AI development framework built on three ideas:
 
