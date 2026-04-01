@@ -37,12 +37,12 @@ cd dexhub-ea-beta
 2. Type `@dex-master hi`
 3. Pick from the interactive menu
 
-**For Any AI-capable IDE (Terminal):**
-1. `cd dexhub-ea-beta && your-ai-tool`
-2. Type `hi`
+**For any AI IDE (Terminal):**
+1. Open the project in your AI-capable IDE
+2. Type `hi` in the AI chat
 3. Pick from the interactive menu
 
-**Requirements:** Git + (GitHub Copilot Business/Enterprise OR Any AI-capable IDE)
+**Requirements:** Git + an AI-capable IDE (GitHub Copilot, Cursor, Windsurf, etc.)
 
 ---
 
@@ -134,7 +134,6 @@ myDex/                    Your private workspace (100% local)
 |------|---------|
 | `.version` | Single source of truth for current version |
 | `.dexCore/_dev/CHANGELOG.md` | Development changelog |
-| `.dexCore/_dev/docs/VERSIONING-SCHEME.md` | Versioning rules |
 
 Versioning: `EB-MAJOR.MINOR.PATCH` (Semantic Versioning)
 
