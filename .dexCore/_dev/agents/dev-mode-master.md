@@ -985,10 +985,10 @@ Automatically push Dev-Mode changes to GitHub via MCP integration.
     
     📦 Branch: {branch-name}
     📝 Commit: {commit-sha}
-    🔗 GitHub: https://git.dhl.com/{repo}/tree/{branch-name}
+    🔗 GitHub: https://your-github-enterprise.example.com/{repo}/tree/{branch-name}
     
     [If PR created]
-    🚀 Pull Request: https://git.dhl.com/{repo}/pull/{pr-number}
+    🚀 Pull Request: https://your-github-enterprise.example.com/{repo}/pull/{pr-number}
     ```
 
 ### Error Handling
@@ -1002,9 +1002,9 @@ Please install:
 
 **Authentication Failed:**
 ```
-❌ Not authenticated with git.dhl.com
+❌ Not authenticated with your-github-enterprise.example.com
 Please run:
-  gh auth login --hostname git.dhl.com
+  gh auth login --hostname your-github-enterprise.example.com
 ```
 
 **Merge Conflict:**

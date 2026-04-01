@@ -73,7 +73,7 @@ Automatisch oder manuell? Was moechtest du?
 4. Token kopieren + im Terminal einfuegen
 
 ### Troubleshooting
-- **"Connection failed"** → VPN verbunden? `ping dhl.atlassian.net`
+- **"Connection failed"** → VPN verbunden? `ping your-org.atlassian.net`
 - **"Permission denied"** → Atlassian-Zugriff pruefen, IT kontaktieren
 - **"Token expired"** → Neuen Token erstellen (gleicher Weg)
 

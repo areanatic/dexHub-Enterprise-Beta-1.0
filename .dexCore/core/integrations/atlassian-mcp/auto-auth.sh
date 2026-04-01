@@ -37,12 +37,12 @@ echo ""
 # Step 0: Instance Selection
 echo -e "${BLUE}🏢 Welche Atlassian-Instanz?${NC}"
 echo ""
-echo "  Gib die URL deiner Instanz ein (z.B. dhl.atlassian.net,"
-echo "  confluence1.lcm.deutschepost.de, jira.dhl.com, etc.)"
+echo "  Gib die URL deiner Instanz ein (z.B. your-org.atlassian.net,"
+echo "  confluence1.lcm.your-company.example.com, jira.yourcompany.com, etc.)"
 echo ""
 echo "  Anhand der Domain erkennen wir automatisch:"
 echo "    - Cloud (*.atlassian.net) → API Token via Browser"
-echo "    - Server (*.deutschepost.de, *.dhl.com) → PAT aus Profil"
+echo "    - Server (*.your-company.example.com, *.yourcompany.com) → PAT aus Profil"
 echo ""
 read -p "Instanz-URL: " ATLASSIAN_INSTANCE
 
@@ -179,7 +179,7 @@ fi
 cat > "$MCP_CONFIG" << EOF
 {
   "mcpServers": {
-    "atlassian-dhl": {
+    "atlassian-enterprise": {
       "command": "npx",
       "args": ["-y", "@anthropic/mcp-remote@latest", "https://mcp.atlassian.com/v1/sse"],
       "env": {

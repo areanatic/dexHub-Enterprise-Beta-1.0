@@ -475,7 +475,7 @@ If no: Return to menu
 
 ### Example 1: Quick Java Framework
 
-**User:** "I want to test https://www.dhl.com in Java"
+**User:** "I want to test https://www.example.com in Java"
 
 **Agent:**
 ```

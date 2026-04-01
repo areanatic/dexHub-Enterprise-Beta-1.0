@@ -1,7 +1,7 @@
 #!/bin/bash
 # Atlassian MCP Setup for DexHub (DHL)
 # Version: 1.0
-# Auto-configures MCP for dhl.atlassian.net
+# Auto-configures MCP for your-org.atlassian.net
 
 set -e
 
@@ -11,10 +11,10 @@ echo ""
 
 # Step 1: VPN Check
 echo "📡 Checking VPN connection..."
-if ping -c 1 -W 2 dhl.atlassian.net &> /dev/null; then
-    echo "✅ VPN connected - dhl.atlassian.net reachable"
+if ping -c 1 -W 2 your-org.atlassian.net &> /dev/null; then
+    echo "✅ VPN connected - your-org.atlassian.net reachable"
 else
-    echo "❌ VPN not connected or dhl.atlassian.net unreachable"
+    echo "❌ VPN not connected or your-org.atlassian.net unreachable"
     echo ""
     echo "Please:"
     echo "  1. Connect to DHL VPN"
@@ -81,7 +81,7 @@ mcp_integrations:
   atlassian:
     enabled: true
     auto_configured: true
-    instance: "dhl.atlassian.net"
+    instance: "your-org.atlassian.net"
 EOF
     echo "✅ DexHub config updated"
 else
@@ -96,7 +96,7 @@ echo ""
 echo "Next Steps:"
 echo "  1. Restart VS Code (to load MCP config)"
 echo "  2. Browser will open for OAuth login"
-echo "  3. Select instance: dhl.atlassian.net"
+echo "  3. Select instance: your-org.atlassian.net"
 echo "  4. Approve permissions"
 echo "  5. Test: 'Get Jira ticket PS-12345' in Copilot Chat"
 echo ""

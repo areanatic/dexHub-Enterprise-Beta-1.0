@@ -41,7 +41,7 @@ BrandHub assets (if imported):
 myDex/projects/dhl-ui-library-kb/.dex/inputs/brandhub/
 ```
 
-If the KB project does not exist, rely on the `dhl-*` skills and https://docs.uilibrary.dhl/
+If the KB project does not exist, rely on the `dhl-*` skills and https://docs.your-design-system.example.com/
 
 ## Skills (Lazy-Loaded Knowledge)
 

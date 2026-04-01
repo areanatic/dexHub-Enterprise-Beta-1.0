@@ -26,7 +26,7 @@ bash .dexCore/core/integrations/atlassian-mcp/install.sh
 
 1. **`~/.vscode/mcp-servers.json`**
    - VS Code MCP configuration
-   - Pre-configured for `dhl.atlassian.net`
+   - Pre-configured for `your-org.atlassian.net`
 
 2. **`.dexCore/_cfg/config.yaml`**
    - DexHub tracking flag
@@ -61,7 +61,7 @@ See: `tools.yaml` (27 tools documented)
 ### "Connection failed"
 
 **Check:**
-1. VPN connected? `ping dhl.atlassian.net`
+1. VPN connected? `ping your-org.atlassian.net`
 2. VS Code restarted after setup?
 3. OAuth completed in browser?
 
@@ -97,7 +97,7 @@ See: `tools.yaml` (27 tools documented)
 
 2. Restart VS Code
 
-3. OAuth prompt appears → Select `dhl.atlassian.net`
+3. OAuth prompt appears → Select `your-org.atlassian.net`
 
 4. Done!
 

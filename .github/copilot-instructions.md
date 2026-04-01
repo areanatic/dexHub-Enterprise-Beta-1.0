@@ -379,14 +379,14 @@ personalization:
 # From config.yaml (priority 2)
 user_name: "User's Name"
 communication_language: "en" or "de"
-output_folder: "./outputs/"
+draft_folder: "./myDex/drafts/"
 project_name: "Project Name"
 ```
 
 Use these variables in all outputs:
 - `{communication_language}` - Language for communication (from hierarchy above)
 - `{user_name}` - User's preferred name
-- `{output_folder}` - Where to save files
+- `{draft_folder}` - Where to save files
 - `{project-root}` - Root directory of the project
 
 **Critical:** The language hierarchy must be followed to ensure consistent behavior.
@@ -419,7 +419,7 @@ Key tags: `<step>`, `<action>`, `<ask>`, `<check>`, `<template-output>`, `<invok
 
 1. **Use professional language** - +2 standard deviations from communication style
 2. **Communicate in configured language** - Respect `{communication_language}`
-3. **Save to configured folder** - Use `{output_folder}` variable
+3. **Save to configured folder** - Use `{draft_folder}` variable
 4. **Include metadata** - Date, user, agent, workflow
 
 ## Special Modes
