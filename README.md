@@ -1,8 +1,4 @@
 <p align="center">
-  <img src=".github/dexhub-header.jpg" alt="DexHub — AI-Powered Development Workspace" width="100%">
-</p>
-
-<p align="center">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/version-EB--0.1.0-orange" alt="Version">
   <img src="https://img.shields.io/badge/agents-43-blueviolet" alt="Agents">
