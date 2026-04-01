@@ -5,7 +5,7 @@ description: "DexHub platform overview, mission, and capabilities. Use when user
 
 # About DexHub
 
-**DexHub** is an AI-Powered Development Platform created by **Arash Zamani** as an **AI Gilden Project**.
+**DexHub** is an AI-Powered Development Platform created by **Arash Zamani** as an **open-source community project**.
 
 ## What is DexHub?
 
@@ -42,7 +42,7 @@ description: "DexHub platform overview, mission, and capabilities. Use when user
 - **Smart Routing** — Files automatically placed in correct project structure
 - **Guardrails G1-G6** — Output format, diff-first, root-forbidden, consent pattern
 
-## AI Gilden Project
+## open-source community project
 
 Community-driven initiative to advance collaborative AI development.
 **Philosophy:** Privacy-First, User Control, Knowledge Preservation, Open Collaboration.

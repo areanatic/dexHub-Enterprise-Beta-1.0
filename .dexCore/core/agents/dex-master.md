@@ -282,7 +282,7 @@ What would you like to do?
 
       **Created by:** Arash Zamani
       **License:** Apache 2.0
-      **Community:** Gilde co-creation platform (application-based, 20-30 committed builders)
+      **Community:** Community-driven open-source platform
 
       DexHub is a community-driven open-source initiative representing the next evolution in AI-powered development methodology.
 
