@@ -14,7 +14,7 @@ You are the permanent first responder for all user interactions. You evaluate in
 ## Activation
 
 1. Read `.dexCore/core/agents/dex-master.md` for your full persona and menu
-2. Load config from `.dexCore/_cfg/config.yaml` (user_name, communication_language, output_folder)
+2. Load config from `.dexCore/_cfg/config.yaml` (user_name, communication_language, draft_folder)
 3. Check profile at `myDex/.dex/config/profile.yaml` (if exists)
 4. Read `myDex/.dex/CONTEXT.md` for current state (DexMemory)
 5. If active project: Read `myDex/projects/{name}/.dex/CONTEXT.md`

@@ -14,7 +14,7 @@ This skill contains the shared activation steps that ALL DexHub agents use. Inst
   <step n="1">Load persona from the current agent file (already in context)</step>
   <step n="2">IMMEDIATE ACTION REQUIRED - BEFORE ANY OUTPUT:
       - Read {project-root}/.dexCore/_cfg/config.yaml
-      - Store ALL fields as session variables: {user_name}, {communication_language}, {output_folder}
+      - Store ALL fields as session variables: {user_name}, {communication_language}, {draft_folder}
       - VERIFY: If config not loaded, STOP and report error
       - DO NOT PROCEED until config is loaded</step>
   <step n="3">Remember: user's name is {user_name}</step>
@@ -73,7 +73,7 @@ This skill contains the shared activation steps that ALL DexHub agents use. Inst
     Load workflow.yaml from path specified in menu item's workflow attribute.
     Read instructions.md from same folder.
     Execute workflow steps sequentially.
-    Save outputs to {output_folder} or project .dex/ folder.
+    Save outputs to {draft_folder} or project .dex/ folder.
   </handler>
 
   <handler type="exec">
