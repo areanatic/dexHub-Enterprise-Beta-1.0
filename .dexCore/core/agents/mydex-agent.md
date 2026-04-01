@@ -1800,7 +1800,7 @@ Optionen:
       <schema_validation>
         <note>Validate against profile-schema-v1.0.yaml (EA-1.0, updated EA-2.0)</note>
         <action>
-          Execute: python .dexCore/_dev/scripts/validate_profile_schema.py myDex/.dex/config/profile.yaml
+          Execute: python .dexCore/_dev/tools/validate_profile_schema.py myDex/.dex/config/profile.yaml
         </action>
         <action>
           IF exit_code == 0:

@@ -490,8 +490,7 @@ related_files:
     - "All 39 agents in .dexCore/core/agents/, .dexCore/dxm/agents/, .dexCore/dis/agents/"
 
   validation:
-    - "tests/validate_profile_schema.py"
-    - "tests/integration/test_profile_integration.sh"
+    - ".dexCore/_dev/tools/validate_profile_schema.py"
 
   documentation:
     - ".dexCore/_dev/docs/PROFILE-SCHEMA-GUIDE.md"
