@@ -174,15 +174,105 @@ myDex/                       Your workspace (local, gitignored)
 
 ## Use Cases
 
-**Brownfield Analysis** — Point DexHub at an existing codebase. The 18 meta-agents analyze architecture, patterns, tech debt, APIs, dependencies, and test coverage. Get structured reports instead of ad-hoc AI guesses.
+### Brownfield Analysis
 
-**Structured Product Development** — Start with Jana (Analyst) for a product brief, hand off to Alex (Architect) for system design, then Steffi (Developer) implements story by story with Murat (Test Architect) validating quality gates. Each step produces templated, traceable artifacts.
+Point DexHub at an existing codebase. The meta-agents analyze architecture, patterns, tech debt, and dependencies.
 
-**Knowledge Preservation** — DexHub's chronicle system captures decisions, session logs, and project context. When someone new joins, the institutional knowledge is already structured in the repository — not lost in chat history.
+```
+You:        "Analyze this codebase — architecture, tech debt, test coverage"
+DexMaster:  Delegates to Codebase Analyzer, Pattern Detector, Tech Debt Auditor
+Agents:     Read your repo, produce structured reports in myDex/drafts/
+Result:     3 markdown reports with findings, scores, and recommendations
+```
 
-**Enterprise Tool Integration** — Connect Jira, Confluence, GitHub Enterprise, and Figma through guided setup wizards. Agents can search issues, read design files, and create documentation without leaving your IDE.
+### Structured Product Development
 
-**Custom Agent Development** — Use `@dex-builder` to create agents for your domain. Define a persona, connect workflows, add knowledge packs. Your custom agents follow the same guardrails and quality standards as built-in ones.
+Full development lifecycle — from idea to implementation, each agent hands off to the next.
+
+```
+You:        "@analyst Create a product brief for a task management app"
+Jana:       Asks clarifying questions, runs brainstorming workflow
+            → Saves product-brief.md to myDex/drafts/
+
+You:        "@architect Design the system based on the product brief"
+Alex:       Reads the brief, proposes architecture, creates tech spec
+            → Saves architecture.md + tech-spec.md
+
+You:        "@sm Create user stories from the tech spec"
+Arjun:      Breaks epics into stories with acceptance criteria
+            → Saves stories to your project folder
+
+You:        "@dev Implement story #1"
+Steffi:     Reads the story, implements against acceptance criteria
+            → Writes code, runs tests
+
+You:        "@tea Review the quality gates"
+Murat:      Validates test coverage, checks NFRs, writes gate decision
+            → Saves quality-gate-report.md
+```
+
+### Knowledge Preservation
+
+Capture decisions and context so nothing is lost between sessions or team members.
+
+```
+You:        "We decided to use PostgreSQL instead of MongoDB"
+DexMaster:  Auto-captures to myDex/.dex/decisions/001-database-choice.md
+
+You:        "*save"
+DexMaster:  Writes session chronicle to myDex/.dex/chronicle/2026-04-01.md
+
+New colleague joins, opens the project:
+Agent:      Reads CONTEXT.md + decisions/ + chronicle/
+            → Has full context of what was built and why
+```
+
+### Enterprise Tool Integration
+
+Connect your existing tools through guided setup — no config file editing.
+
+```
+You:        "@atlassian-onboarding"
+Agent:      "What is your Atlassian instance URL?"
+You:        "mycompany.atlassian.net"
+Agent:      Runs install.sh, configures MCP, tests connection
+            → "Connected. Try: Search for recent Jira issues"
+
+You:        "@figma-onboarding"
+Agent:      "Do you have a Figma Personal Access Token?"
+            Guides through token creation, installs MCP
+            → "Connected. Try: @figma-analyst analyze my design file"
+```
+
+### Custom Agent & Workflow Development
+
+Build your own agents, workflows, and skills — guided by the Dex Builder.
+
+```
+You:        "@dex-builder Create a new agent for security reviews"
+Builder:    "What should this agent be called?"
+You:        "SecGuard"
+Builder:    "What's SecGuard's expertise?"
+You:        "OWASP Top 10, dependency scanning, code security patterns"
+Builder:    Creates agent definition, registers in manifest,
+            generates .agent.md for Copilot integration
+            → New agent ready: "@secguard Review this PR for vulnerabilities"
+
+You:        "@dex-builder Create a workflow for incident response"
+Builder:    Guides through step definition, templates, checklists
+            → New workflow registered and ready to use
+
+You:        "@dex-builder Create a skill for our internal API docs"
+Builder:    "Paste your API documentation or point me to the file"
+            Creates SKILL.md with lazy-loaded knowledge
+            → Agents can now reference your API docs on demand
+```
+
+You can also **modify existing agents** — every agent is a markdown file:
+- Change a persona's communication style
+- Add domain-specific knowledge to an agent's activation steps
+- Create a team-specific workflow variant (fork a workflow, adjust the template)
+- Add your company's coding standards as a skill
 
 ---
 
@@ -197,6 +287,16 @@ DexHub is designed for contribution and exchange:
 - **Dev-Mode** — type `Start Dev-Mode` to access the development meta-layer
 
 The framework follows a distributed model: teams build their own agents and workflows, share them through branches and PRs, and compose them into their own DexHub instance. Development knowledge flows between organizations through standard Git mechanics.
+
+**Customize anything:**
+
+| What | How | Where |
+|------|-----|-------|
+| Add an agent | `@dex-builder` or create `.dexCore/dxm/agents/your-agent.md` | + `.github/agents/your-agent.agent.md` |
+| Add a workflow | `@dex-builder` or create folder in `.dexCore/dxm/workflows/` | workflow.yaml + instructions.md + template.md |
+| Add a skill | Create `.github/skills/your-skill/SKILL.md` | Agents load it on demand |
+| Modify an agent | Edit the markdown file, change persona/style/knowledge | Changes take effect immediately |
+| Add integrations | Create folder in `.dexCore/core/integrations/` | install.sh + tools.yaml + README |
 
 ---
 
