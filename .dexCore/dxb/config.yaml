@@ -1,0 +1,11 @@
+# DXB Module Configuration
+# DexHub Builder Module
+
+custom_agent_location: '{project-root}/.dexCore/agents'
+custom_workflow_location: '{project-root}/.dexCore/workflows'
+custom_module_location: '{project-root}/.dexCore'
+
+# Core Configuration Values
+user_name: Developer
+communication_language: en
+draft_folder: '{project-root}/docs'

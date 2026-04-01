@@ -1,0 +1,20 @@
+# DXM Module Configuration
+# DexHub Methodology Module
+
+project_name: My DexHub Project
+tech_docs: '{project-root}/docs'
+dev_story_location: '{project-root}/docs/stories'
+kb_location: '{project-root}/.dexCore/dxm/kb.md'
+desired_mcp_tools:
+  - Chrome Official MCP
+  - Playwright
+  - Context 7
+  - Tavily
+  - Perplexity
+  - Jira
+  - Trello
+
+# Core Configuration Values
+user_name: Developer
+communication_language: en
+draft_folder: '{project-root}/docs'

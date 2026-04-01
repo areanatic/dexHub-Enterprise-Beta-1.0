@@ -1,0 +1,114 @@
+# TestArchitect Pro - Website Analysis Workflow
+
+name: "analyze-website"
+version: "1.0.0"
+agent: "testarch-pro"
+category: "analysis"
+description: "Analyze website structure and generate test recommendations"
+
+# Configuration
+config:
+  output_file: "{draft_folder}/website-analysis-{timestamp}.md"
+  browser: "chrome"
+  headless: true
+  timeout: 30
+
+# Workflow Variables
+variables:
+  website_url: ""
+  auth_required: false
+  username: ""
+  password: ""
+  analysis_depth: "standard" # standard, deep, quick
+
+# Instructions
+instructions_file: "./instructions.md"
+
+# Template for output
+template: |
+  # Website Analysis Report
+  
+  **Generated:** {timestamp}
+  **Agent:** TestArchitect Pro
+  **Website:** {website_url}
+  **Analysis Date:** {date}
+  
+  ---
+  
+  ## Executive Summary
+  
+  {executive_summary}
+  
+  ---
+  
+  ## Page Structure Analysis
+  
+  ### Identified Pages
+  {identified_pages}
+  
+  ### Navigation Structure
+  {navigation_structure}
+  
+  ---
+  
+  ## Test Scenarios Recommendations
+  
+  {test_scenarios}
+  
+  ---
+  
+  ## Framework Recommendations
+  
+  ### Suggested Architecture
+  {architecture_recommendation}
+  
+  ### Recommended Page Objects
+  {page_objects_list}
+  
+  ### Locator Strategy
+  {locator_strategy}
+  
+  ---
+  
+  ## Next Steps
+  
+  {next_steps}
+
+# Execution Steps
+steps:
+  - id: 1
+    name: "Get Website URL"
+    type: "input"
+    prompt: "Enter the website URL to analyze:"
+    required: true
+    
+  - id: 2
+    name: "Check Authentication"
+    type: "confirm"
+    prompt: "Does this website require authentication?"
+    
+  - id: 3
+    name: "Load Website"
+    type: "action"
+    description: "Open website in headless browser"
+    
+  - id: 4
+    name: "Analyze Structure"
+    type: "action"
+    description: "Scan page elements and structure"
+    
+  - id: 5
+    name: "Generate Report"
+    type: "action"
+    description: "Create analysis report"
+    
+  - id: 6
+    name: "Save Report"
+    type: "output"
+    description: "Save to output folder"
+
+# Validation
+validation:
+  - url_accessible: "Website must be reachable"
+  - page_loaded: "Page must load within timeout"
+  - elements_found: "At least one interactive element detected"

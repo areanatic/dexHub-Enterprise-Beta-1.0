@@ -1,0 +1,29 @@
+# ReDoc - Reverse-Tree Documentation Engine
+name: "redoc"
+description: "Autonomous documentation system that maintains module, workflow, and agent documentation using a reverse-tree approach (leaf folders first, then parents). Understands DEX conventions and produces technical writer quality output."
+
+# Critical variables
+config_source: "{project-root}/.dexCore/dxb/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+# Required knowledge base - DEX conventions and patterns
+dex_conventions:
+  agent_architecture: "{project-root}/.dexCore/dxb/workflows/create-agent/agent-architecture.md"
+  agent_command_patterns: "{project-root}/.dexCore/dxb/workflows/create-agent/agent-command-patterns.md"
+  agent_types: "{project-root}/.dexCore/dxb/workflows/create-agent/agent-types.md"
+  module_structure: "{project-root}/.dexCore/dxb/workflows/create-module/module-structure.md"
+  workflow_guide: "{project-root}/.dexCore/dxb/workflows/create-workflow/workflow-creation-guide.md"
+
+# Runtime inputs
+target_path: "" # User specifies: module path, workflow path, agent path, or folder path
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/dxb/workflows/redoc"
+template: false # Action workflow - updates files in place
+instructions: "{installed_path}/instructions.md"
+validation: "{installed_path}/checklist.md"
+
+# Configuration
+autonomous: true # Runs without user checkpoints unless clarification needed

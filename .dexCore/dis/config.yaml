@@ -1,0 +1,7 @@
+# DIS Module Configuration
+# DexHub Discovery & Intelligence Module
+
+# Core Configuration Values
+user_name: Developer
+communication_language: en
+draft_folder: '{project-root}/docs'

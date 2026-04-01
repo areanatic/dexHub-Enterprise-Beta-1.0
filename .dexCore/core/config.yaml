@@ -1,0 +1,6 @@
+# CORE Module Configuration
+# DexHub Core Module
+
+user_name: Developer
+communication_language: en
+draft_folder: '{project-root}/docs'

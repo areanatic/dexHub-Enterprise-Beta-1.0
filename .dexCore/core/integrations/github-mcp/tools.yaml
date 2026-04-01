@@ -1,0 +1,481 @@
+# GitHub MCP Tools Documentation
+# DexHub Enterprise - your-github-enterprise.example.com Integration
+# Version: 1.0 (based on github-mcp-server v0.23.0)
+
+mcp_tools:
+  repos:
+    - id: get_file_contents
+      description: "Dateiinhalt aus Repository abrufen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: path
+          type: string
+          required: true
+        - name: branch
+          type: string
+          required: false
+      example_prompts:
+        - "Show me the README.md from my-repo"
+        - "Get the content of src/index.ts"
+      response_format: json
+
+    - id: create_or_update_file
+      description: "Datei erstellen oder aktualisieren"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: path
+          type: string
+          required: true
+        - name: content
+          type: string
+          required: true
+        - name: message
+          type: string
+          required: true
+        - name: branch
+          type: string
+          required: false
+        - name: sha
+          type: string
+          required: false
+          description: "Required for updates"
+      example_prompts:
+        - "Create a new file called config.json"
+        - "Update the README with new content"
+      response_format: json
+      permissions: write
+
+    - id: push_files
+      description: "Mehrere Dateien in einem Commit pushen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: branch
+          type: string
+          required: true
+        - name: files
+          type: array
+          required: true
+          description: "Array of {path, content}"
+        - name: message
+          type: string
+          required: true
+      example_prompts:
+        - "Push all my changes to feature/xyz"
+        - "Commit these files with message 'feat: add new feature'"
+      response_format: json
+      permissions: write
+
+    - id: search_repositories
+      description: "Repositories suchen"
+      parameters:
+        - name: query
+          type: string
+          required: true
+      example_prompts:
+        - "Search for repositories with 'dexhub'"
+        - "Find repos in org dhl-it"
+      response_format: json_array
+
+    - id: list_commits
+      description: "Commits eines Branches auflisten"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: branch
+          type: string
+          required: false
+      example_prompts:
+        - "Show recent commits"
+        - "List commits on main branch"
+      response_format: json_array
+
+    - id: get_commit
+      description: "Details eines Commits abrufen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: ref
+          type: string
+          required: true
+      example_prompts:
+        - "Show commit abc123"
+        - "Get details of last commit"
+      response_format: json
+
+    - id: create_branch
+      description: "Neuen Branch erstellen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: branch
+          type: string
+          required: true
+        - name: from_branch
+          type: string
+          required: false
+      example_prompts:
+        - "Create branch feature/new-feature"
+        - "Create a branch from main called hotfix/bug-123"
+      response_format: json
+      permissions: write
+
+    - id: list_branches
+      description: "Branches auflisten"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+      example_prompts:
+        - "List all branches"
+        - "Show me the branches in this repo"
+      response_format: json_array
+
+  pull_requests:
+    - id: create_pull_request
+      description: "Pull Request erstellen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: title
+          type: string
+          required: true
+        - name: body
+          type: string
+          required: false
+        - name: head
+          type: string
+          required: true
+        - name: base
+          type: string
+          required: true
+        - name: draft
+          type: boolean
+          required: false
+      example_prompts:
+        - "Create a PR for feature/xyz"
+        - "Open pull request from my branch to main"
+      response_format: json
+      permissions: write
+
+    - id: list_pull_requests
+      description: "Pull Requests auflisten"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: state
+          type: string
+          required: false
+          description: "open, closed, all"
+      example_prompts:
+        - "Show open PRs"
+        - "List all pull requests"
+      response_format: json_array
+
+    - id: get_pull_request
+      description: "PR-Details abrufen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: pull_number
+          type: number
+          required: true
+      example_prompts:
+        - "Show PR #42"
+        - "Get details of pull request 123"
+      response_format: json
+
+    - id: get_pull_request_diff
+      description: "PR-Diff abrufen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: pull_number
+          type: number
+          required: true
+      example_prompts:
+        - "Show the diff for PR #42"
+        - "What changed in this PR?"
+      response_format: text
+
+    - id: merge_pull_request
+      description: "Pull Request mergen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: pull_number
+          type: number
+          required: true
+        - name: merge_method
+          type: string
+          required: false
+          description: "merge, squash, rebase"
+      example_prompts:
+        - "Merge PR #42"
+        - "Squash merge this pull request"
+      response_format: json
+      permissions: write
+
+    - id: update_pull_request
+      description: "PR aktualisieren"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: pull_number
+          type: number
+          required: true
+        - name: title
+          type: string
+          required: false
+        - name: body
+          type: string
+          required: false
+        - name: state
+          type: string
+          required: false
+      example_prompts:
+        - "Update PR title"
+        - "Close this PR"
+      response_format: json
+      permissions: write
+
+    - id: add_pull_request_comment
+      description: "Kommentar zu PR hinzufügen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: pull_number
+          type: number
+          required: true
+        - name: body
+          type: string
+          required: true
+      example_prompts:
+        - "Add comment 'LGTM' to PR #42"
+        - "Comment on this pull request"
+      response_format: json
+      permissions: write
+
+  issues:
+    - id: create_issue
+      description: "Issue erstellen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: title
+          type: string
+          required: true
+        - name: body
+          type: string
+          required: false
+        - name: labels
+          type: array
+          required: false
+      example_prompts:
+        - "Create issue: Bug in login"
+        - "Open a new issue for this bug"
+      response_format: json
+      permissions: write
+
+    - id: search_issues
+      description: "Issues suchen"
+      parameters:
+        - name: query
+          type: string
+          required: true
+      example_prompts:
+        - "Search for open bugs"
+        - "Find issues assigned to me"
+      response_format: json_array
+
+    - id: list_issues
+      description: "Issues auflisten"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: state
+          type: string
+          required: false
+      example_prompts:
+        - "List open issues"
+        - "Show all issues in this repo"
+      response_format: json_array
+
+    - id: get_issue
+      description: "Issue-Details abrufen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: issue_number
+          type: number
+          required: true
+      example_prompts:
+        - "Show issue #123"
+        - "Get details of this issue"
+      response_format: json
+
+    - id: update_issue
+      description: "Issue aktualisieren"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: issue_number
+          type: number
+          required: true
+        - name: title
+          type: string
+          required: false
+        - name: body
+          type: string
+          required: false
+        - name: state
+          type: string
+          required: false
+      example_prompts:
+        - "Close issue #123"
+        - "Update issue title"
+      response_format: json
+      permissions: write
+
+    - id: add_issue_comment
+      description: "Kommentar zu Issue hinzufügen"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: issue_number
+          type: number
+          required: true
+        - name: body
+          type: string
+          required: true
+      example_prompts:
+        - "Comment on issue #123"
+        - "Add note to this issue"
+      response_format: json
+      permissions: write
+
+  users:
+    - id: get_me
+      description: "Aktuellen User abrufen"
+      parameters: []
+      example_prompts:
+        - "Who am I?"
+        - "Show my GitHub profile"
+      response_format: json
+
+  actions:
+    - id: list_workflow_runs
+      description: "Workflow-Runs auflisten"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+      example_prompts:
+        - "Show recent workflow runs"
+        - "List CI/CD pipelines"
+      response_format: json_array
+
+    - id: get_workflow_run
+      description: "Workflow-Run Details"
+      parameters:
+        - name: owner
+          type: string
+          required: true
+        - name: repo
+          type: string
+          required: true
+        - name: run_id
+          type: number
+          required: true
+      example_prompts:
+        - "Show workflow run #456"
+        - "Get details of last build"
+      response_format: json
+
+# Metadata
+metadata:
+  total_tools: 25
+  version: "1.0"
+  source: "github-mcp-server v0.23.0"
+  last_updated: "2025-12-01"
+  enterprise_host: "your-github-enterprise.example.com"

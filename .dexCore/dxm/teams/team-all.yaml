@@ -1,0 +1,7 @@
+# <!-- Powered by DEX-CORE™ -->
+bundle:
+  name: Team All
+  icon: 👥
+  description: Includes every dxm system agent.
+agents:
+  - "*"

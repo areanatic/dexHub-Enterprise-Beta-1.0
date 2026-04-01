@@ -1,0 +1,196 @@
+mcp_tools:
+  jira:
+    - id: jira_get_issue
+      description: "Abrufen vollständiger Ticket-Details"
+      parameters:
+        - name: issue_id
+          type: string
+          required: true
+          example: "PS-12345"
+      example_prompts:
+        - "Get Jira ticket PS-12345"
+        - "Show me details for ticket PROJ-999"
+        - "What's in PS-12345?"
+      response_format: json
+      
+    - id: jira_search_issues
+      description: "JQL-basierte Ticket-Suche"
+      parameters:
+        - name: jql
+          type: string
+          required: true
+          example: "assignee = currentUser() AND status = 'In Progress'"
+      example_prompts:
+        - "Find all my open tickets"
+        - "Search tickets created this week"
+        - "JQL: project = PS AND sprint = 42"
+      response_format: json_array
+      
+    - id: jira_list_projects
+      description: "Liste aller Jira-Projekte"
+      parameters: []
+      example_prompts:
+        - "List all Jira projects"
+        - "Show me available projects"
+      response_format: json_array
+      
+    - id: jira_get_comments
+      description: "Kommentare eines Tickets abrufen"
+      parameters:
+        - name: issue_id
+          type: string
+          required: true
+      example_prompts:
+        - "Show comments for PS-12345"
+        - "What are people saying about PROJ-999?"
+      response_format: json_array
+      
+    - id: jira_add_comment
+      description: "Kommentar zu Ticket hinzufügen"
+      parameters:
+        - name: issue_id
+          type: string
+          required: true
+        - name: comment
+          type: string
+          required: true
+      example_prompts:
+        - "Add comment to PS-12345: 'Implemented feature X'"
+        - "Comment on PROJ-999: 'Ready for review'"
+      response_format: json
+      permissions: write
+      
+    - id: jira_get_transitions
+      description: "Verfügbare Status-Übergänge für Ticket"
+      parameters:
+        - name: issue_id
+          type: string
+          required: true
+      example_prompts:
+        - "What transitions are available for PS-12345?"
+        - "Can I move PROJ-999 to Done?"
+      response_format: json_array
+      
+    - id: jira_transition_issue
+      description: "Ticket-Status ändern"
+      parameters:
+        - name: issue_id
+          type: string
+          required: true
+        - name: transition_id
+          type: string
+          required: true
+      example_prompts:
+        - "Move PS-12345 to In Progress"
+        - "Transition ticket to Done"
+      response_format: json
+      permissions: write
+      
+    - id: jira_get_issue_types
+      description: "Verfügbare Issue-Typen"
+      parameters: []
+      example_prompts:
+        - "What issue types are available?"
+        - "List all Jira issue types"
+      response_format: json_array
+      
+    - id: jira_get_priorities
+      description: "Verfügbare Prioritäten"
+      parameters: []
+      example_prompts:
+        - "What priorities can I use?"
+        - "List Jira priorities"
+      response_format: json_array
+      
+    - id: jira_get_statuses
+      description: "Verfügbare Stati"
+      parameters: []
+      example_prompts:
+        - "What statuses exist in Jira?"
+        - "List all possible ticket states"
+      response_format: json_array
+
+  confluence:
+    - id: confluence_get_page
+      description: "Confluence-Page-Inhalt abrufen"
+      parameters:
+        - name: page_id
+          type: string
+          required: true
+      example_prompts:
+        - "Get Confluence page 123456789"
+        - "Show me page content for 999888"
+      response_format: json
+      
+    - id: confluence_search
+      description: "Confluence durchsuchen"
+      parameters:
+        - name: query
+          type: string
+          required: true
+        - name: space
+          type: string
+          required: false
+      example_prompts:
+        - "Search Confluence for 'API documentation'"
+        - "Find pages about 'User Export' in space DEV"
+      response_format: json_array
+      
+    - id: confluence_get_space
+      description: "Space-Details abrufen"
+      parameters:
+        - name: space_key
+          type: string
+          required: true
+      example_prompts:
+        - "Show me space DEV"
+        - "Get info about space DOCS"
+      response_format: json
+      
+    - id: confluence_list_pages
+      description: "Alle Pages in einem Space"
+      parameters:
+        - name: space_key
+          type: string
+          required: true
+        - name: limit
+          type: number
+          required: false
+      example_prompts:
+        - "List all pages in space DEV"
+        - "Show me pages in DOCS space"
+      response_format: json_array
+      
+    - id: confluence_get_page_children
+      description: "Child-Pages einer Page"
+      parameters:
+        - name: page_id
+          type: string
+          required: true
+      example_prompts:
+        - "What pages are under page 12345?"
+        - "Show child pages"
+      response_format: json_array
+      
+    - id: confluence_get_attachments
+      description: "Attachments einer Page"
+      parameters:
+        - name: page_id
+          type: string
+          required: true
+      example_prompts:
+        - "Show attachments for page 12345"
+        - "What files are attached?"
+      response_format: json_array
+      
+    - id: confluence_get_labels
+      description: "Labels einer Page"
+      parameters:
+        - name: page_id
+          type: string
+          required: true
+      example_prompts:
+        - "What labels does page 12345 have?"
+        - "Show me page tags"
+      response_format: json_array
+

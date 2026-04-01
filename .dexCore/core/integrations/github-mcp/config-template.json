@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "github-dhl": {
+      "command": "~/.dexhub/bin/github-mcp-server",
+      "args": ["stdio", "--gh-host", "https://your-github-enterprise.example.com", "--toolsets", "default,pull_requests,actions"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GH_DHL_TOKEN}"
+      },
+      "name": "GitHub (DHL Enterprise)",
+      "description": "Git operations for your-github-enterprise.example.com - Push, Commit, PRs via MCP"
+    }
+  }
+}

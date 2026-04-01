@@ -1,0 +1,6 @@
+# <!-- Powered by DEX-CORE™ -->
+bundle:
+  name: Creative Squad
+  icon: 🎨
+  description: Innovation and Creative Excellence Team - Comprehensive creative development from ideation through narrative execution
+agents: "*"

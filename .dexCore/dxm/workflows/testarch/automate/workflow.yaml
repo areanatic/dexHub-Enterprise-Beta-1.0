@@ -1,0 +1,24 @@
+# Test Architect workflow: automate
+name: testarch-automate
+description: "Expand automation coverage after implementation."
+
+config_source: "{project-root}/.dexCore/dxm/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+date: system-generated
+
+installed_path: "{project-root}/.dexCore/dxm/workflows/testarch/automate"
+instructions: "{installed_path}/instructions.md"
+
+template: false
+
+tags:
+  - qa
+  - automation
+  - test-architect
+
+execution_hints:
+  interactive: false
+  autonomous: true
+  iterative: true

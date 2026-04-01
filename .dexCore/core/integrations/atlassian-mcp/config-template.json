@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "atlassian-mcp-dhl": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com",
+      "name": "Atlassian (DHL)",
+      "description": "Jira & Confluence via Rovo MCP - Pre-configured for DHL",
+      "enabled": true,
+      "scope": "global"
+    }
+  }
+}

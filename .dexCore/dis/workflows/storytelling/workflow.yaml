@@ -1,0 +1,28 @@
+# Storytelling Workflow Configuration
+name: "storytelling"
+description: "Craft compelling narratives using proven story frameworks and techniques. This workflow guides users through structured narrative development, applying appropriate story frameworks to create emotionally resonant and engaging stories for any purpose."
+
+# Critical variables load from config_source
+config_source: "{project-root}/.dexCore/dis/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+# Optional inputs for context
+recommended_inputs:
+  - story_context: "Context document passed via data attribute"
+  - previous_stories: "{draft_folder}/story-*.md"
+
+# Context can be provided via data attribute when invoking
+# Example: data="{path}/brand-info.md" provides brand context
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/dis/workflows/storytelling"
+template: "{installed_path}/template.md"
+instructions: "{installed_path}/instructions.md"
+
+# Required Data Files
+story_frameworks: "{installed_path}/story-types.csv"
+
+# Output configuration
+default_output_file: "{draft_folder}/story-{{date}}.md"

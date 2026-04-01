@@ -1,0 +1,29 @@
+# Edit Workflow - Workflow Editor Configuration
+name: "edit-workflow"
+description: "Edit existing DEX workflows while following all best practices and conventions"
+
+# Critical variables load from config_source
+config_source: "{project-root}/.dexCore/dxb/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+communication_language: "{config_source}:communication_language"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+# Required Data Files - Critical for understanding workflow conventions
+workflow_creation_guide: "{project-root}/.dexCore/dxb/workflows/create-workflow/workflow-creation-guide.md"
+workflow_execution_engine: "{project-root}/.dexCore/core/tasks/workflow.xml"
+
+# Optional docs that can be used to understand the target workflow
+recommended_inputs:
+  - target_workflow: "Path to the workflow.yaml file to edit"
+  - workflow_examples: "{project-root}/.dexCore/dxm/workflows/"
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/dxb/workflows/edit-workflow"
+template: false # This is an action workflow - no template needed
+instructions: "{installed_path}/instructions.md"
+validation: "{installed_path}/checklist.md"
+
+# No output file for action workflows
+# But we may generate a change log
+change_log_output: "{draft_folder}/workflow-edit-log-{{date}}.md"

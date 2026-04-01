@@ -1,0 +1,13 @@
+# DEX Init - System Initialization Workflow
+name: "dex-init"
+description: "DEX system initialization and maintenance workflow for agent manifest generation and system configuration"
+
+# Critical variables
+config_source: "{project-root}/.dexCore/_cfg/manifest.yaml"
+date: system-generated
+
+# This is an action workflow - no template output
+template: false
+instructions: "{project-root}/.dexCore/core/workflows/dex-init/instructions.md"
+
+web_bundle: false

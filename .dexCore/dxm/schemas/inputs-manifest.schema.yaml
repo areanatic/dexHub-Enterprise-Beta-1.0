@@ -1,0 +1,284 @@
+# inputs-manifest.csv Schema v1.0
+# ================================
+# Schema für inputs-manifest.csv in DexHub Projekten
+
+version: "1.0"
+description: "Schema for inputs-manifest.csv tracking external files in DexHub projects"
+format: "CSV"
+delimiter: ","
+quoting: "double_quotes"  # Felder mit Kommas in Anführungszeichen
+
+# SPALTEN-DEFINITION
+# ==================
+
+columns:
+  # ═══════════════════════════════════════════════════════════════════
+  # PFLICHT-SPALTEN (müssen immer vorhanden sein)
+  # ═══════════════════════════════════════════════════════════════════
+
+  file:
+    required: true
+    type: string
+    description: "Dateiname (ohne Pfad, relative zum inputs/ Ordner)"
+    constraints:
+      - not_empty
+      - valid_filename
+      - no_path_separators
+    examples:
+      - "spec.pdf"
+      - "requirements/user-stories.md"
+      - "2026-02-21_architecture.png"
+
+  type:
+    required: true
+    type: enum
+    description: "Dateityp basierend auf Extension"
+    values:
+      # Dokumente
+      - pdf
+      - md
+      - txt
+      - docx
+      - doc
+      - odt
+      - rtf
+
+      # Tabellen
+      - csv
+      - xlsx
+      - xls
+      - ods
+
+      # Präsentationen
+      - pptx
+      - ppt
+      - odp
+
+      # Bilder
+      - png
+      - jpg
+      - jpeg
+      - gif
+      - svg
+      - webp
+      - bmp
+
+      # Code/Daten
+      - json
+      - yaml
+      - yml
+      - xml
+      - html
+
+      # Audio/Video
+      - mp3
+      - mp4
+      - wav
+      - mov
+      - avi
+
+      # Archive
+      - zip
+      - tar
+      - gz
+
+      # Sonstiges
+      - other
+
+  created:
+    required: true
+    type: date
+    format: "YYYY-MM-DD"
+    description: "Datum des Imports in das Projekt"
+    example: "2026-02-21"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # OPTIONALE SPALTEN (für erweiterte Funktionalität)
+  # ═══════════════════════════════════════════════════════════════════
+
+  size_kb:
+    required: false
+    type: integer
+    description: "Dateigröße in Kilobytes"
+    example: 2500
+    auto_populate: true  # Agent kann automatisch befüllen
+
+  category:
+    required: false
+    type: enum
+    description: "Inhaltliche Kategorie der Datei"
+    default: "other"
+    values:
+      - requirements    # Anforderungen, Specs, User Stories
+      - research        # Studien, Analysen, Recherche
+      - media           # Bilder, Videos, Audio für Content
+      - reference       # Standards, Guidelines, Templates
+      - notes           # Meeting-Notes, Protokolle
+      - external        # Confluence-Exports, Jira-Dumps etc.
+      - archive         # Alte Versionen, nicht mehr aktiv
+      - other           # Nicht kategorisiert
+
+  description:
+    required: false
+    type: string
+    max_length: 200
+    description: "Kurzbeschreibung des Inhalts"
+    examples:
+      - "Anforderungsdokument Q1 2026"
+      - "Kickoff Meeting Protokoll"
+      - "API Dokumentation v2.1"
+
+  source:
+    required: false
+    type: string
+    description: "Ursprungsquelle der Datei"
+    examples:
+      - "Confluence Export"
+      - "Jira Export"
+      - "Manual Upload"
+      - "Voice-to-Text"
+      - "Screenshot"
+      - "external"
+      - "generated"
+
+  hash:
+    required: false
+    type: string
+    format: "sha256:{64_hex_chars}"
+    description: "Content-Hash für Deduplizierung und Änderungserkennung"
+    example: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    auto_populate: true
+
+  location:
+    required: false
+    type: string
+    description: "Relativer Pfad zur Datei (für Brownfield/externe Referenzen)"
+    note: "Wenn leer/fehlend, ist Datei direkt in inputs/ Ordner"
+    examples:
+      - "../../../external-docs/spec.pdf"
+      - "../../docs/architecture.md"
+      - "/absolute/path/to/file.pdf"
+
+  archived:
+    required: false
+    type: boolean
+    default: false
+    description: "Ob Datei archiviert (inaktiv) ist"
+
+  extracted:
+    required: false
+    type: boolean
+    default: false
+    description: "Ob Text-Extraktion durchgeführt wurde (für PDFs)"
+    related_feature: "FEATURE-004"
+
+  indexed:
+    required: false
+    type: boolean
+    default: false
+    description: "Ob in Knowledge Base indexiert wurde"
+    related_feature: "FEATURE-007"
+
+  symlink:
+    required: false
+    type: boolean
+    default: false
+    description: "Ob Datei ein Symlink ist (für Brownfield-Projekte)"
+    note: "Wenn true, zeigt 'location' auf das Symlink-Ziel"
+
+  broken_link:
+    required: false
+    type: boolean
+    default: false
+    description: "Ob Symlink-Ziel nicht erreichbar ist"
+    note: "Agent setzt dies bei fehlenden Symlink-Zielen"
+
+  last_accessed:
+    required: false
+    type: date
+    format: "YYYY-MM-DD"
+    description: "Letztes Zugriffsdatum durch Agent"
+
+  tags:
+    required: false
+    type: string
+    description: "Komma-separierte Tags für Suche"
+    example: "api,authentication,oauth"
+
+# BEISPIEL CSV
+# ============
+
+example_csv: |
+  file,type,size_kb,category,description,source,created,hash,location,archived,extracted,indexed,symlink,broken_link
+  "spec.pdf","pdf",2500,"requirements","Anforderungsdokument Q1","Confluence","2026-02-21","sha256:abc123...","",false,false,false,false,false
+  "architecture.png","png",450,"reference","System-Übersicht","Manual Upload","2026-02-20","sha256:def456...","",false,false,false,false,false
+  "external-api.pdf","pdf",1200,"reference","API Dokumentation","external","2026-02-15","sha256:ghi789...","../../../docs/api.pdf",false,true,true,true,false
+  "notes/kickoff.md","md",12,"notes","Kickoff Meeting","Voice-to-Text","2026-02-01","sha256:jkl012...","",false,false,false,false,false
+
+# MINIMAL-BEISPIEL
+# ================
+
+minimal_example_csv: |
+  file,type,created
+  "spec.pdf","pdf","2026-02-21"
+  "notes.md","md","2026-02-20"
+
+# VALIDIERUNG
+# ===========
+
+validation:
+  # Pflicht-Spalten müssen existieren
+  required_columns:
+    - file
+    - type
+    - created
+
+  # Keine Duplikate
+  unique_constraints:
+    - file  # Jeder Dateiname nur einmal
+
+  # Referenz-Integrität
+  file_exists_check:
+    enabled: true
+    action: warn  # warn | error | skip
+    note: "Prüft ob Datei existiert (außer bei location-Referenzen)"
+
+  # Hash-Deduplizierung
+  hash_dedup:
+    enabled: true
+    action: warn  # warn | error | skip
+    note: "Warnt bei identischen Hashes (potenzielle Duplikate)"
+
+# WANN MANIFEST.CSV ERSTELLEN
+# ===========================
+
+creation_trigger:
+  # Automatisch vorschlagen ab dieser Anzahl
+  file_count_threshold: 20
+
+  # Agent-Prompt
+  prompt: |
+    📊 Du hast jetzt {count} Dateien in inputs/.
+    Soll ich eine manifest.csv erstellen für bessere Übersicht?
+
+    Vorteile:
+    • Schnelle Suche nach Dateien
+    • Kategorisierung und Beschreibungen
+    • Deduplizierung (Hash-basiert)
+    • Vorbereitung für Knowledge Base (FEATURE-007)
+
+# INTEGRATION MIT AGENTS
+# ======================
+
+agent_integration:
+  auto_update:
+    on_file_add: true      # Neue Zeile bei Import
+    on_file_remove: true   # Zeile entfernen bei Löschung
+    hash_on_add: true      # Hash berechnen bei Import
+
+  activity_log:
+    log_changes: true      # Änderungen in INDEX.md loggen
+
+  prompts:
+    description_ask: "Kurze Beschreibung für {filename}? (Enter für keine)"
+    category_ask: "Kategorie für {filename}? (1-8 oder Enter für 'other')"

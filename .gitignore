@@ -1,0 +1,80 @@
+# === Build Artifacts ===
+node_modules/
+dist/
+repos/
+.DS_Store
+*.log
+*.bak
+.cache/
+tmp/
+temp/
+.tmp-backup/
+
+# === Secrets ===
+.env
+*.secret
+*.key
+*.pem
+credentials.json
+.mcp.json
+
+# === User Private Data ===
+# User configs (examples are OK, actual configs are private)
+myDex/.dex/config/*.yaml
+myDex/.dex/config/*.md
+!myDex/.dex/config/*.example
+
+# User projects (user work is private)
+myDex/projects/*
+!myDex/projects/README.md
+
+# User inbox (uploaded files are private)
+myDex/inbox/*
+!myDex/inbox/README.md
+# Project exceptions
+!myDex/projects/dhl-ui-library-kb/
+myDex/projects/dhl-ui-library-kb/.dex/inputs/
+
+# Agent working state (private)
+myDex/.dex/agent-state/*
+!myDex/.dex/agent-state/README.md
+
+# DexMemory session state (private, FEATURE-012)
+myDex/.dex/CONTEXT.md
+myDex/.dex/chronicle/*
+!myDex/.dex/chronicle/README.md
+myDex/.dex/decisions/*
+!myDex/.dex/decisions/README.md
+
+# === IDE Files ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# === OS Files ===
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# === Claude Code Artifacts ===
+# Keep .claude/CLAUDE.md (project instructions) + .claude/settings.json (hooks)
+# But exclude session/cache/project/personal files
+.claude/sessions/
+.claude/cache/
+.claude/projects/
+.claude/settings.local.json
+.claude/session-registry.json
+.claude/SESSION-SAVE-CONFIRMATION.md
+.claude/*.log
+.claude/*.backup
+
+# === Note ===
+# Planning docs (docs/planning/) are COMMITTED for team collaboration
+# Learning docs (myDex/.dex/learnings/, myDex/.dex/docs/) are COMMITTED for team sharing
+# This enables dogfooding: we share "how we built it" knowledge
+.env.mcp-atlassian
+*.env

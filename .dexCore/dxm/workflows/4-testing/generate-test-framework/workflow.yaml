@@ -1,0 +1,202 @@
+# Generate Test Framework Workflow
+
+name: "generate-test-framework"
+version: "1.0.0"
+agent: "testarch-pro"
+category: "generation"
+description: "Generate complete test automation framework from website analysis"
+
+# Configuration
+config:
+  draft_folder: "{draft_folder}/{project_name}-framework-{timestamp}"
+  create_zip: true
+  language: "java" # java, python, javascript, csharp
+  framework: "selenium" # selenium, playwright, cypress
+  test_framework: "testng" # testng, junit, pytest, mocha, nunit
+  reporting: "allure" # allure, html, extent, default
+  ci_cd: "github-actions" # github-actions, jenkins, gitlab, none
+
+# Workflow Variables
+variables:
+  website_url: ""
+  project_name: ""
+  language: "java"
+  test_framework: "testng"
+  reporting_tool: "allure"
+  ci_cd_platform: "github-actions"
+  features_to_test: []
+  browser: "chrome"
+  parallel_execution: true
+  
+# Instructions
+instructions_file: "./instructions.md"
+
+# Framework Templates by Language
+templates:
+  java:
+    structure:
+      - "pom.xml"
+      - "src/main/java/pages/"
+      - "src/main/java/utils/"
+      - "src/main/java/config/"
+      - "src/test/java/base/"
+      - "src/test/java/tests/"
+      - "src/test/java/listeners/"
+      - "src/test/resources/"
+      - ".github/workflows/"
+      - "README.md"
+      - ".gitignore"
+    
+  python:
+    structure:
+      - "requirements.txt"
+      - "pytest.ini"
+      - "conftest.py"
+      - "pages/"
+      - "tests/"
+      - "utils/"
+      - "config/"
+      - ".github/workflows/"
+      - "README.md"
+      - ".gitignore"
+    
+  javascript:
+    structure:
+      - "package.json"
+      - "playwright.config.js"
+      - "pages/"
+      - "tests/"
+      - "utils/"
+      - ".github/workflows/"
+      - "README.md"
+      - ".gitignore"
+      
+  csharp:
+    structure:
+      - "Project.csproj"
+      - "Pages/"
+      - "Tests/"
+      - "Utils/"
+      - "Config/"
+      - ".github/workflows/"
+      - "README.md"
+      - ".gitignore"
+
+# Execution Steps
+steps:
+  - id: 1
+    name: "Gather Requirements"
+    type: "elicit"
+    questions:
+      - "What is the website URL?"
+      - "Preferred language? (Java/Python/JavaScript/C#)"
+      - "Test framework preference?"
+      - "Reporting tool?"
+      - "CI/CD platform?"
+      - "Features to test? (comma-separated)"
+    
+  - id: 2
+    name: "Analyze Website"
+    type: "action"
+    description: "Navigate to website and analyze structure"
+    
+  - id: 3
+    name: "Generate Project Structure"
+    type: "action"
+    description: "Create directories and base files"
+    
+  - id: 4
+    name: "Generate Page Objects"
+    type: "action"
+    description: "Create page object classes from website analysis"
+    
+  - id: 5
+    name: "Generate Test Cases"
+    type: "action"
+    description: "Create test classes with actual scenarios"
+    
+  - id: 6
+    name: "Create Configuration"
+    type: "action"
+    description: "Generate config files (pom.xml, requirements.txt, etc.)"
+    
+  - id: 7
+    name: "Add Utilities"
+    type: "action"
+    description: "Create utility classes (DriverManager, ConfigReader, etc.)"
+    
+  - id: 8
+    name: "Setup Reporting"
+    type: "action"
+    description: "Configure reporting tool"
+    
+  - id: 9
+    name: "Create CI/CD Pipeline"
+    type: "action"
+    description: "Generate CI/CD configuration"
+    
+  - id: 10
+    name: "Generate README"
+    type: "action"
+    description: "Create comprehensive setup documentation"
+    
+  - id: 11
+    name: "Package Framework"
+    type: "action"
+    description: "Create ZIP archive"
+    
+  - id: 12
+    name: "Display Summary"
+    type: "output"
+    description: "Show framework summary and quick start"
+
+# Output Template
+output_template: |
+  # {project_name} - Test Automation Framework
+  
+  **Generated:** {timestamp}
+  **Language:** {language}
+  **Framework:** {test_framework}
+  **Website:** {website_url}
+  
+  ---
+  
+  ## Quick Start
+  
+  {quick_start_commands}
+  
+  ---
+  
+  ## Framework Structure
+  
+  {structure_tree}
+  
+  ---
+  
+  ## Generated Components
+  
+  - ✅ {page_objects_count} Page Object classes
+  - ✅ {test_count} Test cases
+  - ✅ {utility_count} Utility classes
+  - ✅ Configuration management
+  - ✅ {reporting_tool} reporting
+  - ✅ CI/CD pipeline ({ci_cd_platform})
+  
+  ---
+  
+  ## Next Steps
+  
+  1. Navigate to framework directory
+  2. Install dependencies
+  3. Update config with actual credentials (if needed)
+  4. Run tests
+  5. View reports
+  
+  **Location:** {draft_folder}
+
+# Validation
+validation:
+  - project_structure_created: "All directories created successfully"
+  - files_generated: "All required files present"
+  - syntax_valid: "Generated code compiles/runs without errors"
+  - readme_complete: "README has all setup instructions"

@@ -1,0 +1,166 @@
+<!-- DexHub Project Guardian Enforcement Engine -->
+<!-- Prevents agents from reading files matching sensitive patterns in projects folder -->
+<!-- Integrated into all file read operations via workflow.xml step 0.6 -->
+
+<task id="dex/core/tasks/guardian-check.xml" name="Guardian File Access Check">
+  <objective>Validate file access requests against project-guards rules before any read operation</objective>
+
+  <critical-mandate>
+    NEVER allow file reads that match guardian patterns without explicit user approval
+    This is the PRIMARY security layer for DexHub project files
+  </critical-mandate>
+
+  <flow>
+    <!-- ============================================ -->
+    <!-- Step 1: Load Guardian Rules -->
+    <!-- ============================================ -->
+    <step n="1" title="Load Guardian Rules">
+      <action>Read {project-root}/.dexCore/_cfg/project-guards.yaml</action>
+      <parse_yaml>
+        Extract guardian configuration:
+        - file_read_guards[].name → {guard_names}
+        - file_read_guards[].description → {guard_descriptions}
+        - file_read_guards[].enforced → {guard_enforced}
+        - file_read_guards[].patterns[] → {guard_patterns} (array of regex)
+        - file_read_guards[].action → {guard_action}
+        - file_read_guards[].message → {guard_message}
+      </parse_yaml>
+      <set_variables>
+        {guardians_loaded} = true
+        {guards_count} = count({guard_names})
+      </set_variables>
+    </step>
+
+    <!-- ============================================ -->
+    <!-- Step 2: Validate File Path Against Patterns -->
+    <!-- ============================================ -->
+    <step n="2" title="Check File Path Against Guardian Patterns">
+      <input parameter="file_path" required="true">
+        The absolute path to the file being requested
+      </input>
+
+      <for_each pattern in {guard_patterns}>
+        <check if="file_path matches pattern (regex)">
+          <then>
+            <set_variables>
+              {path_blocked} = true
+              {blocked_by_pattern} = {pattern}
+              {block_reason} = "Path matches sensitive file pattern: " + {pattern}
+            </set_variables>
+            <action>STOP - Do not proceed to file read</action>
+            <goto step="4">Jump to blocking action</goto>
+          </then>
+        </check>
+      </for_each>
+
+      <!-- If no patterns matched, file is safe to read -->
+      <set_variables>
+        {path_blocked} = false
+      </set_variables>
+    </step>
+
+    <!-- ============================================ -->
+    <!-- Step 3: Validate File Location (myDex/projects only) -->
+    <!-- ============================================ -->
+    <step n="3" title="Validate File Location">
+      <check if="file_path contains '/myDex/projects/'">
+        <then>
+          <set_variables>
+            {in_protected_project} = true
+          </set_variables>
+          <action>Apply full guardian checks (Step 2 patterns)</action>
+        </then>
+      </check>
+      <check if="file_path NOT contains '/myDex/projects/'">
+        <then>
+          <set_variables>
+            {in_protected_project} = false
+          </set_variables>
+          <action>File outside projects folder - allow read (not protected by project-guards)</action>
+          <goto step="5">Proceed to allow read</goto>
+        </then>
+      </check>
+    </step>
+
+    <!-- ============================================ -->
+    <!-- Step 4: BLOCK - File Matches Guardian Pattern -->
+    <!-- ============================================ -->
+    <step n="4" title="Block Access - Pattern Match">
+      <set_variables>
+        {access_denied} = true
+        {access_denied_reason} = {block_reason}
+      </set_variables>
+
+      <action type="communicate">
+        Send message to user in {communication_language}:
+
+        **🔐 DexHub Guardian - Access Blocked**
+
+        Datei: {file_path}
+        Grund: {block_reason}
+
+        Diese Datei ist durch DexHub Guardian geschützt. 
+        Sichere Dateien (Passwörter, API-Keys, Geheimnisse) können nicht automatisch gelesen werden.
+
+        **Optionen:**
+        1. Die Datei manuell überprüfen (sicherer)
+        2. Anfragen: Manuelles Kopieren + Einfügen (mit Genehmigung)
+        3. Datei in sicherer Ordner verschieben (nicht /myDex/projects/)
+      </action>
+
+      <mandate critical="true">
+        DO NOT proceed to file read
+        DO NOT attempt to bypass guardian check
+        STOP execution and report to user
+      </mandate>
+    </step>
+
+    <!-- ============================================ -->
+    <!-- Step 5: ALLOW - File Passes All Checks -->
+    <!-- ============================================ -->
+    <step n="5" title="Allow Access - File is Safe">
+      <set_variables>
+        {access_allowed} = true
+      </set_variables>
+
+      <action type="proceed">
+        Proceed with file read operation - file passed all guardian checks
+      </action>
+    </step>
+  </flow>
+
+  <!-- ============================================ -->
+  <!-- Output - Guardian Check Result -->
+  <!-- ============================================ -->
+  <output>
+    <on_access_allowed>
+      Return: {access_allowed} = true
+      File read can proceed normally
+    </on_access_allowed>
+
+    <on_access_denied>
+      Return: {access_allowed} = false
+      Return: {access_denied_reason} = blocking reason
+      STOP execution - do not proceed with file read
+    </on_access_denied>
+  </output>
+
+  <!-- ============================================ -->
+  <!-- Integration Points -->
+  <!-- ============================================ -->
+  <integration>
+    <note>This task is invoked by:</note>
+    - workflow.xml step 0.6 (before profile loading)
+    - All agent file read operations (dex-master.md, etc.)
+    - Any workflow step that reads files from myDex/projects/
+    
+    <usage>
+      When reading file: {file_path}
+      1. Call guardian-check.xml with file_path parameter
+      2. Check return: {access_allowed}
+      3. If false → STOP and show user {access_denied_reason}
+      4. If true → Proceed with normal file read
+    </usage>
+  </integration>
+
+</task>

@@ -1,0 +1,216 @@
+# DexHub File Naming Conventions v1.0
+# ====================================
+# Standard für Datei-Benennung bei Import in .dex/inputs/
+
+version: "1.0"
+description: "Naming conventions for files imported into DexHub projects"
+
+# GRUNDREGELN
+# ===========
+
+rules:
+  # 1. Lowercase-Normalisierung
+  case: lowercase
+  example: "SPEC.PDF" → "spec.pdf"
+
+  # 2. Leerzeichen ersetzen
+  spaces:
+    replace_with: underscore
+    example: "My File.pdf" → "my_file.pdf"
+
+  # 3. Sonderzeichen
+  special_chars:
+    remove:
+      - "!"
+      - "@"
+      - "#"
+      - "$"
+      - "%"
+      - "^"
+      - "&"
+      - "*"
+      - "("
+      - ")"
+      - "+"
+      - "="
+      - "{"
+      - "}"
+      - "["
+      - "]"
+      - "|"
+      - "\\"
+      - ":"
+      - ";"
+      - "'"
+      - "\""
+      - "<"
+      - ">"
+      - ","
+      - "?"
+
+    replace_with_underscore:
+      - " "
+      - "-"
+
+  # 4. Umlaute
+  umlaut_handling:
+    ä: ae
+    ö: oe
+    ü: ue
+    ß: ss
+    Ä: Ae
+    Ö: Oe
+    Ü: Ue
+
+  # 5. Maximale Länge
+  max_length:
+    filename: 100  # Zeichen ohne Extension
+    total: 120     # Zeichen mit Extension
+
+  # 6. Mehrere Unterstriche
+  multiple_underscores:
+    collapse: true
+    example: "my___file.pdf" → "my_file.pdf"
+
+# DATUM-PRÄFIX (OPTIONAL)
+# ======================
+
+date_prefix:
+  enabled: false  # Default: aus
+  format: "YYYY-MM-DD"
+  separator: "_"
+  example:
+    input: "spec.pdf"
+    output: "2026-02-21_spec.pdf"
+
+  # User-Konfiguration in .dex/config/project.yaml:
+  # naming:
+  #   date_prefix: true
+
+# DUPLIKAT-BEHANDLUNG
+# ==================
+
+duplicate_handling:
+  default_strategy: "append_timestamp"
+
+  strategies:
+    append_timestamp:
+      format: "{filename}_{unix_timestamp}.{ext}"
+      example: "spec_1708520400.pdf"
+
+    append_number:
+      format: "{filename}_{counter}.{ext}"
+      example: "spec_1.pdf", "spec_2.pdf"
+
+    ask_user:
+      prompt: "Datei existiert bereits. Neuer Name?"
+
+    overwrite:
+      warning: true
+      confirm: true
+
+# KATEGORIE-BASIERTE PREFIXE (OPTIONAL)
+# ====================================
+
+category_prefix:
+  enabled: false  # Default: aus
+
+  mapping:
+    requirements: "req_"
+    research: "res_"
+    media: "med_"
+    reference: "ref_"
+    notes: "note_"
+
+  example:
+    input: "spec.pdf"
+    category: "requirements"
+    output: "req_spec.pdf"
+
+# BESCHREIBUNGS-SUFFIX (OPTIONAL)
+# ==============================
+
+description_suffix:
+  enabled: false  # Default: aus
+  max_length: 30  # Zeichen
+  separator: "_"
+
+  example:
+    input: "spec.pdf"
+    description: "Q1 Anforderungen"
+    output: "spec_q1_anforderungen.pdf"
+
+# BEISPIELE
+# =========
+
+examples:
+  - input: "SPEC (Final Version) v2.PDF"
+    output: "spec_final_version_v2.pdf"
+
+  - input: "Präsentation für Meeting.pptx"
+    output: "praesentation_fuer_meeting.pptx"
+
+  - input: "spec.pdf"
+    note: "existiert bereits"
+    output: "spec_1708520400.pdf"
+
+  - input: "user-story #5.md"
+    output: "user_story_5.md"
+
+  - input: "API  Docs   v1.2.pdf"
+    output: "api_docs_v1_2.pdf"
+
+  - input: "Müller's Übersicht.docx"
+    output: "muellers_uebersicht.docx"
+
+# USER-KONFIGURATION
+# ==================
+
+# In .dex/config/project.yaml kann der User überschreiben:
+#
+# naming:
+#   date_prefix: true
+#   category_prefix: true
+#   description_suffix: true
+#   duplicate_strategy: ask
+#   preserve_original_case: false
+
+# IMPLEMENTATION NOTES
+# ====================
+
+implementation:
+  # Python-ähnlicher Pseudocode für Umbenennung
+  algorithm: |
+    def normalize_filename(filename, config):
+        name, ext = split_extension(filename)
+
+        # 1. Umlaute ersetzen
+        name = replace_umlauts(name)
+
+        # 2. Lowercase
+        name = name.lower()
+
+        # 3. Sonderzeichen entfernen/ersetzen
+        name = remove_special_chars(name)
+        name = replace_with_underscore(name, [" ", "-"])
+
+        # 4. Mehrfache Unterstriche
+        name = collapse_underscores(name)
+
+        # 5. Länge begrenzen
+        name = truncate(name, max_length=100)
+
+        # 6. Optional: Datum-Präfix
+        if config.date_prefix:
+            name = f"{today()}_{name}"
+
+        # 7. Optional: Kategorie-Präfix
+        if config.category_prefix and category:
+            name = f"{category_mapping[category]}{name}"
+
+        # 8. Duplikat-Check
+        final = f"{name}.{ext.lower()}"
+        if exists(final):
+            final = handle_duplicate(final, config.duplicate_strategy)
+
+        return final

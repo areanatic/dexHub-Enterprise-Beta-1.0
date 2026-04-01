@@ -1,0 +1,132 @@
+# Figma MCP Tools Reference
+# Source: Official Figma MCP Server (https://mcp.figma.com/mcp)
+# Version: 1.0
+# Last Updated: 2026-03-26
+#
+# NOTE: This is reference documentation, NOT a runtime contract.
+# The actual tool schemas come from the MCP server itself.
+# See: feedback_false_assumptions_mcp_tools.md
+
+mcp_tools:
+  design_read:
+    - id: get_design_context
+      description: "Get design as structured React + Tailwind code representation"
+      parameters:
+        - name: file_url
+          type: string
+          required: true
+          description: "Figma file URL or file key"
+          example: "https://www.figma.com/design/abc123/My-Design"
+        - name: node_id
+          type: string
+          required: false
+          description: "Specific node/frame to analyze"
+      example_prompts:
+        - "Analyze this Figma design: https://www.figma.com/design/..."
+        - "Show me the layout structure of this screen"
+        - "Convert this Figma frame to code"
+      response_format: structured_code
+
+    - id: get_variable_defs
+      description: "Get design tokens and style variables (colors, typography, spacing)"
+      parameters:
+        - name: file_url
+          type: string
+          required: true
+      example_prompts:
+        - "What design tokens does this file use?"
+        - "Show me the color palette from Figma"
+        - "Extract typography styles from this design"
+      response_format: json
+
+    - id: get_code_connect_map
+      description: "Map Figma elements to existing codebase components"
+      parameters:
+        - name: file_url
+          type: string
+          required: true
+      example_prompts:
+        - "Which code components match this Figma design?"
+        - "Map design elements to my React components"
+      response_format: json
+
+    - id: search_design_system
+      description: "Search for reusable components and tokens in design system"
+      parameters:
+        - name: query
+          type: string
+          required: true
+          description: "Search term (component name, token, etc.)"
+      example_prompts:
+        - "Find the Button component in the design system"
+        - "Search for input field variants"
+        - "What reusable components are available?"
+      response_format: json_array
+
+  design_write:
+    - id: use_figma
+      description: "Create or modify frames on Figma canvas"
+      parameters:
+        - name: file_url
+          type: string
+          required: true
+        - name: instructions
+          type: string
+          required: true
+          description: "What to create or change on the canvas"
+      example_prompts:
+        - "Add a new login screen to this Figma file"
+        - "Update the button colors to match our brand"
+        - "Create a mobile version of this desktop layout"
+      response_format: json
+      permissions: write
+
+    - id: generate_figma_design
+      description: "Capture a webpage and generate Figma design from it"
+      parameters:
+        - name: url
+          type: string
+          required: true
+          description: "URL of the webpage to capture"
+        - name: file_url
+          type: string
+          required: true
+          description: "Target Figma file"
+      example_prompts:
+        - "Capture our landing page into Figma"
+        - "Import this website design into Figma"
+      response_format: json
+      permissions: write
+
+    - id: generate_diagram
+      description: "Create FigJam diagrams from text descriptions"
+      parameters:
+        - name: description
+          type: string
+          required: true
+          description: "Diagram description (flowchart, architecture, etc.)"
+        - name: file_url
+          type: string
+          required: true
+          description: "Target FigJam file"
+      example_prompts:
+        - "Create a user flow diagram in FigJam"
+        - "Generate an architecture diagram from this description"
+        - "Draw a flowchart for the checkout process"
+      response_format: json
+      permissions: write
+
+metadata:
+  total_tools: 7
+  read_tools: 4
+  write_tools: 3
+  version: "1.0"
+  source: "Official Figma MCP Server"
+  server_url: "https://mcp.figma.com/mcp"
+  auth_methods:
+    - oauth
+    - personal_access_token
+  rate_limits:
+    enterprise: "Per-minute limits, unlimited within API tiers"
+    professional: "Per-minute limits (Tier 1 REST API)"
+    free: "6 tool calls/month (not recommended)"

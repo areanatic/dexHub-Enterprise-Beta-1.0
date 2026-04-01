@@ -1,0 +1,21 @@
+# DexHub Project Guardian Rules
+# Prevent agents from reading files matching specified regex patterns in projects folder
+# Enforced: Agents MUST NOT read files matching these patterns
+
+file_read_guards:
+  - name: block_sensitive_files
+    description: Prevent DexHub agents from reading files matching sensitive patterns in any project
+    enforced: true
+    patterns:
+      - ".*\.env$"
+      - ".*\.key$"
+      - ".*\.pem$"
+      - ".*secret.*"
+      - ".*password.*"
+      # Add more regex patterns as needed
+    action: block
+    message: "Access to files matching this pattern is blocked by DexHub Guardian."
+
+# Example usage:
+# Agents must check these rules before any file read operation in myDex/projects/
+# If a file matches any pattern, the read is blocked and the user is notified.

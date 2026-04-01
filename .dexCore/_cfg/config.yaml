@@ -1,0 +1,82 @@
+# DexHub Configuration
+# This file contains user preferences and project settings for DexHub agents
+
+# User Preferences
+user_name: "Developer"           # Your preferred name
+communication_language: "en"     # "en" for English, "de" for German
+
+# Project Settings
+project_name: "My DexHub Project"
+draft_folder: "./myDex/drafts"           # Temporary workflow outputs
+inbox_folder: "./myDex/inbox"            # User input files
+export_folder: "./myDex/export"          # Default output location (finished exports)
+current_project: null                    # null = draft mode, or set to project name when working in project
+project_base_path: "./myDex/projects"     # Where user projects live
+
+# Agent Settings
+default_agent: "dex-master"
+auto_activate_on_greeting: true
+
+# Workflow Settings
+workflow_mode: "interactive"     # "interactive" or "yolo"
+save_checkpoints: true
+
+# Module Configuration
+modules:
+  enabled:
+    - core
+    - dxm
+    - dxb
+    - dis
+    - meta-agents
+
+# IDE Integration
+ides:
+  - github-copilot
+
+# Guardian File Blacklist (EA-1.0) - Prevents DexHub from processing sensitive files
+# Configuration: Can be overridden per-project in myDex/projects/{name}/.dex/config/blacklist.yaml
+guardian:
+  blacklist:
+    enabled: true
+    # Phase 1: Glob patterns (simple wildcards and paths)
+    patterns:
+      # Security - Exclude cryptographic keys and secrets
+      - "*.key"              # Private keys
+      - "*.pem"              # PEM certificates
+      - "*.p12"              # PKCS12 certificates
+      - "*.pfx"              # Windows certificates
+      - "*secret*"           # Files with 'secret' in name
+      - "*password*"         # Files with 'password' in name
+      - "*credentials*"      # Files with 'credentials' in name
+      # Configuration - Environment and config files
+      - "*.env*"             # Environment files (.env, .env.local, .env.prod, etc.)
+      - "*.envrc"            # Direnv configuration
+      # Dependencies - Third-party code
+      - "node_modules/"      # NPM dependencies
+      - "venv/"              # Python virtual environment
+      - ".venv/"             # Python virtual environment (alt)
+      - "vendor/"            # Composer/PHP dependencies
+      - ".gem/"              # Ruby gems cache
+      - "target/"            # Java build output
+      # Version Control
+      - ".git/"              # Git repository data
+      - ".svn/"              # Subversion data
+      - ".hg/"               # Mercurial data
+      # Build Artifacts
+      - "dist/"              # Distribution builds
+      - "build/"             # Build output
+      - ".next/"             # Next.js build
+      - ".nuxt/"             # Nuxt build
+      # Temporary and Cache
+      - "*.log"              # Log files
+      - ".DS_Store"          # macOS folder metadata
+      - "Thumbs.db"          # Windows thumbnail cache
+      - ".cache/"            # Cache directories
+    
+    # Whitelist exceptions (files that would match blacklist but should be allowed)
+    # Phase 3 feature - allows specific files for documentation/templates
+    whitelist_exceptions: []
+
+# Version Info
+version: "eb-0.1.0"

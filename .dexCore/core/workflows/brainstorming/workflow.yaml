@@ -1,0 +1,39 @@
+# Brainstorming Session Workflow Configuration
+name: "brainstorming"
+description: "Facilitate interactive brainstorming sessions using diverse creative techniques. This workflow facilitates interactive brainstorming sessions using diverse creative techniques. The session is highly interactive, with the AI acting as a facilitator to guide the user through various ideation methods to generate and refine creative solutions."
+
+# Critical variables load from config_source
+config_source: "{project-root}/.dexCore/dis/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+# Optional inputs for guided brainstorming
+recommended_inputs:
+  - session_context: "Context document passed via data attribute"
+  - previous_results: "{draft_folder}/brainstorming-*.md"
+
+# Context can be provided via data attribute when invoking
+# Example: data="{path}/context.md" provides domain-specific guidance
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/core/workflows/brainstorming"
+template: "{installed_path}/template.md"
+instructions: "{installed_path}/instructions.md"
+validation: "{installed_path}/checklist.md"
+brain_techniques: "{installed_path}/brain-methods.csv"
+
+# Output configuration
+default_output_file: "{draft_folder}/brainstorming-session-results-{{date}}.md"
+
+web_bundle:
+  name: "brainstorming"
+  description: "Facilitate interactive brainstorming sessions using diverse creative techniques. This workflow facilitates interactive brainstorming sessions using diverse creative techniques. The session is highly interactive, with the AI acting as a facilitator to guide the user through various ideation methods to generate and refine creative solutions."
+  template: "dex/core/workflows/brainstorming/template.md"
+  instructions: "dex/core/workflows/brainstorming/instructions.md"
+  brain_techniques: "dex/core/workflows/brainstorming/brain-methods.csv"
+  use_advanced_elicitation: true
+  web_bundle_files:
+    - "dex/core/workflows/brainstorming/instructions.md"
+    - "dex/core/workflows/brainstorming/brain-methods.csv"
+    - "dex/core/workflows/brainstorming/template.md"

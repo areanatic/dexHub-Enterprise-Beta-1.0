@@ -1,0 +1,24 @@
+# Test Architect workflow: gate
+name: testarch-gate
+description: "Record the quality gate decision for the story."
+
+config_source: "{project-root}/.dexCore/dxm/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+date: system-generated
+
+installed_path: "{project-root}/.dexCore/dxm/workflows/testarch/gate"
+instructions: "{installed_path}/instructions.md"
+
+template: false
+
+tags:
+  - qa
+  - gate
+  - test-architect
+
+execution_hints:
+  interactive: false
+  autonomous: true
+  iterative: true

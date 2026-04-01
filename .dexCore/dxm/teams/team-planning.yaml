@@ -1,0 +1,12 @@
+# <!-- Powered by DEX-CORE™ -->
+bundle:
+  name: Team Plan and Architect
+  icon: 🚀
+  description: Team capable of project analysis, design, and architecture.
+agents:
+  - analyst
+  - architect
+  - pm
+  - po
+  - tea
+  - ux-expert

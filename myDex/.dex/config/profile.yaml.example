@@ -1,0 +1,154 @@
+# DexHub Developer Profile
+# Generated from myDex Enhanced Onboarding (v4.2)
+# Schema: profile-schema-v1.0.yaml
+# Copy this to profile.yaml after running onboarding
+
+# TOP-LEVEL METADATA
+version: "1.0"
+created_at: "2025-11-16T10:30:00Z"   # Set on first onboarding interaction
+updated_at: "2025-11-16T10:45:00Z"   # Updated on every save
+
+# CATEGORY 0: Personalization (Q0-Q1, Q2)
+personalization:
+  name: "Alex"                       # Q0 - Your name or nickname
+  language: "de"                     # Q1 - "de"|"en"|"es"|"fr"|"it"|"pt" (overrides config.yaml if set)
+  role: "developer"                  # Q2 - developer|architect|product_manager|designer|analyst|student|other
+
+# CATEGORY 1: Technical Preferences (Q3, Q38, Q39 - NEW in v4.2/EA-1.0)
+technical:
+  experience_level: "intermediate"   # Derived from Q3 (0-2→junior, 3-7→intermediate, 8-15→senior, 15+→expert)
+  code_style: "standard"             # Q38 - airbnb|google|standard|custom (NEW in EA-1.0)
+  verbosity: "balanced"              # Q39 - concise|balanced|detailed (NEW in EA-1.0)
+
+# CATEGORY 2: Tech Stack (Q22)
+tech:
+  primary_stack:                     # Q22 - VOLLSTÄNDIG only, max 3
+    - typescript
+    - react
+    - python
+  secondary_stack: []                # Q16 - Optional
+  interests: []                      # Q17 - Optional
+
+# CATEGORY 3: AI Preferences (Q14-Q15, Q21, Q22)
+ai:
+  readiness: "intermediate"          # Q14 - beginner|intermediate|advanced|expert (NEW: transformed from ai_experimenting)
+  readiness_level: "ai_experimenting" # OLD FORMAT (kept for backward compatibility, Q14 raw value)
+  copilot_enabled: false             # Q21 - true|false
+  preferred_model: "claude"          # Q22 - Optional: claude|gpt4|gemini|local|other
+  tools_used:                        # Q15 - Multiple selections allowed
+    - chatgpt
+    - github_copilot
+  concerns:                          # Q16 - VOLLSTÄNDIG only, max 3
+    - quality_trust
+    - productivity_pressure
+  skill_goal: "prompt_engineering"   # Q17 - VOLLSTÄNDIG only
+  transformation_expectation: "automated_routine"  # Q17a - VOLLSTÄNDIG only
+
+# CATEGORY 4: Communication (NEW in EA-1.0 - Aliases + formality)
+communication:
+  language_preference: "de"          # Alias for personalization.language (backward compatibility)
+  verbosity: "balanced"              # Alias for technical.verbosity (backward compatibility)
+  formality: "professional"          # Q30 - Optional: casual|professional|academic
+
+# CATEGORY 5: Identity (Legacy fields - kept for backward compatibility)
+identity:
+  role: "developer"                  # Q2 - Copied to personalization.role
+  experience_years: "3-7"            # Q3 - Transformed to technical.experience_level
+  team_size: "small"                 # Q4 - solo|small|medium|large
+
+# CATEGORY 6: Company & Team (Q5-Q13 - VOLLSTÄNDIG only)
+company:
+  tool_adoption: "early_adopters"    # Q5 - innovators|early_adopters|pragmatic|skeptical|resistant
+  communication_issues:              # Q6 - Max 2 selections
+    - knowledge_not_documented
+    - too_many_meetings
+  ai_culture: "supported"            # Q7 - championed|supported|neutral|skeptical|blocked
+  time_wasted_on:                    # Q8 - VOLLSTÄNDIG only, max 3
+    - meetings
+    - legacy_code
+    - unclear_requirements
+  productivity_use:                  # Q9 - VOLLSTÄNDIG only, max 2
+    - improve_quality
+    - work_life_balance
+  skill_gaps:                        # Q10 - VOLLSTÄNDIG only, max 2
+    - ai_tool_competence
+    - critical_thinking
+  ai_adoption_driver: "bottom_up"    # Q11 - VOLLSTÄNDIG only
+  ai_breakthrough_needs:             # Q12 - VOLLSTÄNDIG only, max 2
+    - training
+    - time
+  onboarding_duration: "1-2_months"  # Q13 - VOLLSTÄNDIG only
+
+# CATEGORY 7: Workflow (Q18-Q21)
+workflow:
+  time_spent_on:                     # Q18 - VOLLSTÄNDIG only, max 3
+    - writing_code
+    - debugging
+    - meetings
+  current_project_count: "2-3"       # Q18a - 1|2-3|4-6|7+|varies|no_fixed
+  ideal_work_mode: "deep_work"       # Q18b - VOLLSTÄNDIG only
+  biggest_frustration: "understanding_legacy_code"  # Q19 - VOLLSTÄNDIG only (role-based options)
+  time_lost_weekly: "5-10_hours"     # Q20 - <2|2-5|5-10|10-20|20+
+  extra_time_use:                    # Q21 - Max 2 selections
+    - learn_new_skills
+    - improve_quality
+
+# CATEGORY 8: Growth (Q25-Q26a - VOLLSTÄNDIG only)
+growth:
+  learning_style:                    # Q25 - Max 2
+    - interactive_sandboxes
+    - code_first
+  six_month_goal: "master_system_design"  # Q26 - Role-based options
+  future_critical_skill: "creative_thinking"  # Q26a
+
+# CATEGORY 9: Zeitgeist (Q27-Q28 - VOLLSTÄNDIG only)
+zeitgeist:
+  career_sentiment: "moderately_hopeful"  # Q27
+  future_emotion: "optimistic"       # Q27a
+  future_vision: "ai_augmented"      # Q28
+
+# CATEGORY 10: Vision (Q29-Q31 - VOLLSTÄNDIG only)
+vision:
+  ai_transformation_wish: |          # Q29 - Free text
+    "Legacy code is my biggest time sink. AI could help with automated refactoring suggestions and better documentation generation."
+  career_dream: |                    # Q30 - Free text
+    "Become a tech lead who still codes 50% of the time, mentoring others while building impactful features."
+  additional_context: |              # Q31 - Optional free text
+    "Currently working on microservices migration. Interested in architecture patterns and system design."
+
+# CATEGORY 11: Work Context (Optional - Placeholder for V1.3 multi-tier profiles)
+work:
+  company: "Acme Corp"               # Q35 - Optional
+  team: "Platform Team"              # Q36 - Optional
+  domain: "web"                      # Q37 - Optional: web|mobile|backend|devops|data|ml|embedded|other
+
+# CATEGORY 12: Custom Instructions (EA-1.0.1)
+# User-defined rules and context for AI agents
+custom_instructions:
+  always_do:                         # Q40 - Max 20 items
+    - "Use TypeScript strict mode"
+    - "Write tests for all features"
+    - "Follow Airbnb style guide"
+  never_do:                          # Q41 - Max 20 items
+    - "Use var keyword"
+    - "Commit secrets to git"
+    - "Skip code reviews"
+  domain_knowledge: |                # Q42 - Max 2000 characters (VOLLSTÄNDIG only)
+    E-Commerce Platform for Acme Corp
+    Payment processing with Stripe and PayPal
+    Microservices architecture with Node.js and React
+    Kubernetes deployment on AWS EKS
+
+# METADATA
+onboarding:
+  variant: "vollständig"             # "smart" or "vollständig"
+  started_at: "2025-11-16T10:30:00Z"  # When onboarding began
+  completed_at: "2025-11-16T10:45:00Z"  # null if not finished
+  questions_answered: 42             # 39 original + 3 custom instructions (Q40-Q42)
+  questions_skipped: 0
+  completion_percentage: 100.0
+  version: "v4.3"                    # Updated for custom instructions support
+
+# PRIVACY
+# This file stays 100% local. Nothing is sent anywhere.
+# You control what gets saved and can edit this manually anytime.

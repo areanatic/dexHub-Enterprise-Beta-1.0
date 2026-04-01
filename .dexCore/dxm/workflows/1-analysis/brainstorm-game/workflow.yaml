@@ -1,0 +1,21 @@
+# Brainstorm Game Workflow Configuration
+name: "brainstorm-game"
+description: "Facilitate game brainstorming sessions by orchestrating the DIS brainstorming workflow with game-specific context, guidance, and additional game design techniques."
+
+# Critical variables load from config_source
+config_source: "{project-root}/.dexCore/dxm/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/dxm/workflows/1-analysis/brainstorm-game"
+template: false
+instructions: "{installed_path}/instructions.md"
+
+# Context and techniques for game brainstorming
+game_context: "{installed_path}/game-context.md"
+game_brain_methods: "{installed_path}/game-brain-methods.csv"
+
+# CORE brainstorming workflow to invoke
+core_brainstorming: "{project-root}/.dexCore/core/workflows/brainstorming/workflow.yaml"

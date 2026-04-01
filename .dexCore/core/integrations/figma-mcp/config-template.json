@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "name": "Figma",
+      "description": "Figma Design Files, Components & Design Tokens via MCP",
+      "enabled": true,
+      "scope": "global"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+# Module Brief Workflow Configuration
+name: module-brief
+description: "Create a comprehensive Module Brief that serves as the blueprint for building new DEX modules using strategic analysis and creative vision"
+
+# Critical variables
+config_source: "{project-root}/.dexCore/dxb/config.yaml"
+draft_folder: "{config_source}:draft_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+date: system-generated
+
+# Optional input docs that enhance module planning
+recommended_inputs:
+  - brainstorming_results: "{draft_folder}/brainstorming-*.md"
+  - existing_modules: "{project-root}/.dexCore/"
+  - module_examples: "{project-root}/.dexCore/dxb/workflows/create-module/module-structure.md"
+
+# Module path and component files
+installed_path: "{project-root}/.dexCore/dxb/workflows/module-brief"
+template: "{installed_path}/template.md"
+instructions: "{installed_path}/instructions.md"
+validation: "{installed_path}/checklist.md"
+
+# Output configuration
+default_output_file: "{draft_folder}/module-brief-{{module_code}}-{{date}}.md"

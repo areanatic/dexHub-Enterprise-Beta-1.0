@@ -1,0 +1,85 @@
+# Create Skill Workflow
+name: create-skill
+description: "Create a new GitHub Copilot Skill with proper structure, frontmatter, and lazy-loading design."
+
+config_source: "{project-root}/.dexCore/_cfg/config.yaml"
+user_name: "{config_source}:user_name"
+date: system-generated
+
+instructions: |
+
+  ## Create a New Copilot Skill
+
+  ### Step 1: Gather Requirements
+
+  Ask the user:
+  1. **Skill Name** — lowercase, hyphens for spaces (e.g., "my-project-rules")
+  2. **Purpose** — What knowledge should this skill provide?
+  3. **Trigger Keywords** — When should Copilot load this skill? (e.g., "testing", "deployment", "database")
+  4. **Scope** — Is this for all projects or specific to one?
+
+  ### Step 2: Create Skill Structure
+
+  ```
+  .github/skills/{skill-name}/
+  ├── SKILL.md              ← Required: Main entry point
+  ├── references/           ← Optional: Supporting docs
+  └── scripts/              ← Optional: Helper scripts
+  ```
+
+  ### Step 3: Generate SKILL.md
+
+  **CRITICAL:** The `name` field MUST match the directory name exactly.
+
+  Template:
+  ```yaml
+  ---
+  name: {skill-name}
+  description: "{description with trigger keywords, 10-1024 chars}"
+  ---
+
+  # {Skill Title}
+
+  ## When to Use This Skill
+
+  {Describe when Copilot should load this skill}
+
+  ## Instructions
+
+  {The actual knowledge/rules/procedures}
+
+  ## References
+
+  {Links to supporting files if any}
+  ```
+
+  ### Step 4: Validate
+
+  Checklist:
+  - [ ] Directory name matches `name:` field in frontmatter
+  - [ ] Description is 10-1024 characters
+  - [ ] Description contains trigger keywords
+  - [ ] SKILL.md is concise (details in references/ subdirectory)
+  - [ ] No hardcoded project-specific paths (use relative paths)
+
+  ### Step 5: Register (Optional)
+
+  Skills are auto-discovered by Copilot from `.github/skills/`.
+  No manifest registration needed (unlike agents/workflows).
+
+  ### Step 6: Confirm
+
+  Show the user:
+  - Created file path
+  - Frontmatter preview
+  - How to test: "Ask Copilot something related to [{trigger keywords}]"
+
+  ### Design Tips
+
+  - **Description is everything** — Copilot uses ONLY the description to decide when to load
+  - **One skill = one concern** — Narrow scope = better activation accuracy
+  - **Keep SKILL.md short** — Put details in `references/` subdirectory
+  - **Include trigger keywords explicitly** — "testing", "deploy", "database", not vague terms
+
+output_format: markdown
+draft_folder: ".github/skills/{skill-name}/"

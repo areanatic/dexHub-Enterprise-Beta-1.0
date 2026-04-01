@@ -1,0 +1,40 @@
+# Guardian File Blacklist Configuration Template
+# Location: myDex/projects/{project-name}/.dex/config/blacklist.yaml
+#
+# This file allows you to override the global blacklist for this specific project.
+# Useful when a project needs to exclude additional files beyond the DexHub defaults.
+#
+# Priority Order (HIGHEST to LOWEST):
+#   1. This file (per-project override)
+#   2. .dexCore/_cfg/config.yaml (global defaults)
+#
+# Pattern Types:
+#   - Glob patterns: *.ext, folder/, file.txt (wildcards and literal paths)
+#   - NOT regex (Phase 1) - Phase 2+ will support regex patterns
+#
+# Documentation:
+#   - Full pattern matching rules: See project documentation
+#   - Research on best practices: .dexCore/_dev/todos/research.md#RESEARCH-001
+
+---
+guardian:
+  blacklist:
+    # Enable/disable Guardian for this project (default: true from global config)
+    enabled: true
+    
+    # Additional patterns to exclude (merged with global patterns)
+    # Example: Exclude project-specific sensitive files
+    patterns: []
+      # Examples to uncomment and customize:
+      # - "config/secrets.json"    # Project-specific secret file
+      # - "local/**/*.key"         # Local environment keys
+      # - "migrations/seed*.sql"   # Database seeds with test data
+      # - ".env.*.local"           # All local environment files
+    
+    # Whitelist exceptions - allow specific files that match blacklist patterns
+    # Example: .env.example should be allowed even though *.env* is blocked
+    whitelist_exceptions: []
+      # Examples to uncomment:
+      # - ".env.example"           # Allow environment template
+      # - "docs/.env-reference"    # Allow reference documentation
+      # - "config/secrets.template.json"  # Allow template file

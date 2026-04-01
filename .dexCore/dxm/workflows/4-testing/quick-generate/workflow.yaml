@@ -1,0 +1,105 @@
+# Quick Generate Workflow
+
+name: "quick-generate"
+version: "1.0.0"
+agent: "testarch-pro"
+category: "generation"
+description: "Fastest path to working test framework - minimal questions, smart defaults"
+
+# Configuration
+config:
+  draft_folder: "{draft_folder}/{project_name}-test-automation-{timestamp}"
+  auto_detect: true
+  use_defaults: true
+
+# Smart Defaults by Language
+defaults:
+  java:
+    framework: "selenium"
+    test_framework: "testng"
+    build_tool: "maven"
+    reporting: "allure"
+    ci_cd: "github-actions"
+    
+  python:
+    framework: "selenium"
+    test_framework: "pytest"
+    reporting: "allure"
+    ci_cd: "github-actions"
+    
+  javascript:
+    framework: "playwright"
+    test_framework: "mocha"
+    reporting: "html"
+    ci_cd: "github-actions"
+    
+  csharp:
+    framework: "selenium"
+    test_framework: "nunit"
+    reporting: "extent"
+    ci_cd: "github-actions"
+
+# Workflow Variables
+variables:
+  website_url: ""
+  language: ""
+  project_name: ""
+
+# Execution Steps
+steps:
+  - id: 1
+    name: "Get Essentials"
+    type: "elicit-minimal"
+    questions:
+      - "Website URL to test?"
+      - "Language? (Java/Python/JavaScript/C#)"
+    
+  - id: 2
+    name: "Auto-Detect Website Type"
+    type: "action"
+    description: "Analyze website and determine optimal test approach"
+    
+  - id: 3
+    name: "Generate with Defaults"
+    type: "action"
+    description: "Create framework using best-practice defaults"
+    call_workflow: "generate-test-framework"
+    
+  - id: 4
+    name: "Display Summary"
+    type: "output"
+
+# Instructions
+instructions: |
+  This is the fastest way to get a working test framework.
+  
+  **Process:**
+  1. Ask only: URL + Language
+  2. Auto-detect website type
+  3. Apply best-practice defaults
+  4. Generate complete framework
+  
+  **No customization questions** - optimized for speed!
+  
+  User can always customize the generated framework manually.
+
+# Output
+output_template: |
+  🚀 **Quick Generate Complete!**
+  
+  **Framework:** {project_name}-test-automation
+  **Language:** {language}
+  **Defaults Applied:**
+  - Framework: {framework}
+  - Test Tool: {test_framework}
+  - Reporting: {reporting}
+  - CI/CD: {ci_cd}
+  
+  **Location:** {draft_folder}
+  
+  **Run Tests Now:**
+  ```bash
+  {run_command}
+  ```
+  
+  Everything is ready to execute! 🎉
