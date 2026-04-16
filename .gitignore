@@ -23,6 +23,8 @@ credentials.json
 myDex/.dex/config/*.yaml
 myDex/.dex/config/*.md
 !myDex/.dex/config/*.example
+# Explicit profile.yaml protection (defense-in-depth, catches any path)
+**/profile.yaml
 
 # User projects (user work is private)
 myDex/projects/*

@@ -1,6 +1,7 @@
 # DexHub Contributors
 
 **Last updated:** 2026-04-16 (corrected — attribution was in commit messages since March 2026)
+*Ported from Playground to Beta on 2026-04-17. References to "Playground" describe the integration state at investigation time (2026-04-15/16).*
 
 ---
 

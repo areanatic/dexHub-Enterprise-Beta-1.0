@@ -1,5 +1,7 @@
 # workstreams.csv changelog
 
+*Ported from Playground to Beta on 2026-04-17. References to "Playground" describe the state at investigation time (2026-04-15/16).*
+
 ## v2 — 2026-04-15 (Layer 1 Block 3)
 
 **Trigger:** Layer 1 Portfolio Buildout. v1 had 19 rows produced by Agent 1 during Layer 0. Layer 0 self-review flagged three gaps: (a) status fields were agent estimates not user-confirmed, (b) Nexus cross-references missing, (c) colleague-branches not represented. Block 2 (Cold Clones Inventory) added a fourth discovery: 1 unique commit in `bkp_181125`.
