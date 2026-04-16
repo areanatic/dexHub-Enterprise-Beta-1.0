@@ -67,10 +67,10 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/18] Cross-Platform Consistency (Instructions cross-check (copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/18] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 # GREETING action — check key phrase exists in both
-if grep -q 'Display the.*EXACTLY as defined' .github/copilot-instructions.md && \
+if grep -q 'Display the.*EXACTLY as defined' .claude/CLAUDE.md && \
    grep -q 'Display the.*EXACTLY as defined' .github/copilot-instructions.md; then
   pass "GREETING action: 'Display EXACTLY as defined' in both"
 else
@@ -78,32 +78,32 @@ else
 fi
 
 # AGENT-REQUEST action
-INST_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
+CLAUDE_AR=$(grep 'AGENT-REQUEST' .claude/CLAUDE.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
 COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
-if [ -n "$INST_AR" ] && [ "$INST_AR" = "$COPILOT_AR" ]; then
+if [ -n "$CLAUDE_AR" ] && [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
   pass "AGENT-REQUEST action identical"
 else
   fail "AGENT-REQUEST action mismatch"
 fi
 
 # Agent Resolution rule
-INST_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
+CLAUDE_RES=$(grep -c 'agent-manifest.csv' .claude/CLAUDE.md 2>/dev/null || echo "0")
 COPILOT_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
-if [ "$INST_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
+if [ "$CLAUDE_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
   pass "Agent Resolution rule in both files"
 else
-  fail "Agent Resolution missing (INSTRUCTIONS=$INST_RES, COPILOT=$COPILOT_RES)"
+  fail "Agent Resolution missing (CLAUDE=$CLAUDE_RES, COPILOT=$COPILOT_RES)"
 fi
 
 # G4 Anti-Overplanning
-if grep -q 'keep scope proportional' .github/copilot-instructions.md && grep -q 'keep scope proportional' .github/copilot-instructions.md; then
+if grep -q 'keep scope proportional' .claude/CLAUDE.md && grep -q 'keep scope proportional' .github/copilot-instructions.md; then
   pass "G4 anti-overplanning in both files"
 else
   fail "G4 anti-overplanning missing in one file"
 fi
 
 # NEVER DO strengthened
-if grep -qi 'Never invent, simplify, or rearrange' .github/copilot-instructions.md && grep -qi 'Never invent, simplify, or rearrange' .github/copilot-instructions.md; then
+if grep -qi 'Never invent, simplify, or rearrange' .claude/CLAUDE.md && grep -qi 'Never invent, simplify, or rearrange' .github/copilot-instructions.md; then
   pass "NEVER DO #1 strengthened in both"
 else
   fail "NEVER DO #1 mismatch"
@@ -124,7 +124,7 @@ FILES=(
   ".dexCore/_dev/tools/dexhub-dashboard.html"
   ".dexCore/_dev/tools/generate-dashboard.py"
   ".dexCore/_dev/docs/SILO-ARCHITECTURE.md"
-  ".github/copilot-instructions.md"
+  ".claude/CLAUDE.md"
   ".github/copilot-instructions.md"
   ".github/agents/dex-master.agent.md"
   ".github/agents/mydex.agent.md"
@@ -147,7 +147,7 @@ echo -e "\n${BOLD}[5/18] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
-  if grep -q "$g:" .github/copilot-instructions.md && grep -q "$g:" .github/copilot-instructions.md; then
+  if grep -q "$g:" .claude/CLAUDE.md && grep -q "$g:" .github/copilot-instructions.md; then
     pass "Guardrail $g in both instruction files"
   else
     fail "Guardrail $g missing"
@@ -178,10 +178,10 @@ else
 fi
 
 # F-012: DexMemory
-if grep -q 'DexMemory' .github/copilot-instructions.md; then
-  pass "F-012: DexMemory referenced in instructions"
+if grep -q 'DexMemory' .claude/CLAUDE.md; then
+  pass "F-012: DexMemory referenced in CLAUDE.md"
 else
-  fail "F-012: DexMemory missing from instructions"
+  fail "F-012: DexMemory missing from CLAUDE.md"
 fi
 
 if [ -d "myDex/.dex/chronicle" ] && [ -d "myDex/.dex/decisions" ]; then
@@ -191,8 +191,8 @@ else
 fi
 
 # Intent Detection Protocol
-if grep -q 'GREETING.*AGENT-REQUEST.*TASK-DIRECT' .github/copilot-instructions.md 2>/dev/null || \
-   (grep -q 'GREETING' .github/copilot-instructions.md && grep -q 'TASK-DIRECT' .github/copilot-instructions.md); then
+if grep -q 'GREETING.*AGENT-REQUEST.*TASK-DIRECT' .claude/CLAUDE.md 2>/dev/null || \
+   (grep -q 'GREETING' .claude/CLAUDE.md && grep -q 'TASK-DIRECT' .claude/CLAUDE.md); then
   pass "Intent Detection Protocol present"
 else
   fail "Intent Detection Protocol missing"
@@ -396,7 +396,7 @@ fi
 
 # Guard: No hardcoded exact agent/workflow counts in user-facing docs (use 40+ instead)
 HARDCODED_COUNTS=0
-for guard_file in README.md .github/copilot-instructions.md; do
+for guard_file in README.md .claude/CLAUDE.md; do
   if [ -f "$guard_file" ]; then
     HC=$(grep -cE '\b(39|40|41|42|43|44|45) (agents|Agents|workflows|Workflows|specialized|expert|production|structured)' "$guard_file" 2>/dev/null || echo 0)
     HC=$(echo "$HC" | tr -d '[:space:]')
@@ -446,7 +446,7 @@ for agent_file in .github/agents/*.agent.md; do
     continue
   fi
   # Extract persona path from activation step
-  PERSONA_PATH=$(grep -o '\.dexCore/[a-z/_-]*/agents/[a-z_-]*.md' "$agent_file" 2>/dev/null | head -1)
+  PERSONA_PATH=$(grep -o '\.dexCore/[a-z/_-]*/agents/[a-z_-]*.md' "$agent_file" 2>/dev/null | head -1 || true)
   if [ -n "$PERSONA_PATH" ] && [ -f "$PERSONA_PATH" ]; then
     pass "Agent $name: persona file exists ($PERSONA_PATH)"
   elif [ -n "$PERSONA_PATH" ]; then
@@ -523,37 +523,37 @@ fi
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
 echo -e "\n${BOLD}[17/18] Guardrail Pattern Enforcement${NC}"
 
-# Check G3 enforcement in instructions
-if grep -q "Root-Forbidden" .github/copilot-instructions.md && grep -q "Smart Routing" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G3: Root-Forbidden + Smart Routing in instructions"
+# Check G3 enforcement in CLAUDE.md
+if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
+  pass "G3: Root-Forbidden + Smart Routing in CLAUDE.md"
 else
-  fail "G3: Missing Root-Forbidden enforcement in instructions"
+  fail "G3: Missing Root-Forbidden enforcement in CLAUDE.md"
 fi
 
 # Check G5 consent pattern
-if grep -q "WAIT for explicit" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G5: Consent pattern in instructions"
+if grep -q "WAIT for explicit" .claude/CLAUDE.md 2>/dev/null; then
+  pass "G5: Consent pattern (WAIT for explicit) in CLAUDE.md"
 else
   fail "G5: Consent pattern missing"
 fi
 
 # Check G6 no hallucinated paths
-if grep -q "Verify with file system" .github/copilot-instructions.md 2>/dev/null || grep -q "verify.*file system" .github/copilot-instructions.md 2>/dev/null; then
-  pass "G6: No hallucinated paths rule in instructions"
+if grep -q "Verify with file system" .claude/CLAUDE.md 2>/dev/null || grep -q "verify.*file system" .claude/CLAUDE.md 2>/dev/null; then
+  pass "G6: No hallucinated paths rule in CLAUDE.md"
 else
   warn "G6: Hallucinated paths rule may be missing"
 fi
 
 # Check hook enforcement exists
-if [ -f ".claude/settings.json" ] 2>/dev/null # Optional: Claude Code only && grep -q "PostToolUse" .claude/settings.json 2>/dev/null; then
+if [ -f ".claude/settings.json" ] && grep -q "PostToolUse" .claude/settings.json 2>/dev/null; then
   pass "Guardrail hook: PostToolUse hook configured"
 else
   warn "Guardrail hook: No PostToolUse hook in settings.json"
 fi
 
-if [ -f ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ] 2>/dev/null # Optional: Claude Code only; then
+if [ -f ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
   pass "Guardrail hook: post-write-check.sh exists"
-  if [ -x ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ] 2>/dev/null # Optional: Claude Code only; then
+  if [ -x ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
     pass "Guardrail hook: post-write-check.sh is executable"
   else
     fail "Guardrail hook: post-write-check.sh NOT executable"

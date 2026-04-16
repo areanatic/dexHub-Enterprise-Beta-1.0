@@ -39,8 +39,8 @@ scale_parameters:
   level_3: "12-40 stories, 2-5 epics, full PRD + architect handoff"
   level_4: "40+ stories, 5+ epics, enterprise PRD + architect handoff"
 
-# IDE integration points
-IDE_enhancements:
+# Claude Code integration points
+claude_code_enhancements:
   - injection_point: "prd-subagents"
   - available_subagents:
       - requirements-analyst: "Requirements analysis and refinement"

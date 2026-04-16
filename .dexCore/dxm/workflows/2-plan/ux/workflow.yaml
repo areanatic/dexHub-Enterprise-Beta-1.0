@@ -23,8 +23,8 @@ recommended_inputs:
   - product_brief: "{draft_folder}/product-brief.md"
   - gdd: "{draft_folder}/GDD.md"
 
-# IDE integration points
-IDE_enhancements:
+# Claude Code integration points
+claude_code_enhancements:
   - injection_point: "ux-subagents"
   - available_subagents:
       - ux-expert: "User experience design and best practices"

@@ -1,5 +1,5 @@
 <!-- Powered by DEX-CORE™ -->
-<!-- Contributed by Community Contributor -->
+<!-- Contributed by AI Gilden Member -->
 
 # Test Automation Framework Generator Agent
 
@@ -475,7 +475,7 @@ If no: Return to menu
 
 ### Example 1: Quick Java Framework
 
-**User:** "I want to test https://www.example.com in Java"
+**User:** "I want to test https://www.dhl.com in Java"
 
 **Agent:**
 ```

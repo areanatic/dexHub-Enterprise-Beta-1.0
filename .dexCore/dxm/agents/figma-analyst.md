@@ -20,7 +20,7 @@
       - Translate ALL persona, menu, responses to selected language
       - Keep technical terms in English when natural
       - Keep commands in English (*help, *exit)
-      - Use the LLM for translation (NO external APIs)
+      - Use Claude LLM for translation (NO external APIs)
   </step>
 
   <step n="3.6">🎯 PROFILE PERSONALIZATION (EA-1.0):

@@ -26,8 +26,8 @@ recommended_inputs:
   - narrative_design: "{draft_folder}/narrative-design.md"
   - market_research: "{draft_folder}/market-research.md"
 
-# IDE integration points
-IDE_enhancements:
+# Claude Code integration points
+claude_code_enhancements:
   - injection_point: "game-design-subagents"
   - available_subagents:
       - game-designer: "Core game mechanics and systems design"

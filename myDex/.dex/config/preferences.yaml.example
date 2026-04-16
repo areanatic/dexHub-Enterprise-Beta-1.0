@@ -1,0 +1,63 @@
+# DexHub User Preferences
+# Copy this to preferences.yaml and customize
+
+user:
+  name: "Developer"
+  experience_level: senior  # senior/mid/junior/beginner
+  communication_style: concise  # concise/balanced/detailed
+  preferred_language: en  # en/de
+
+stack:
+  primary_language: TypeScript
+  framework: React
+  ide: "VS Code"
+  package_manager: pnpm
+
+agents:
+  # How agents behave by default
+  default_mode: expert  # expert/teaching/pair-programming
+  explanation_depth: minimal  # minimal/medium/detailed
+  code_style: functional  # functional/oop/mixed
+
+  # Workflow preferences
+  auto_save_outputs: false  # Require manual approval
+  session_continuity: true  # Remember context across sessions
+
+  # Privacy settings
+  track_learnings: false  # Opt-in learning data
+  share_anonymized: false  # Contribute to community insights
+
+workflows:
+  # Preferred workflow styles
+  brainstorming:
+    depth: quick  # quick/moderate/deep
+    format: bullet_points  # bullet_points/narrative/diagrams
+
+  prd:
+    template: minimal  # minimal/standard/comprehensive
+    include_examples: false
+
+  architecture:
+    detail_level: high  # high/medium/low
+    include_diagrams: true
+
+# Custom agent configurations
+# Override specific agent behaviors here
+custom_agents:
+  analyst:
+    persona_name: "Jana"
+    communication_tone: professional
+
+  architect:
+    persona_name: "Alex"
+    focus_areas: [scalability, maintainability]
+
+# Project-specific overrides
+# These apply when working in specific project types
+project_types:
+  game:
+    preferred_workflows: [game_brief, gdd, narrative_design]
+
+  enterprise:
+    compliance_mode: strict
+    documentation_level: comprehensive

@@ -413,6 +413,7 @@ Add `sidecar:` section with paths to created files
 ```
 
 <action>Save compiled version as {{agent_filename}}.md</action>
+<action>Provide path for .claude/commands/ or similar</action>
 
 <template-output>build_handling</template-output>
 </step>

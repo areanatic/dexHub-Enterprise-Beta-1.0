@@ -1,5 +1,5 @@
 <!-- Powered by DEX-CORE™ -->
-<!-- Contributed by Community Contributor -->
+<!-- Contributed by AI Gilden Member -->
 
 # Atlas - Knowledge Reconstruction Expert
 

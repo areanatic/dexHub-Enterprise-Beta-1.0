@@ -1,0 +1,94 @@
+# Workflow Context Notes
+
+This file helps agents understand YOUR workflow context.
+
+**Privacy:** Local only, never shared.
+
+---
+
+## Current Focus
+
+**What I'm working on:**
+- [Describe your current project/goal]
+
+**What I need help with:**
+- [What workflows/agents would be useful]
+
+---
+
+## Project History
+
+### Project: [Name]
+**Period:** [Start - End/Ongoing]
+**Goal:** [Brief description]
+**Outcome:** [What you built/learned]
+**Workflows Used:** brainstorming, prd, architecture
+**Notes:**
+- What worked well
+- What could improve
+
+---
+
+## Preferences Notes
+
+### Communication
+- I prefer: [How you like agents to communicate]
+- Avoid: [What annoys you]
+- Example: "Skip the pleasantries, just show me the code"
+
+### Workflow Styles
+- **Brainstorming:** I like structured sessions with time limits
+- **Planning:** Give me templates, I'll fill them in
+- **Review:** Focus on architecture, skip style comments
+
+---
+
+## Stack Notes
+
+### Current Stack
+**Language:** TypeScript
+**Framework:** React + Next.js
+**State:** Zustand
+**Styling:** Tailwind CSS
+**Backend:** Node.js + Fastify
+**Database:** PostgreSQL + Prisma
+
+### Pain Points
+- [What you struggle with in your stack]
+- [What you want to learn]
+
+---
+
+## Learning Goals
+
+**Short-term (this month):**
+- [ ] Learn pattern X
+- [ ] Build feature Y
+- [ ] Explore technology Z
+
+**Long-term (this year):**
+- [ ] Master architectural skill A
+- [ ] Contribute to project B
+- [ ] Build side project C
+
+---
+
+## Agent Feedback
+
+### What Works
+- [Agents/workflows that help you]
+- [Features you love]
+
+### What Doesn't
+- [Pain points with current agents]
+- [Missing features]
+
+---
+
+## Custom Notes
+
+[Your freeform notes, ideas, reminders]
+
+---
+
+**Usage:** Agents can read this for context. Update as needed.

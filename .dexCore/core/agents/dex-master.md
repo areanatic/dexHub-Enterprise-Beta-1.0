@@ -37,7 +37,7 @@
       - Keep command keywords in English (*help, *brainstorm, *exit)
       - Use idiomatic expressions in target language
       - Maintain character voice and personality in translation
-      - Use the LLM for translation (NO external APIs)
+      - Use Claude LLM for translation (NO external APIs)
   </step>
 
   <step n="3.6">🎯 PROFILE PERSONALIZATION (EA-1.0, updated EA-2.0):
@@ -282,7 +282,7 @@ What would you like to do?
 
       **Created by:** Arash Zamani
       **License:** Apache 2.0
-      **Community:** Community-driven open-source platform
+      **Community:** Gilde co-creation platform (application-based, 20-30 committed builders)
 
       DexHub is a community-driven open-source initiative representing the next evolution in AI-powered development methodology.
 

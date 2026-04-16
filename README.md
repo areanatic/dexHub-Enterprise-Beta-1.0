@@ -2,7 +2,7 @@
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/version-EB--1.0-orange" alt="Version">
   <img src="https://img.shields.io/badge/agents-43-blueviolet" alt="Agents">
-  <img src="https://img.shields.io/badge/workflows-45-blueviolet" alt="Workflows">
+  <img src="https://img.shields.io/badge/workflows-48-blueviolet" alt="Workflows">
   <img src="https://img.shields.io/badge/skills-12-blueviolet" alt="Skills">
   <img src="https://img.shields.io/badge/100%25-local-green" alt="Local">
 </p>
@@ -303,7 +303,7 @@ The framework follows a distributed model: teams build their own agents and work
 ## Quality & Validation
 
 ```bash
-# 168 automated structural checks
+# 251 automated structural checks (9 guardrails)
 bash .dexCore/_dev/tools/validate.sh
 
 # Profile schema validation

@@ -2,38 +2,32 @@
 
 # myDex - Your Personal Workspace & Profile Manager
 
-> **✅  IMPLEMENTATION STATUS: V2.0 (EA-2.0 Beta)**
+> **STATUS (honest labeling, 2026-04-14): Spec-complete, agent-driven, untested at scale**
 >
 > This agent uses the **SPEC-ONLY pattern** — the LLM reads this specification
-> and executes directly via file tools.
+> and executes directly via file tools. **There is no compiled runtime, no
+> background worker, and no test suite proving the flow works end-to-end.**
+> Everything here is what the agent is *supposed* to do; whether it actually
+> does it on a given session is a function of whether the LLM follows the spec.
 >
-> ✅ **Implemented:**
-> - Agent structure with detailed onboarding_execution steps
-> - Question database (onboarding-questions.yaml v4.1, 37 questions)
-> - Profile schema (profile.yaml.example)
-> - Welcome and completion prompts
-> - 3 Onboarding variants: MINIMAL (5q) / SMART (16q) / VOLLSTAENDIG (37q)
-> - Integration with mydex-project-manager
-> - First-time welcome flow (in dex-master)
+> **Spec is defined for:**
+> - Onboarding question flow (questions database in `myDex/.dex/config/onboarding-questions.yaml`, current version v4.3 with 42 questions)
+> - Profile generation against `myDex/.dex/config/profile.yaml.example` template
+> - 3 Onboarding variants: MINIMAL (5q) / SMART (16q) / VOLLSTAENDIG (~42q)
+> - Welcome + completion prompts, bilingual DE/EN
+> - Integration hooks for project-manager and dex-master
 >
-> ✅ **Execution Flow Complete:**
-> - [x] Agent reads onboarding-questions.yaml
-> - [x] Agent asks questions conversationally (bilingual DE/EN support)
-> - [x] Agent generates profile.yaml from answers
-> - [x] Profile validation against schema
-> - [x] Completion percentage calculation
-> - [x] 5 critical edge cases handled
-> - [x] YAML generation with profile_path mapping
+> **Known gaps between spec and reality:**
+> - Schema drift between `profile-schema-v1.0.yaml` and `profile.yaml.example` — see `FIX-PLAN-PROFILE-SCHEMA.md` in `myDex/drafts/` for the 3 remaining surgical fixes (Phase 2 Block 3 scope)
+> - Chronicle / decisions / CONTEXT.md writes are **agent-driven during the turn**, not automatic. See SHARED.md § DexMemory for honest description.
+> - End-to-end runs of SMART and VOLLSTÄNDIG variants never validated
+> - Edge cases (cancel mid-flow, invalid input, existing profile) defined but not tested
 >
-> 🧪 **Testing Required:**
-> - [ ] End-to-end test with SMART variant
-> - [ ] End-to-end test with VOLLSTÄNDIG variant
-> - [ ] Edge cases (cancel, invalid input, existing profile)
-> - [ ] Multilingual test (DE/EN switching)
+> **The table at the top (previously labeled "✅ Implemented") conflated "spec written" with "runtime verified". Those are different things. Read this header before trusting any checkmark deeper in the file.**
 >
 > **Reference:**
 > - Implementation Plan: `.dexCore/_dev/roadmap/V1.1.2-MYDEX-ONBOARDING.md`
-> - Pattern Documentation: `docs/learnings/template-filling-agent-pattern-v1.md`
+> - Pattern Documentation: `.claude/learnings/template-filling-agent-pattern-v1.md`
 > - Questions Database: `myDex/.dex/config/onboarding-questions.yaml`
 > - Profile Schema: `myDex/.dex/config/profile.yaml.example`
 >
@@ -87,7 +81,7 @@
       - Translate ALL persona, menu, responses to selected language
       - Keep technical terms in English (Pull Request, myDex, profile.yaml)
       - Keep commands in English (*onboarding, *profile, *projects, *back)
-      - Use the LLM for translation (NO external APIs)
+      - Use Claude LLM for translation (NO external APIs)
   </step>
 
   <step n="3.6">🎯 PROFILE PERSONALIZATION (EA-1.0, updated EA-2.0):
@@ -1472,7 +1466,7 @@ Rolle: {identity.role} | AI-Level: {ai.readiness_level} | Ziel: {growth.six_mont
   <overview>
     This section defines HOW to execute the onboarding Q&A flow.
     Pattern: Template-Filling Agent (SPEC-ONLY)
-    The LLM reads these steps and executes via Read/Write tools.
+    Claude reads these steps and executes via Read/Write tools.
   </overview>
 
   <step n="1" title="Load Onboarding Questions">
@@ -1800,7 +1794,7 @@ Optionen:
       <schema_validation>
         <note>Validate against profile-schema-v1.0.yaml (EA-1.0, updated EA-2.0)</note>
         <action>
-          Execute: python .dexCore/_dev/tools/validate_profile_schema.py myDex/.dex/config/profile.yaml
+          Execute: python .dexCore/_dev/scripts/validate_profile_schema.py myDex/.dex/config/profile.yaml
         </action>
         <action>
           IF exit_code == 0:

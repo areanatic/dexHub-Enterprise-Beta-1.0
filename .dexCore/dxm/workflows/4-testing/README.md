@@ -414,7 +414,7 @@ prod.url=https://www.example.com
 
 ## Credits
 
-**Created by:** DexHub Community  
+**Created by:** DexHub AI Gilden Project  
 **Agent Author:** Arash Zamani  
 **Version:** 1.0.0  
 **License:** MIT
