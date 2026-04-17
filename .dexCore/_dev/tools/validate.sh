@@ -35,7 +35,7 @@ echo -e "${BOLD}========================================${NC}"
 echo ""
 
 # ==================== SECTION 1: Byte Limits ====================
-echo -e "${BOLD}[1/18] Byte Limits${NC}"
+echo -e "${BOLD}[1/20] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
 if [ "$BYTES" -le 30500 ]; then
@@ -45,7 +45,7 @@ else
 fi
 
 # ==================== SECTION 2: Bug Status ====================
-echo -e "\n${BOLD}[2/18] Bug Status${NC}"
+echo -e "\n${BOLD}[2/20] Bug Status${NC}"
 
 OPEN_BUGS=$(grep -c 'status: open\|status: confirmed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
 OPEN_BUGS=$(echo "$OPEN_BUGS" | tr -d '[:space:]')
@@ -71,7 +71,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/18] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/20] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 # GREETING action — check key phrase exists in both
 if grep -q 'Display the.*EXACTLY as defined' .claude/CLAUDE.md && \
@@ -114,7 +114,7 @@ else
 fi
 
 # ==================== SECTION 4: File Existence ====================
-echo -e "\n${BOLD}[4/18] Critical File Existence${NC}"
+echo -e "\n${BOLD}[4/20] Critical File Existence${NC}"
 
 FILES=(
   ".dexCore/core/agents/dex-master.md"
@@ -147,7 +147,7 @@ for f in "${FILES[@]}"; do
 done
 
 # ==================== SECTION 5: Feature Validation ====================
-echo -e "\n${BOLD}[5/18] Feature Artifact Validation${NC}"
+echo -e "\n${BOLD}[5/20] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
@@ -223,7 +223,7 @@ else
 fi
 
 # ==================== SECTION 6: Architecture Rules ====================
-echo -e "\n${BOLD}[6/18] Architecture Rules${NC}"
+echo -e "\n${BOLD}[6/20] Architecture Rules${NC}"
 
 # G3: No files in root (except allowed)
 ALLOWED_ROOT="CONTRIBUTING.md|LICENSE|NOTICE|README.md|.gitignore|.gitattributes|myDex|tests"
@@ -249,7 +249,7 @@ else
 fi
 
 # ==================== SECTION 7: Sanity Checks ====================
-echo -e "\n${BOLD}[7/18] Sanity Checks${NC}"
+echo -e "\n${BOLD}[7/20] Sanity Checks${NC}"
 
 # Agent count
 AGENT_FILES=$(find .dexCore/dxm/agents -name "*.md" 2>/dev/null | wc -l)
@@ -267,7 +267,7 @@ else
 fi
 
 # ==================== SECTION 8: Agent File Validation ====================
-echo -e "\n${BOLD}[8/18] Agent File Validation${NC}"
+echo -e "\n${BOLD}[8/20] Agent File Validation${NC}"
 
 # Check all .agent.md files have required frontmatter
 for agent_file in .github/agents/*.agent.md; do
@@ -292,7 +292,7 @@ else
 fi
 
 # ==================== SECTION 9: Skill Validation ====================
-echo -e "\n${BOLD}[9/18] Skill Validation${NC}"
+echo -e "\n${BOLD}[9/20] Skill Validation${NC}"
 
 SKILL_COUNT=$(find .github/skills -name "SKILL.md" 2>/dev/null | wc -l)
 pass "Copilot Skills found: $SKILL_COUNT"
@@ -316,7 +316,7 @@ for skill_dir in .github/skills/*/; do
 done
 
 # ==================== SECTION 10: Manifest Sync ====================
-echo -e "\n${BOLD}[10/18] Manifest Sync${NC}"
+echo -e "\n${BOLD}[10/20] Manifest Sync${NC}"
 
 # Workflow manifest paths should use .dexCore/ not dex/
 BAD_PATHS=$(grep -c '"dex/' .dexCore/_cfg/workflow-manifest.csv 2>/dev/null || echo 0)
@@ -339,7 +339,7 @@ else
 fi
 
 # ==================== SECTION 11: Platform Hygiene ====================
-echo -e "\n${BOLD}[11/18] Platform Hygiene${NC}"
+echo -e "\n${BOLD}[11/20] Platform Hygiene${NC}"
 
 # No Claude Code refs in user-facing files
 CC_REFS=0
@@ -381,7 +381,7 @@ else
 fi
 
 # ==================== SECTION 12: Number Consistency ====================
-echo -e "\n${BOLD}[12/18] Number Consistency${NC}"
+echo -e "\n${BOLD}[12/20] Number Consistency${NC}"
 
 # Count actual values
 ACTUAL_AGENTS=$(tail -n +2 .dexCore/_cfg/agent-manifest.csv | wc -l | tr -d ' ')
@@ -414,7 +414,7 @@ else
 fi
 
 # ==================== SECTION 13: Workflow YAML Validation ====================
-echo -e "\n${BOLD}[13/18] Workflow YAML Validation${NC}"
+echo -e "\n${BOLD}[13/20] Workflow YAML Validation${NC}"
 
 WORKFLOW_PASS=0
 WORKFLOW_FAIL=0
@@ -440,7 +440,7 @@ if [ "$WORKFLOW_FAIL" -gt 0 ]; then
 fi
 
 # ==================== SECTION 14: Agent Persona Consistency ====================
-echo -e "\n${BOLD}[14/18] Agent Persona Consistency${NC}"
+echo -e "\n${BOLD}[14/20] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
@@ -461,7 +461,7 @@ for agent_file in .github/agents/*.agent.md; do
 done
 
 # ==================== SECTION 15: Cross-Reference Integrity ====================
-echo -e "\n${BOLD}[15/18] Cross-Reference Integrity${NC}"
+echo -e "\n${BOLD}[15/20] Cross-Reference Integrity${NC}"
 
 # Check key paths mentioned in copilot-instructions.md
 CRITICAL_PATHS=(
@@ -483,7 +483,7 @@ for ref_path in "${CRITICAL_PATHS[@]}"; do
 done
 
 # ==================== SECTION 16: Onboarding Logic ====================
-echo -e "\n${BOLD}[16/18] Onboarding Logic${NC}"
+echo -e "\n${BOLD}[16/20] Onboarding Logic${NC}"
 
 QUESTIONS_FILE="myDex/.dex/config/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
@@ -525,7 +525,7 @@ else
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
-echo -e "\n${BOLD}[17/18] Guardrail Pattern Enforcement${NC}"
+echo -e "\n${BOLD}[17/20] Guardrail Pattern Enforcement${NC}"
 
 # Check G3 enforcement in CLAUDE.md
 if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
@@ -567,7 +567,7 @@ else
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
-echo -e "\n${BOLD}[18/18] DexMemory & Chronicle Structure${NC}"
+echo -e "\n${BOLD}[18/20] DexMemory & Chronicle Structure${NC}"
 
 # DexMemory infrastructure
 if [ -d "myDex/.dex/chronicle" ]; then
@@ -631,6 +631,96 @@ if grep -q "chronicle/" .gitignore 2>/dev/null; then
   pass "Privacy: chronicle/ is gitignored"
 else
   warn "Privacy: chronicle/ may not be gitignored"
+fi
+
+# ==================== SECTION 19: SSOT Instruction Drift Detection ====================
+echo -e "\n${BOLD}[19/20] SSOT Instruction Drift Detection${NC}"
+
+if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
+  if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
+    pass "Instruction outputs are in sync with sources (SHARED.md + tails)"
+  else
+    fail "Instructions STALE — run: bash .dexCore/_dev/tools/build-instructions.sh"
+  fi
+else
+  warn "build-instructions.sh not found — cannot check SSOT drift"
+fi
+
+# Verify generated files exist
+for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
+  if [ -f "$gen_file" ]; then
+    pass "Generated file exists: $gen_file"
+  else
+    fail "Generated file MISSING: $gen_file"
+  fi
+done
+
+# ==================== SECTION 20: Files-Manifest Integrity ====================
+echo -e "\n${BOLD}[20/20] Files-Manifest Integrity${NC}"
+
+if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
+  MANIFEST_TOTAL=$(tail -n +2 .dexCore/_cfg/files-manifest.csv | wc -l | tr -d ' ')
+  MANIFEST_MISSING=0
+  MANIFEST_HASH_FAIL=0
+  MANIFEST_CHECKED=0
+
+  # Check file existence for ALL entries, hash-check a sample of critical files
+  while IFS=',' read -r type name module path hash; do
+    # Skip header
+    [ "$type" = "type" ] && continue
+
+    # Strip quotes
+    path="${path%\"}"
+    path="${path#\"}"
+    hash="${hash%\"}"
+    hash="${hash#\"}"
+
+    # Skip empty paths
+    [ -z "$path" ] && continue
+
+    if [ ! -e "$path" ]; then
+      MANIFEST_MISSING=$((MANIFEST_MISSING + 1))
+      # Only report first 5 missing files to avoid flooding
+      if [ "$MANIFEST_MISSING" -le 5 ]; then
+        fail "Files-Manifest: MISSING $path"
+      fi
+    fi
+  done < .dexCore/_cfg/files-manifest.csv
+
+  if [ "$MANIFEST_MISSING" -eq 0 ]; then
+    pass "Files-Manifest: all $MANIFEST_TOTAL tracked files exist"
+  elif [ "$MANIFEST_MISSING" -gt 5 ]; then
+    fail "Files-Manifest: $MANIFEST_MISSING files missing (showing first 5 above)"
+  fi
+
+  # Hash-check critical files (manifests, configs, truth-manifest, dex-master)
+  CRITICAL_PATTERNS="manifest\|config\.yaml\|truth-manifest\|SHARED\.md\|dex-master\.md"
+  while IFS=',' read -r type name module path hash; do
+    [ "$type" = "type" ] && continue
+    path="${path%\"}"
+    path="${path#\"}"
+    hash="${hash%\"}"
+    hash="${hash#\"}"
+
+    [ -z "$path" ] || [ -z "$hash" ] && continue
+    echo "$path" | grep -q "$CRITICAL_PATTERNS" || continue
+    [ ! -f "$path" ] && continue
+
+    MANIFEST_CHECKED=$((MANIFEST_CHECKED + 1))
+    ACTUAL_HASH=$(shasum -a 256 "$path" 2>/dev/null | cut -d' ' -f1)
+    if [ "$ACTUAL_HASH" != "$hash" ]; then
+      MANIFEST_HASH_FAIL=$((MANIFEST_HASH_FAIL + 1))
+      warn "Files-Manifest: hash mismatch for $path"
+    fi
+  done < .dexCore/_cfg/files-manifest.csv
+
+  if [ "$MANIFEST_CHECKED" -gt 0 ] && [ "$MANIFEST_HASH_FAIL" -eq 0 ]; then
+    pass "Files-Manifest: $MANIFEST_CHECKED critical file hashes verified"
+  elif [ "$MANIFEST_HASH_FAIL" -gt 0 ]; then
+    warn "Files-Manifest: $MANIFEST_HASH_FAIL/$MANIFEST_CHECKED critical hash mismatches (run rebuild or update manifest)"
+  fi
+else
+  warn "Files-Manifest not found — skipping integrity check"
 fi
 
 # ==================== SUMMARY ====================
