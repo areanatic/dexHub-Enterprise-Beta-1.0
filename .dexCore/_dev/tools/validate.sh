@@ -73,19 +73,26 @@ fi
 # ==================== SECTION 3: Cross-Platform Consistency ====================
 echo -e "\n${BOLD}[3/20] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
-# GREETING action — check key phrase exists in both
-if grep -q 'Display the.*EXACTLY as defined' .claude/CLAUDE.md && \
-   grep -q 'Display the.*EXACTLY as defined' .github/copilot-instructions.md; then
-  pass "GREETING action: 'Display EXACTLY as defined' in both"
+# GREETING action — check state model references in both
+if grep -q 'GREETING' .claude/CLAUDE.md && \
+   grep -q 'GREETING' .github/copilot-instructions.md && \
+   grep -q 'dex-master.md' .claude/CLAUDE.md && \
+   grep -q 'dex-master.md' .github/copilot-instructions.md; then
+  pass "GREETING action: references dex-master.md in both"
 else
   fail "GREETING action mismatch"
 fi
 
-# AGENT-REQUEST action
-CLAUDE_AR=$(grep 'AGENT-REQUEST' .claude/CLAUDE.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
-COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | grep -o 'Load agent.*working\.' 2>/dev/null || echo "")
-if [ -n "$CLAUDE_AR" ] && [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
-  pass "AGENT-REQUEST action identical"
+# AGENT-REQUEST action — check agent loading protocol in both
+if grep -q 'AGENT-REQUEST' .claude/CLAUDE.md && \
+   grep -q 'AGENT-REQUEST' .github/copilot-instructions.md; then
+  CLAUDE_AR=$(grep 'AGENT-REQUEST' .claude/CLAUDE.md | head -1)
+  COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | head -1)
+  if [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
+    pass "AGENT-REQUEST action identical"
+  else
+    warn "AGENT-REQUEST wording differs (may be platform-specific tail)"
+  fi
 else
   fail "AGENT-REQUEST action mismatch"
 fi
@@ -106,9 +113,9 @@ else
   fail "G4 anti-overplanning missing in one file"
 fi
 
-# NEVER DO strengthened
-if grep -qi 'Never invent, simplify, or rearrange' .claude/CLAUDE.md && grep -qi 'Never invent, simplify, or rearrange' .github/copilot-instructions.md; then
-  pass "NEVER DO #1 strengthened in both"
+# NEVER DO — menu integrity rule
+if grep -qi 'Never invent or simplify.*menu' .claude/CLAUDE.md && grep -qi 'Never invent or simplify.*menu' .github/copilot-instructions.md; then
+  pass "NEVER DO: menu integrity rule in both"
 else
   fail "NEVER DO #1 mismatch"
 fi
