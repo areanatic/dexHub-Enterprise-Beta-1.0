@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [],
+    "additionalDirectories": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/skills/dexhub-testing/scripts/post-write-check.sh",
+            "timeout": 5,
+            "statusMessage": "Checking DexHub guardrails..."
+          }
+        ]
+      }
+    ]
+  }
+}

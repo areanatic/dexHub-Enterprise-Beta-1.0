@@ -158,7 +158,7 @@ Transform development through AI collaboration:
 
 ### Portability Principle
 
-DexHub is a **Portability Layer across LLM Providers**. The same SHARED instructions + truth-manifest drive behavior in GitHub Copilot, Claude Code, Cursor, Continue.dev, Ollama, and direct API callers. Platform-specific adaptations live in small tail files, not in the core rules.
+DexHub is a **Portability Layer across LLM Providers**. The same SHARED instructions + truth-manifest drive behavior across all supported platforms (Copilot, CLI agents, Cursor, Continue.dev, Ollama, direct API callers). Platform-specific adaptations live in small tail files, not in the core rules.
 
 ---
 
@@ -287,7 +287,7 @@ Layer 1 (truth-manifest + files it promotes) always overrides Layer 2 (indexed k
 ### DexHub Architecture Principle
 
 **Root directory is RESERVED for essential project files ONLY:**
-- `.claude/` (Claude Code config; never pushed to enterprise targets)
+- `.claude/` (CLI agent config; never pushed to enterprise targets)
 - `.dexCore/` (development silo)
 - `.github/` (GitHub config)
 - `myDex/` (user workspace)

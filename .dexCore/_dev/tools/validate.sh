@@ -55,11 +55,15 @@ else
   fail "$OPEN_BUGS bugs still open/confirmed"
 fi
 
-FIXED_BUGS=$(grep -c 'status: fixed' .dexCore/_dev/todos/bugs.md 2>/dev/null || echo "0")
+FIXED_BUGS=$(grep -c 'status: fixed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
+FIXED_BUGS=$(echo "$FIXED_BUGS" | tr -d '[:space:]')
+: "${FIXED_BUGS:=0}"
 pass "$FIXED_BUGS bugs marked as fixed"
 
 # Bug detail checks (only if bugs are tracked)
-BUG_COUNT=$(grep -c 'id: BUG-' .dexCore/_dev/todos/bugs.md 2>/dev/null || echo "0")
+BUG_COUNT=$(grep -c 'id: BUG-' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
+BUG_COUNT=$(echo "$BUG_COUNT" | tr -d '[:space:]')
+: "${BUG_COUNT:=0}"
 if [ "$BUG_COUNT" -gt 0 ]; then
   pass "Bug tracking active ($BUG_COUNT bugs tracked)"
 else
@@ -388,7 +392,7 @@ ACTUAL_AGENT_FILES=$(ls .github/agents/*.agent.md 2>/dev/null | wc -l | tr -d ' 
 pass "Actual counts: ${ACTUAL_AGENTS} agents, ${ACTUAL_SKILLS} skills, ${ACTUAL_WORKFLOWS} workflows, ${ACTUAL_AGENT_FILES} .agent.md"
 
 # Check README claims match reality
-if grep -q "${ACTUAL_SKILLS} skills\|${ACTUAL_SKILLS} Skills" README.md 2>/dev/null; then
+if grep -qiE "${ACTUAL_SKILLS} (skills|knowledge packs)" README.md 2>/dev/null; then
   pass "README skill count matches reality ($ACTUAL_SKILLS)"
 else
   warn "README skill count may not match reality ($ACTUAL_SKILLS actual)"
@@ -440,13 +444,13 @@ echo -e "\n${BOLD}[14/18] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
-  # Skip DHL agents (self-contained, no persona file)
-  if echo "$name" | grep -q "dhl-"; then
-    pass "Agent $name: self-contained (DHL — no persona file)"
+  # Skip self-contained agents (no separate persona file)
+  if echo "$name" | grep -qE "dhl-|onboarding"; then
+    pass "Agent $name: self-contained (no persona file)"
     continue
   fi
-  # Extract persona path from activation step
-  PERSONA_PATH=$(grep -o '\.dexCore/[a-z/_-]*/agents/[a-z_-]*.md' "$agent_file" 2>/dev/null | head -1 || true)
+  # Extract persona path from activation step (dxm/agents, _dev/agents, or custom-agents)
+  PERSONA_PATH=$(grep -o '\.dexCore/[a-z/_-]*/[a-z_-]*.md' "$agent_file" 2>/dev/null | grep -E '(agents|custom-agents)/' | head -1 || true)
   if [ -n "$PERSONA_PATH" ] && [ -f "$PERSONA_PATH" ]; then
     pass "Agent $name: persona file exists ($PERSONA_PATH)"
   elif [ -n "$PERSONA_PATH" ]; then
