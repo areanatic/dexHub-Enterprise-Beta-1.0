@@ -1,0 +1,52 @@
+name: DexHub E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  structural:
+    name: Structural E2E (no Claude/Copilot required)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby (for YAML parsing)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Run validate.sh
+        run: bash .dexCore/_dev/tools/validate.sh
+
+      - name: Run E2E test suite
+        run: bash tests/e2e/run-all.sh
+
+      - name: Upload test output on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-output
+          path: |
+            tests/e2e/*.log
+            /tmp/test-*.json
+
+  # Future job: claude-e2e
+  # Requires: Claude Code binary available in CI environment
+  # Will run tests 10-*.test.sh etc. (agent loading, workflow execution)
+  # Commented out until claude-runner.sh tests are implemented
+  #
+  # claude-e2e:
+  #   name: Claude Code E2E (agent loading + workflows)
+  #   runs-on: ubuntu-latest
+  #   needs: structural
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install Claude Code
+  #       run: ... # TBD when tests exist
+  #     - name: Run Claude-dependent tests
+  #       run: bash tests/e2e/run-all.sh --filter "claude-required"
