@@ -731,25 +731,32 @@ else
 fi
 
 # ==================== SECTION 21: Source File Semantic Consistency ====================
-echo -e "\n${BOLD}[21/21] Source File Semantic Consistency (SHARED vs tails)${NC}"
+echo -e "\n${BOLD}[21/21] Source File Semantic Consistency (SHARED vs peer files)${NC}"
 
 # Detect contradictions between SHARED.md and the platform-specific tails.
 # Catches the class of bug where SHARED.md asserts a new paradigm but a tail
 # still uses old paradigm language (e.g., D1 Agent Boundary refactor drift).
 
-SOURCES="$(find .dexCore/core/instructions -name '*.md' -maxdepth 1 2>/dev/null)"
 SHARED=".dexCore/core/instructions/SHARED.md"
-CLAUDE_TAIL=".dexCore/core/instructions/claude-specific.md"
-COPILOT_TAIL=".dexCore/core/instructions/copilot-specific.md"
+# All peer files in the instructions dir that must stay consistent with SHARED.
+# Includes tails AND truth-manifest (added 2026-04-18 after Phase 4 Reality Sync
+# found truth-manifest.md had drifted with "permanent orchestrator" wording).
+PEER_FILES=(
+  ".dexCore/core/instructions/claude-specific.md"
+  ".dexCore/core/instructions/copilot-specific.md"
+  ".dexCore/core/instructions/truth-manifest.md"
+)
 
-# Deprecated phrases — if SHARED has moved past them, tails must too.
+# Deprecated phrases — if SHARED has moved past them, peers must too.
 # Each entry: phrase|reason
 DEPRECATED_PHRASES=(
   "DexMaster is ALWAYS active|Old meta-layer paradigm (pre-D1)"
   "FIRST RESPONDER|Old meta-layer paradigm (pre-D1)"
   "Evaluate intent on EVERY message|Old meta-layer paradigm (pre-D1)"
   "permanent first responder|Contradicts on-demand agent model (D1)"
+  "permanent orchestrator|Contradicts on-demand agent model (D1)"
   "Level 1.*Orchestration.*Level 2.*Level 3|Old DexMaster scope-levels (pre-D1)"
+  "always_load_on:|Old always-active load semantic (pre-D1); use load_on: instead"
 )
 
 CONSISTENCY_ISSUES=0
@@ -759,35 +766,32 @@ for entry in "${DEPRECATED_PHRASES[@]}"; do
 
   # Check if SHARED has already moved past this phrase
   if grep -qE "$phrase" "$SHARED" 2>/dev/null; then
-    # SHARED still uses it — not actually deprecated yet, skip
     continue
   fi
 
-  # SHARED has moved past it. Check tails.
-  for tail_file in "$CLAUDE_TAIL" "$COPILOT_TAIL"; do
-    [ -f "$tail_file" ] || continue
-    if grep -qE "$phrase" "$tail_file" 2>/dev/null; then
-      fail "Source consistency: $(basename "$tail_file") uses deprecated phrase '$phrase' ($reason)"
+  # SHARED has moved past it. Check peer files.
+  for peer_file in "${PEER_FILES[@]}"; do
+    [ -f "$peer_file" ] || continue
+    if grep -qE "$phrase" "$peer_file" 2>/dev/null; then
+      fail "Source consistency: $(basename "$peer_file") uses deprecated phrase '$phrase' ($reason)"
       CONSISTENCY_ISSUES=$((CONSISTENCY_ISSUES + 1))
     fi
   done
 done
 
-# Required new paradigm phrases — SHARED established them, tails should not contradict
+# Contradictions to new paradigm
 if grep -q "loaded on demand" "$SHARED" 2>/dev/null; then
-  # New paradigm is in SHARED. Tails must not contradict.
-  for tail_file in "$CLAUDE_TAIL" "$COPILOT_TAIL"; do
-    [ -f "$tail_file" ] || continue
-    # Contradictions to flag
-    if grep -qE "DexMaster is active\b" "$tail_file" 2>/dev/null; then
-      fail "Source consistency: $(basename "$tail_file") says 'DexMaster is active' — contradicts 'loaded on demand' in SHARED.md"
+  for peer_file in "${PEER_FILES[@]}"; do
+    [ -f "$peer_file" ] || continue
+    if grep -qE "DexMaster is active\b" "$peer_file" 2>/dev/null; then
+      fail "Source consistency: $(basename "$peer_file") says 'DexMaster is active' — contradicts 'loaded on demand' in SHARED.md"
       CONSISTENCY_ISSUES=$((CONSISTENCY_ISSUES + 1))
     fi
   done
 fi
 
 if [ "$CONSISTENCY_ISSUES" -eq 0 ]; then
-  pass "Source file semantic consistency: SHARED.md + tails aligned"
+  pass "Source file semantic consistency: SHARED.md + ${#PEER_FILES[@]} peer files aligned"
 fi
 
 # ==================== SUMMARY ====================

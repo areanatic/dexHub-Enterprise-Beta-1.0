@@ -42,14 +42,14 @@ global_instructions:
 ```yaml
 global_agents:
   - path: .dexCore/core/agents/dex-master.md
-    role: "DexMaster — permanent orchestrator (loaded via intent detection protocol)"
+    role: "DexMaster — on-demand orchestrator (loaded in IDLE state; dormant when another agent is active; see ADR-009)"
     critical: true
-    always_load_on: [greeting, agent-request-ambiguous]
+    load_on: [greeting, agent-request-ambiguous]
 
   - path: .dexCore/core/agents/mydex-agent.md
     role: "myDex Project Manager — project context, chronicle, DexMemory handlers"
     critical: true
-    always_load_on: [project-active]
+    load_on: [project-active]
 ```
 
 ## Global Layer 1 — Config
