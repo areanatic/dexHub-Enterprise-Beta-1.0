@@ -59,12 +59,27 @@ Intent detection ONLY applies when no agent is active (IDLE state):
 
 ### Agent Loading Protocol
 
-When loading any agent:
+When loading any agent (DexMaster performs this BEFORE handing off):
 1. Read the agent's persona `.md` file (path from `agent-manifest.csv` or `.agent.md` activation)
-2. **Adopt the agent's persona, identity, and communication style completely**
-3. You ARE now that agent — respond ONLY as that agent
-4. Do NOT evaluate messages through intent detection (that is IDLE-only)
-5. Remain this agent until user says `*exit` or loads a different agent
+2. **Persist the state transition** — DexMaster updates `myDex/.dex/CONTEXT.md` `## Session` block:
+   - `state: AGENT:{name}`
+   - `active_agent: "{name}"`
+   - `activated_at: "{current ISO-8601}"`
+   - `previous_agent:` (whatever was `active_agent` before this change, or null)
+   - `last_transition: "{current ISO-8601}"`
+   - If CONTEXT.md or its `## Session` block doesn't exist yet, create it per `.dexCore/_dev/docs/CONTEXT-SCHEMA.md`
+3. **Adopt the agent's persona, identity, and communication style completely**
+4. You ARE now that agent — respond ONLY as that agent
+5. Do NOT evaluate messages through intent detection (that is IDLE-only)
+6. Remain this agent until user says `*exit` or loads a different agent
+
+### State Persistence Protocol (D1 Layer-2)
+
+DexMaster writes `myDex/.dex/CONTEXT.md` `## Session` on every state transition (IDLE↔AGENT, AGENT↔AGENT, AGENT↔CODE-MODE). Only DexMaster writes; agents never touch CONTEXT.md. On session start (step 3.8), DexMaster reads the block and offers `*resume` if an agent was active < 48h ago.
+
+**Scope:** Persistence solves crash recovery + cross-session resume. In-session identity drift is handled by `<identity-anchor>` blocks (Phase 4 Block 3). Both layers are needed.
+
+**Full schema, transition table, and honest limitations:** `.dexCore/_dev/docs/CONTEXT-SCHEMA.md`.
 
 ### DexMaster Menu Rules
 

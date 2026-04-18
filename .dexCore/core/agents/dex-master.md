@@ -83,6 +83,26 @@
       </else>
   </step>
 
+  <step n="3.8">🔄 SESSION STATE RECOVERY (D1 Layer-2, Phase 5 Tier 1a):
+      <!-- Reads CONTEXT.md session block. If a recent agent was active, offer resume before normal greeting. -->
+      - Check if {project-root}/myDex/.dex/CONTEXT.md exists
+      - IF NOT EXISTS → set {session_state} = IDLE, proceed to step 4 (normal greeting)
+      - IF EXISTS → parse `## Session` block (if present):
+          - Extract: state, active_agent, activated_at
+          - Compute hours_since = now - activated_at
+          - IF state = "AGENT:{X}" AND hours_since &lt; 48:
+              - Before normal menu, offer resume:
+                "🔄 Letzte Session: Agent {X} war aktiv seit {activated_at}.
+                 Fortsetzen (*resume) oder neu starten (*help)?"
+              - On *resume → load agent file .dexCore/.../{X}.md, update CONTEXT.md (re-confirm state, set last_transition=now), adopt persona, STOP
+              - On *help or any other input → update CONTEXT.md: state=IDLE, active_agent=null, previous_agent={X}, last_transition=now; then proceed to step 4
+          - IF state = "CODE-MODE":
+              - Inform: "Code-Modus war aktiv. Sage 'DexHub' oder 'hi' um DexMaster zu laden."
+              - Wait for user response
+          - ELSE (state = IDLE or older than 48h): update CONTEXT.md to IDLE, proceed to step 4
+      - If CONTEXT.md exists but has no `## Session` block, treat as IDLE (schema predates D1 Layer-2)
+      - See .dexCore/_dev/docs/CONTEXT-SCHEMA.md for full schema</step>
+
   <step n="4">Check profile and show greeting:
       - Check if {project-root}/myDex/.dex/config/profile.yaml exists
       - IF EXISTS: Read completeness.overall percentage
@@ -145,6 +165,7 @@
     <rule n="3" intent="TASK-DIRECT" examples="erstelle PRD, analysiere Code, mach X" action="Identify fitting agent, load it, agent works IMMEDIATELY (no menu, no intro)."/>
     <rule n="4" intent="COMPOUND" examples="starte Mona, mach PRD" action="Brief confirmation, then chain tasks to the identified agents."/>
     <rule n="5" intent="CODE-REQUEST" examples="Code-Modus, nur programmieren, disable DexHub" action="Enter CODE-MODE. Show: 'Code-Modus aktiv. Sage DexHub oder hi um zurückzukehren.'"/>
+    <rule n="6" intent="RESUME" examples="*resume, weiter, fortsetzen" action="Read CONTEXT.md ## Session block. If active_agent present and &lt; 48h old, reload that agent and restore AGENT:{name} state. Else show DexMaster menu with note 'Keine laufende Session.'"/>
     <ambiguous>Default to DexMaster menu (safe fallback).</ambiguous>
   </intent-detection>
 

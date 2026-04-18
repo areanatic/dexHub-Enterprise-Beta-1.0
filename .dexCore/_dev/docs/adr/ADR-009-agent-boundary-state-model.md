@@ -1,7 +1,7 @@
 # ADR-009: Agent Boundary State Model (D1 prompt-layer fix)
 
 **Date:** 2026-04-17
-**Status:** accepted — prompt layer implemented in Phase 4 Block 3 (commit `d248f0d`), persistence layer (Option 3) deferred
+**Status:** accepted — prompt layer implemented in Phase 4 Block 3 (`d248f0d`); persistence layer (Option 3) implemented in Phase 5 Tier 1a (2026-04-18)
 **Deciders:** Arash Zamani, phase-4-opus-4.6-session, phase-4-opus-4.7-review
 **Context:** Phase 4 Block 3 + Phase 4 Reality Sync (2026-04-18)
 
@@ -61,11 +61,13 @@ CODE-MODE ........ Raw LLM mode → no DexHub persona, direct LLM access
 - 45 `.agent.md` Copilot wrappers get a `**CRITICAL:** You are NOT DexMaster` line
 - `dex-master.agent.md` wording changes from "permanent first responder" to "on-demand orchestrator"
 
-**Layer 2 — State persistence (deferred, Option 3 from fix plan):**
-- Write active agent name to `myDex/.dex/CONTEXT.md` on agent activation
-- Read CONTEXT.md at session start to resume state
-- Clear on `*exit`
-- Not implemented in Phase 4 — planned as separate follow-on work
+**Layer 2 — State persistence (Option 3, implemented Phase 5 Tier 1a 2026-04-18):**
+- Schema defined in `.dexCore/_dev/docs/CONTEXT-SCHEMA.md` (new file)
+- SHARED.md Agent Loading Protocol updated with explicit state-write instructions at each transition (IDLE↔AGENT, AGENT↔AGENT, AGENT↔CODE-MODE)
+- `dex-master.md` step 3.8 reads CONTEXT.md `## Session` block on session start; if `AGENT:{X}` with `activated_at < 48h`, offers `*resume` before normal greeting
+- Intent-detection rule #6 (RESUME) handles `*resume` command
+- validate.sh §22 checks CONTEXT.md schema when present (doesn't fail for fresh users)
+- **Honest limitation:** still prompt-level convention — DexMaster must faithfully write state at each transition. No hook enforces it. See CONTEXT-SCHEMA.md §Honest Limitations.
 
 ## Consequences
 
