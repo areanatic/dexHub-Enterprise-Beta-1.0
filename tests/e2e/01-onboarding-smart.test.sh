@@ -4,12 +4,15 @@
 # that produces a valid profile.yaml structure when walked through.
 #
 # Phase 5.0: This test validates the STRUCTURE of the onboarding definition.
-# Phase 5.1: Will extend this to actually invoke Claude Code and script answers.
+# Phase 5.1.a: Adds LIVE claude-runner assertions (opt-in via CLAUDE_E2E_LIVE=1).
+#              Structural assertions always run; live block is gated to avoid
+#              API-token cost and nested-session issues in casual CI runs.
 
 set -u
 
 HARNESS="$(cd "$(dirname "$0")/harness" && pwd)"
 source "$HARNESS/assertion-lib.sh"
+source "$HARNESS/claude-runner.sh"
 
 ensure_beta_root
 test_banner "01 Onboarding SMART (21 questions)"
@@ -178,5 +181,51 @@ else
   # Not a hard fail — might have been removed intentionally
   echo "  ⊘ Backup run-onboarding.sh not found (may be deprecated per myDex agent honest-label)"
 fi
+
+# ─── LIVE BLOCK (opt-in via CLAUDE_E2E_LIVE=1) ──────────────────────────────
+# Each live assertion invokes `claude -p` headlessly — costs API tokens + ~30s.
+# Gate: CLAUDE_E2E_LIVE=1 + claude CLI present.
+if live_mode_enabled; then
+  echo ""
+  echo -e "\033[1;33m  ⚡ LIVE MODE: invoking claude CLI headlessly (CLAUDE_E2E_LIVE=1)\033[0m"
+
+  if ! check_claude_installed; then
+    fail "Live mode requested but claude CLI not installed" \
+         "Install Claude Code or unset CLAUDE_E2E_LIVE"
+  else
+    # L1: Greeting activates DexMaster (the fundamental promise of the platform)
+    L1_RESPONSE=$(claude_prompt "hi")
+    if [ -z "$L1_RESPONSE" ]; then
+      fail "LIVE: 'hi' produced empty response" "claude CLI may be misconfigured"
+    else
+      pass "LIVE: 'hi' returns non-empty response ($(echo "$L1_RESPONSE" | wc -c | tr -d ' ') chars)"
+
+      if echo "$L1_RESPONSE" | grep -qiE "dex[ -]?master"; then
+        pass "LIVE: 'hi' response names DexMaster"
+      else
+        fail "LIVE: 'hi' response does not identify as DexMaster" \
+             "First 200 chars: ${L1_RESPONSE:0:200}"
+      fi
+
+      # Menu items 1-7 must appear (marker of the full menu rendering)
+      if echo "$L1_RESPONSE" | grep -qE "^\s*1\." && \
+         echo "$L1_RESPONSE" | grep -qE "^\s*7\."; then
+        pass "LIVE: DexMaster menu renders items 1-7"
+      else
+        fail "LIVE: DexMaster menu items 1-7 not all present" \
+             "Menu structure may be broken"
+      fi
+
+      # Onboarding entrypoint (*mydex) visible in menu
+      if echo "$L1_RESPONSE" | grep -qE "\*mydex"; then
+        pass "LIVE: Menu exposes *mydex onboarding entrypoint"
+      else
+        fail "LIVE: Menu missing *mydex onboarding entrypoint" \
+             "User cannot discover onboarding path"
+      fi
+    fi
+  fi
+fi
+# ─── END LIVE BLOCK ─────────────────────────────────────────────────────────
 
 test_summary

@@ -17,22 +17,40 @@ check_claude_installed() {
   return 0
 }
 
+# Live-mode gate: tests must opt-in via CLAUDE_E2E_LIVE=1.
+# Reasons: headless invocations cost API tokens + take time, and nested sessions
+# require env adjustments. Default-off keeps CI fast and cheap.
+live_mode_enabled() {
+  [ "${CLAUDE_E2E_LIVE:-0}" = "1" ]
+}
+
 # claude_prompt "prompt text" [extra-args]
-# Returns the raw text response (via -p --output-format=text)
+# Returns the raw text response (via -p --output-format=text).
+# CLAUDECODE is unset for the child so dev-session nesting guard doesn't block.
 # Quiet mode: stderr suppressed unless CLAUDE_E2E_VERBOSE=1
 claude_prompt() {
   local prompt="$1"
   shift
-  local extra_args=("$@")
-  local stderr_redirect="2>/dev/null"
-  [ "${CLAUDE_E2E_VERBOSE:-0}" = "1" ] && stderr_redirect=""
+  # Guard against set -u with empty extra args: ${arr[@]+"${arr[@]}"} is the
+  # portable idiom for "expand only if array has elements".
+  local extra_args=()
+  if [ "$#" -gt 0 ]; then
+    extra_args=("$@")
+  fi
 
   if ! check_claude_installed; then
     return 1
   fi
 
-  # Headless one-shot prompt
-  eval "claude -p \"\$prompt\" --output-format=text ${extra_args[*]} $stderr_redirect"
+  # env -u CLAUDECODE bypasses the nested-session guard when running under an
+  # outer Claude Code dev session (documented in Anthropic runtime).
+  if [ "${CLAUDE_E2E_VERBOSE:-0}" = "1" ]; then
+    env -u CLAUDECODE claude -p "$prompt" --output-format=text \
+      ${extra_args[@]+"${extra_args[@]}"}
+  else
+    env -u CLAUDECODE claude -p "$prompt" --output-format=text \
+      ${extra_args[@]+"${extra_args[@]}"} 2>/dev/null
+  fi
 }
 
 # claude_prompt_json "prompt text" — returns JSON structure
@@ -41,7 +59,7 @@ claude_prompt_json() {
   if ! check_claude_installed; then
     return 1
   fi
-  claude -p "$prompt" --output-format=json 2>/dev/null
+  env -u CLAUDECODE claude -p "$prompt" --output-format=json 2>/dev/null
 }
 
 # assert_claude_response_contains "prompt" "expected-pattern" [description]

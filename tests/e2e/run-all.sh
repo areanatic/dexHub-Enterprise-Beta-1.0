@@ -1,10 +1,23 @@
 #!/bin/bash
 # DexHub E2E Test — Master Runner
 # Phase 5.0 Test Harness Foundation (2026-04-19)
+# Phase 5.1.a: --live flag to opt-in live claude-runner assertions
 #
 # Runs all tests/e2e/NN-*.test.sh and aggregates results.
+#
+# Flags:
+#   --live          Enable live claude-runner assertions (sets CLAUDE_E2E_LIVE=1)
+#                   Costs API tokens. ~30-60s per live assertion.
+#   --verbose       Show claude stderr (sets CLAUDE_E2E_VERBOSE=1)
 
 set -u
+
+for arg in "$@"; do
+  case "$arg" in
+    --live)    export CLAUDE_E2E_LIVE=1 ;;
+    --verbose) export CLAUDE_E2E_VERBOSE=1 ;;
+  esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR/../.." || exit 2  # Beta repo root
@@ -20,9 +33,12 @@ TOTAL_FAIL=0
 TOTAL_SKIPPED=0
 FAILED_TESTS=()
 
+MODE_BANNER="structural"
+[ "${CLAUDE_E2E_LIVE:-0}" = "1" ] && MODE_BANNER="structural + LIVE claude-runner"
+
 echo -e "${BOLD}╔═══════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║     DexHub E2E Test Suite                 ║${NC}"
-echo -e "${BOLD}║     Phase 5.0 Test Harness Foundation     ║${NC}"
+echo -e "${BOLD}║     Phase 5.1.a (mode: ${MODE_BANNER})${NC}"
 echo -e "${BOLD}╚═══════════════════════════════════════════╝${NC}"
 
 for test_file in tests/e2e/[0-9]*.test.sh; do

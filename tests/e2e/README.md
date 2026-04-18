@@ -1,6 +1,7 @@
 # DexHub E2E Test Suite
 
 **Phase 5.0 Test Harness Foundation (2026-04-19)**
+**Phase 5.1.a Live claude-runner layer (2026-04-19)**
 
 Automated tests that validate DexHub features actually work end-to-end — not just that files exist. This complements `validate.sh` (which checks structural invariants) with **feature-function validation**.
 
@@ -30,22 +31,37 @@ tests/e2e/
 ## Running locally
 
 ```bash
-# All tests
+# Structural tests only (fast, no API cost) — DEFAULT
 bash tests/e2e/run-all.sh
+
+# Structural + LIVE claude-runner assertions (opt-in, uses API tokens)
+bash tests/e2e/run-all.sh --live
 
 # Single test
 bash tests/e2e/00-fresh-install.test.sh
 
-# Verbose mode (show claude stderr etc.)
+# Verbose (show claude stderr etc.)
+bash tests/e2e/run-all.sh --verbose
+# or:
 CLAUDE_E2E_VERBOSE=1 bash tests/e2e/run-all.sh
 ```
 
-## Current tests (Phase 5.0)
+### Live mode — what it does
 
-| # | Test | Requires | Purpose |
-|---|------|----------|---------|
-| 00 | `00-fresh-install.test.sh` | None (structural) | Fresh clone has all expected files + structure |
-| 01 | `01-onboarding-smart.test.sh` | Ruby or Python+YAML | SMART 21-question onboarding is structurally valid, profile_paths map to example |
+With `--live` (or `CLAUDE_E2E_LIVE=1`), tests invoke `claude -p` headlessly to exercise DexHub behavior against a real LLM. Each invocation:
+
+- Costs API tokens (your Claude Code subscription / API key).
+- Takes ~10-60 seconds per assertion.
+- Auto-unsets `CLAUDECODE` so tests can run from inside a dev session.
+
+If `claude` CLI is missing, live assertions fail with a clear message. Structural assertions always run regardless.
+
+## Current tests
+
+| # | Test | Requires | Structural | Live (--live) |
+|---|------|----------|-----------|---------------|
+| 00 | `00-fresh-install.test.sh` | None | 36 assertions | — |
+| 01 | `01-onboarding-smart.test.sh` | Ruby / Python+YAML | 15 assertions | 4 assertions (DexMaster greeting, menu render, *mydex entrypoint) |
 
 ## Coming next (Phase 5.1+)
 
@@ -95,7 +111,17 @@ Mark executable: `chmod +x tests/e2e/NN-*.test.sh`.
 
 ## CI integration
 
-`.github/workflows/e2e.yml` runs the structural job on every PR to main. Claude-dependent tests will be added as a second job once Claude Code CI installation is solved.
+`.github/workflows/e2e.yml` runs structural tests on every PR to main. Live tests are NOT run in CI by default — they need Claude Code installed + API credentials. A separate `e2e-live` job guarded by a repository secret + manual dispatch will follow.
+
+## First live finding (2026-04-19)
+
+Live-mode proved DexMaster greeting works end-to-end — not a structural claim, a measured one:
+
+- `claude -p "hi"` from Beta root returns 870 chars naming "Dex Master"
+- Menu items 1-7 render cleanly
+- `*mydex` onboarding entrypoint is visible in the menu
+
+This is the first measured confirmation that the SSOT→compiled CLAUDE.md→DexMaster greeting chain actually works in headless Claude Code. Structurally green ≠ measurement green; the live layer closes that gap.
 
 ## Relationship to validate.sh
 
