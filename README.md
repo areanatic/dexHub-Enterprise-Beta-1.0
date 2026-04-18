@@ -217,7 +217,9 @@ Capture decisions and context so nothing is lost between sessions or team member
 
 ```
 You:        "We decided to use PostgreSQL instead of MongoDB"
-DexMaster:  Auto-captures to myDex/.dex/decisions/001-database-choice.md
+DexMaster:  Detects decision signal, announces "📌 Notiert" and writes
+            myDex/.dex/decisions/001-database-choice.md
+            (agent-driven, never silent — you always see it happen)
 
 You:        "*save"
 DexMaster:  Writes session chronicle to myDex/.dex/chronicle/2026-04-01.md
@@ -226,6 +228,8 @@ New colleague joins, opens the project:
 Agent:      Reads CONTEXT.md + decisions/ + chronicle/
             → Has full context of what was built and why
 ```
+
+*Note: DexMemory is an agent-driven convention, not a background service — captures happen when the agent detects a strong signal and announces the write. See `dexhub-chronicle` skill for details.*
 
 ### Enterprise Tool Integration
 

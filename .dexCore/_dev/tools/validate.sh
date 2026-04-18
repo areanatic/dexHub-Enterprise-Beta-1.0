@@ -35,7 +35,7 @@ echo -e "${BOLD}========================================${NC}"
 echo ""
 
 # ==================== SECTION 1: Byte Limits ====================
-echo -e "${BOLD}[1/20] Byte Limits${NC}"
+echo -e "${BOLD}[1/21] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
 if [ "$BYTES" -le 30500 ]; then
@@ -45,7 +45,7 @@ else
 fi
 
 # ==================== SECTION 2: Bug Status ====================
-echo -e "\n${BOLD}[2/20] Bug Status${NC}"
+echo -e "\n${BOLD}[2/21] Bug Status${NC}"
 
 OPEN_BUGS=$(grep -c 'status: open\|status: confirmed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
 OPEN_BUGS=$(echo "$OPEN_BUGS" | tr -d '[:space:]')
@@ -71,7 +71,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/20] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/21] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 # GREETING action — check state model references in both
 if grep -q 'GREETING' .claude/CLAUDE.md && \
@@ -121,7 +121,7 @@ else
 fi
 
 # ==================== SECTION 4: File Existence ====================
-echo -e "\n${BOLD}[4/20] Critical File Existence${NC}"
+echo -e "\n${BOLD}[4/21] Critical File Existence${NC}"
 
 FILES=(
   ".dexCore/core/agents/dex-master.md"
@@ -154,7 +154,7 @@ for f in "${FILES[@]}"; do
 done
 
 # ==================== SECTION 5: Feature Validation ====================
-echo -e "\n${BOLD}[5/20] Feature Artifact Validation${NC}"
+echo -e "\n${BOLD}[5/21] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
@@ -230,7 +230,7 @@ else
 fi
 
 # ==================== SECTION 6: Architecture Rules ====================
-echo -e "\n${BOLD}[6/20] Architecture Rules${NC}"
+echo -e "\n${BOLD}[6/21] Architecture Rules${NC}"
 
 # G3: No files in root (except allowed)
 ALLOWED_ROOT="CONTRIBUTING.md|LICENSE|NOTICE|README.md|.gitignore|.gitattributes|myDex|tests"
@@ -256,7 +256,7 @@ else
 fi
 
 # ==================== SECTION 7: Sanity Checks ====================
-echo -e "\n${BOLD}[7/20] Sanity Checks${NC}"
+echo -e "\n${BOLD}[7/21] Sanity Checks${NC}"
 
 # Agent count
 AGENT_FILES=$(find .dexCore/dxm/agents -name "*.md" 2>/dev/null | wc -l)
@@ -274,7 +274,7 @@ else
 fi
 
 # ==================== SECTION 8: Agent File Validation ====================
-echo -e "\n${BOLD}[8/20] Agent File Validation${NC}"
+echo -e "\n${BOLD}[8/21] Agent File Validation${NC}"
 
 # Check all .agent.md files have required frontmatter
 for agent_file in .github/agents/*.agent.md; do
@@ -299,7 +299,7 @@ else
 fi
 
 # ==================== SECTION 9: Skill Validation ====================
-echo -e "\n${BOLD}[9/20] Skill Validation${NC}"
+echo -e "\n${BOLD}[9/21] Skill Validation${NC}"
 
 SKILL_COUNT=$(find .github/skills -name "SKILL.md" 2>/dev/null | wc -l)
 pass "Copilot Skills found: $SKILL_COUNT"
@@ -323,7 +323,7 @@ for skill_dir in .github/skills/*/; do
 done
 
 # ==================== SECTION 10: Manifest Sync ====================
-echo -e "\n${BOLD}[10/20] Manifest Sync${NC}"
+echo -e "\n${BOLD}[10/21] Manifest Sync${NC}"
 
 # Workflow manifest paths should use .dexCore/ not dex/
 BAD_PATHS=$(grep -c '"dex/' .dexCore/_cfg/workflow-manifest.csv 2>/dev/null || echo 0)
@@ -346,7 +346,7 @@ else
 fi
 
 # ==================== SECTION 11: Platform Hygiene ====================
-echo -e "\n${BOLD}[11/20] Platform Hygiene${NC}"
+echo -e "\n${BOLD}[11/21] Platform Hygiene${NC}"
 
 # No Claude Code refs in user-facing files
 CC_REFS=0
@@ -388,7 +388,7 @@ else
 fi
 
 # ==================== SECTION 12: Number Consistency ====================
-echo -e "\n${BOLD}[12/20] Number Consistency${NC}"
+echo -e "\n${BOLD}[12/21] Number Consistency${NC}"
 
 # Count actual values
 ACTUAL_AGENTS=$(tail -n +2 .dexCore/_cfg/agent-manifest.csv | wc -l | tr -d ' ')
@@ -421,7 +421,7 @@ else
 fi
 
 # ==================== SECTION 13: Workflow YAML Validation ====================
-echo -e "\n${BOLD}[13/20] Workflow YAML Validation${NC}"
+echo -e "\n${BOLD}[13/21] Workflow YAML Validation${NC}"
 
 WORKFLOW_PASS=0
 WORKFLOW_FAIL=0
@@ -447,7 +447,7 @@ if [ "$WORKFLOW_FAIL" -gt 0 ]; then
 fi
 
 # ==================== SECTION 14: Agent Persona Consistency ====================
-echo -e "\n${BOLD}[14/20] Agent Persona Consistency${NC}"
+echo -e "\n${BOLD}[14/21] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
@@ -468,7 +468,7 @@ for agent_file in .github/agents/*.agent.md; do
 done
 
 # ==================== SECTION 15: Cross-Reference Integrity ====================
-echo -e "\n${BOLD}[15/20] Cross-Reference Integrity${NC}"
+echo -e "\n${BOLD}[15/21] Cross-Reference Integrity${NC}"
 
 # Check key paths mentioned in copilot-instructions.md
 CRITICAL_PATHS=(
@@ -490,7 +490,7 @@ for ref_path in "${CRITICAL_PATHS[@]}"; do
 done
 
 # ==================== SECTION 16: Onboarding Logic ====================
-echo -e "\n${BOLD}[16/20] Onboarding Logic${NC}"
+echo -e "\n${BOLD}[16/21] Onboarding Logic${NC}"
 
 QUESTIONS_FILE="myDex/.dex/config/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
@@ -532,7 +532,7 @@ else
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
-echo -e "\n${BOLD}[17/20] Guardrail Pattern Enforcement${NC}"
+echo -e "\n${BOLD}[17/21] Guardrail Pattern Enforcement${NC}"
 
 # Check G3 enforcement in CLAUDE.md
 if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
@@ -574,7 +574,7 @@ else
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
-echo -e "\n${BOLD}[18/20] DexMemory & Chronicle Structure${NC}"
+echo -e "\n${BOLD}[18/21] DexMemory & Chronicle Structure${NC}"
 
 # DexMemory infrastructure
 if [ -d "myDex/.dex/chronicle" ]; then
@@ -641,7 +641,7 @@ else
 fi
 
 # ==================== SECTION 19: SSOT Instruction Drift Detection ====================
-echo -e "\n${BOLD}[19/20] SSOT Instruction Drift Detection${NC}"
+echo -e "\n${BOLD}[19/21] SSOT Instruction Drift Detection${NC}"
 
 if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
   if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
@@ -663,7 +663,7 @@ for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
 done
 
 # ==================== SECTION 20: Files-Manifest Integrity ====================
-echo -e "\n${BOLD}[20/20] Files-Manifest Integrity${NC}"
+echo -e "\n${BOLD}[20/21] Files-Manifest Integrity${NC}"
 
 if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
   MANIFEST_TOTAL=$(tail -n +2 .dexCore/_cfg/files-manifest.csv | wc -l | tr -d ' ')
@@ -728,6 +728,66 @@ if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
   fi
 else
   warn "Files-Manifest not found — skipping integrity check"
+fi
+
+# ==================== SECTION 21: Source File Semantic Consistency ====================
+echo -e "\n${BOLD}[21/21] Source File Semantic Consistency (SHARED vs tails)${NC}"
+
+# Detect contradictions between SHARED.md and the platform-specific tails.
+# Catches the class of bug where SHARED.md asserts a new paradigm but a tail
+# still uses old paradigm language (e.g., D1 Agent Boundary refactor drift).
+
+SOURCES="$(find .dexCore/core/instructions -name '*.md' -maxdepth 1 2>/dev/null)"
+SHARED=".dexCore/core/instructions/SHARED.md"
+CLAUDE_TAIL=".dexCore/core/instructions/claude-specific.md"
+COPILOT_TAIL=".dexCore/core/instructions/copilot-specific.md"
+
+# Deprecated phrases — if SHARED has moved past them, tails must too.
+# Each entry: phrase|reason
+DEPRECATED_PHRASES=(
+  "DexMaster is ALWAYS active|Old meta-layer paradigm (pre-D1)"
+  "FIRST RESPONDER|Old meta-layer paradigm (pre-D1)"
+  "Evaluate intent on EVERY message|Old meta-layer paradigm (pre-D1)"
+  "permanent first responder|Contradicts on-demand agent model (D1)"
+  "Level 1.*Orchestration.*Level 2.*Level 3|Old DexMaster scope-levels (pre-D1)"
+)
+
+CONSISTENCY_ISSUES=0
+for entry in "${DEPRECATED_PHRASES[@]}"; do
+  phrase="${entry%%|*}"
+  reason="${entry##*|}"
+
+  # Check if SHARED has already moved past this phrase
+  if grep -qE "$phrase" "$SHARED" 2>/dev/null; then
+    # SHARED still uses it — not actually deprecated yet, skip
+    continue
+  fi
+
+  # SHARED has moved past it. Check tails.
+  for tail_file in "$CLAUDE_TAIL" "$COPILOT_TAIL"; do
+    [ -f "$tail_file" ] || continue
+    if grep -qE "$phrase" "$tail_file" 2>/dev/null; then
+      fail "Source consistency: $(basename "$tail_file") uses deprecated phrase '$phrase' ($reason)"
+      CONSISTENCY_ISSUES=$((CONSISTENCY_ISSUES + 1))
+    fi
+  done
+done
+
+# Required new paradigm phrases — SHARED established them, tails should not contradict
+if grep -q "loaded on demand" "$SHARED" 2>/dev/null; then
+  # New paradigm is in SHARED. Tails must not contradict.
+  for tail_file in "$CLAUDE_TAIL" "$COPILOT_TAIL"; do
+    [ -f "$tail_file" ] || continue
+    # Contradictions to flag
+    if grep -qE "DexMaster is active\b" "$tail_file" 2>/dev/null; then
+      fail "Source consistency: $(basename "$tail_file") says 'DexMaster is active' — contradicts 'loaded on demand' in SHARED.md"
+      CONSISTENCY_ISSUES=$((CONSISTENCY_ISSUES + 1))
+    fi
+  done
+fi
+
+if [ "$CONSISTENCY_ISSUES" -eq 0 ]; then
+  pass "Source file semantic consistency: SHARED.md + tails aligned"
 fi
 
 # ==================== SUMMARY ====================

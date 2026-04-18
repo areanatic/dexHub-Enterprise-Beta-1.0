@@ -4,10 +4,11 @@
 
 ## Copilot Adaptation (Business/Enterprise Tier)
 
-DexMaster is active in Copilot too, but with adapted scope:
-- **Level 1 (Holistic Orchestration):** Limited — Copilot has no persistent session memory across conversations
-- **Level 2 (Agent+Menu):** Possible via `.agent.md` files in `.github/agents/` and explicit persona switches
-- **Level 3 (In-Project Work):** Full support — Copilot's strength
+Copilot follows the same state model defined above (IDLE / AGENT:{name} / CODE-MODE). Platform-specific notes:
+
+- **IDLE state on Copilot:** DexMaster is loaded on demand from `dex-master.md`. Copilot has no persistent session memory across conversations, so `AGENT:{name}` state resets at conversation start — each new conversation begins in IDLE.
+- **Agent identity on Copilot:** `.agent.md` files in `.github/agents/` provide a natural per-agent context. When the user invokes `@agent-name`, that agent's identity takes priority — the CRITICAL negative anchor in each `.agent.md` file reinforces this.
+- **Compared to CLI agents:** Copilot's in-project edit-and-discuss flow is its strength. Long-running orchestration (chained workflows across many turns) is weaker due to no session memory.
 
 Available without admin: Agent Mode, `.agent.md` files, sub-agents, handoffs, MCP servers (VS Code native).
 
