@@ -1037,13 +1037,25 @@ else
   EXPECTED_PATH_FRAG=$(grep -E "^expected_worktree_path_contains:" "$ANCHOR_FILE" | head -1 | sed -E 's/^expected_worktree_path_contains: *"?([^"]*)"?/\1/')
 
   # Check git remote origin
+  # Normalize: strip optional .git suffix + optional trailing slash so that
+  # https://github.com/foo/bar  https://github.com/foo/bar.git
+  # git@github.com:foo/bar.git   git@github.com:foo/bar
+  # are all considered equivalent.
+  normalize_git_url() {
+    echo "$1" | sed -E 's#\.git/?$##; s#/$##'
+  }
+
   ACTUAL_ORIGIN=$(git config --get remote.origin.url 2>/dev/null || echo "")
+  ACTUAL_NORM=$(normalize_git_url "$ACTUAL_ORIGIN")
+  EXP_NORM=$(normalize_git_url "$EXPECTED_ORIGIN")
+  EXP_ALT_NORM=$(normalize_git_url "$EXPECTED_ORIGIN_ALT")
+
   if [ -z "$ACTUAL_ORIGIN" ]; then
-    warn "Session-anchor: git remote.origin.url not set (CI checkout?)"
-  elif [ "$ACTUAL_ORIGIN" = "$EXPECTED_ORIGIN" ] || [ "$ACTUAL_ORIGIN" = "$EXPECTED_ORIGIN_ALT" ]; then
-    pass "Session-anchor: git remote origin matches expected ($ACTUAL_ORIGIN)"
+    warn "Session-anchor: git remote.origin.url not set (unusual checkout?)"
+  elif [ "$ACTUAL_NORM" = "$EXP_NORM" ] || [ "$ACTUAL_NORM" = "$EXP_ALT_NORM" ]; then
+    pass "Session-anchor: git remote origin matches expected (normalized: $ACTUAL_NORM)"
   else
-    fail "Session-anchor: remote origin '$ACTUAL_ORIGIN' does NOT match expected '$EXPECTED_ORIGIN' — wrong repo?"
+    fail "Session-anchor: remote origin '$ACTUAL_ORIGIN' does NOT match expected '$EXPECTED_ORIGIN' or alt '$EXPECTED_ORIGIN_ALT' — wrong repo?"
   fi
 
   # Check worktree path contains expected fragment
