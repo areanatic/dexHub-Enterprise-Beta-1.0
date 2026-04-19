@@ -27,9 +27,10 @@
 
 set -u
 
-HARNESS="$(cd "$(dirname "$0")/harness" && pwd)"
+HARNESS="$(cd "$(dirname "$0")/../../harness" && pwd)"
+CC_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$HARNESS/assertion-lib.sh"
-source "$HARNESS/claude-runner.sh"
+source "$CC_DIR/claude-runner.sh"
 
 ensure_beta_root
 test_banner "07 Onboarding — overwrite confirm-gate REJECT (Tier 5.5.3)"

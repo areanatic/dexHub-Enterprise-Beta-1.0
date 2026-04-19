@@ -2,20 +2,30 @@
 # DexHub E2E Test — Master Runner
 # Phase 5.0 Test Harness Foundation (2026-04-19)
 # Phase 5.1.a: --live flag to opt-in live claude-runner assertions
+# 2026-04-20: --enterprise flag to simulate enterprise build (skip integrations/)
 #
-# Runs all tests/e2e/NN-*.test.sh and aggregates results.
+# Runs tests/e2e/NN-*.test.sh (core, platform-agnostic) +
+# tests/e2e/integrations/*/NN-*.test.sh (integration modules, removable).
+# Aggregates results.
 #
 # Flags:
 #   --live          Enable live claude-runner assertions (sets CLAUDE_E2E_LIVE=1)
 #                   Costs API tokens. ~30-60s per live assertion.
 #   --verbose       Show claude stderr (sets CLAUDE_E2E_VERBOSE=1)
+#   --enterprise    Simulate enterprise build: skip tests/e2e/integrations/*/ entirely.
+#                   Useful for verifying core tests pass without any integration module
+#                   (what the stripped enterprise bundle looks like).
+#   --core-only     Alias for --enterprise (more readable for dev use)
 
 set -u
 
+SKIP_INTEGRATIONS=0
+
 for arg in "$@"; do
   case "$arg" in
-    --live)    export CLAUDE_E2E_LIVE=1 ;;
-    --verbose) export CLAUDE_E2E_VERBOSE=1 ;;
+    --live)              export CLAUDE_E2E_LIVE=1 ;;
+    --verbose)           export CLAUDE_E2E_VERBOSE=1 ;;
+    --enterprise|--core-only) SKIP_INTEGRATIONS=1 ;;
   esac
 done
 
@@ -35,13 +45,28 @@ FAILED_TESTS=()
 
 MODE_BANNER="structural"
 [ "${CLAUDE_E2E_LIVE:-0}" = "1" ] && MODE_BANNER="structural + LIVE claude-runner"
+[ "$SKIP_INTEGRATIONS" = "1" ] && MODE_BANNER="$MODE_BANNER [enterprise / core-only]"
 
 echo -e "${BOLD}╔═══════════════════════════════════════════╗${NC}"
 echo -e "${BOLD}║     DexHub E2E Test Suite                 ║${NC}"
 echo -e "${BOLD}║     Phase 5.1.a (mode: ${MODE_BANNER})${NC}"
 echo -e "${BOLD}╚═══════════════════════════════════════════╝${NC}"
 
-for test_file in tests/e2e/[0-9]*.test.sh; do
+# Enumerate core tests (always) + integration module tests (unless --enterprise).
+# Core tests are platform-agnostic, ship in enterprise build.
+# Integration tests live under tests/e2e/integrations/<platform>/ and are stripped
+# by build-for-enterprise.sh per PLATFORM-POLICY.md.
+TEST_FILES=()
+for f in tests/e2e/[0-9]*.test.sh; do
+  [ -f "$f" ] && TEST_FILES+=("$f")
+done
+if [ "$SKIP_INTEGRATIONS" = "0" ]; then
+  for f in tests/e2e/integrations/*/[0-9]*.test.sh; do
+    [ -f "$f" ] && TEST_FILES+=("$f")
+  done
+fi
+
+for test_file in "${TEST_FILES[@]+"${TEST_FILES[@]}"}"; do
   [ -f "$test_file" ] || continue
 
   # Run test, capture PASS/FAIL counts via export variables

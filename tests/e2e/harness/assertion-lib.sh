@@ -193,3 +193,68 @@ ensure_beta_root() {
     exit 2
   fi
 }
+
+# ─────────────────────────────────────────────────────────────────────
+# PLATFORM INTEGRATION STUBS
+# ─────────────────────────────────────────────────────────────────────
+# These are no-op stubs for platform-specific helpers. Integration
+# modules (e.g. tests/e2e/integrations/claude-code/claude-runner.sh)
+# OVERRIDE these with real implementations when sourced.
+#
+# Why this exists:
+# Per PLATFORM-POLICY.md, integration modules are removable for
+# enterprise builds. When a module is absent (stripped by
+# build-for-enterprise.sh), tests that merely check `if
+# live_mode_enabled; then ...` auto-skip cleanly instead of breaking
+# with "function not found".
+#
+# Override contract: integration modules should redefine these
+# functions AFTER sourcing assertion-lib.sh. Bash function redefinition
+# simply replaces the prior definition — no guard needed.
+# ─────────────────────────────────────────────────────────────────────
+
+check_claude_installed() {
+  # Stub: returns 1 = "not installed / integration module not loaded"
+  return 1
+}
+
+live_mode_enabled() {
+  # Stub: returns 1 = "live mode disabled / no integration available"
+  return 1
+}
+
+walkthrough_mode_enabled() {
+  # Stub: returns 1 = "multi-turn walkthrough disabled / no integration"
+  return 1
+}
+
+claude_prompt() {
+  echo "ERROR: claude_prompt called but claude-code integration module not loaded" >&2
+  return 1
+}
+
+claude_prompt_json() {
+  echo "ERROR: claude_prompt_json called but claude-code integration module not loaded" >&2
+  return 1
+}
+
+assert_claude_response_contains() {
+  local desc="${3:-platform helper}"
+  fail "$desc" "claude-code integration module not loaded (stripped or missing)"
+  return 1
+}
+
+start_conversation() {
+  echo "ERROR: start_conversation called but claude-code integration module not loaded" >&2
+  return 1
+}
+
+resume_conversation() {
+  echo "ERROR: resume_conversation called but claude-code integration module not loaded" >&2
+  return 1
+}
+
+skip_if_no_claude() {
+  echo -e "  \033[1;33m⊘\033[0m Skipping: claude-code integration module not loaded" >&2
+  exit 77
+}

@@ -142,7 +142,7 @@ onboarding:
     docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml + .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
     tests:
       - tests/e2e/01-onboarding-smart.test.sh
-      - tests/e2e/03-onboarding-smart-v5-full-walk.test.sh
+      - tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
     validated_at: "2026-04-20"
     validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Content correct. Cosmetic drift (variant-label mislabeled as v4.3.1) patched same day via mydex-agent R5-metadata rule + profile.yaml.example defaults — re-verification pending live re-run."
     known_issues:
@@ -709,7 +709,7 @@ quality:
     depends_on: [quality.e2e_harness, onboarding.smart_v5]
     docs: tests/e2e/02-onboarding-walkthrough.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/02-onboarding-walkthrough.test.sh
+      - tests/e2e/integrations/claude-code/02-onboarding-walkthrough.test.sh
     known_issues:
       - "First iteration proves plumbing only. Full 5-answer walk + profile.yaml-produced assertion is quality.walkthrough_smart_v5_full (Tier 5.2)."
 
@@ -723,7 +723,7 @@ quality:
     depends_on: [quality.walkthrough_existing_profile_edge]
     docs: tests/e2e/08-onboarding-view-profile.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/08-onboarding-view-profile.test.sh
+      - tests/e2e/integrations/claude-code/08-onboarding-view-profile.test.sh
 
   - id: quality.walkthrough_complete_only
     name: "Complete-Only Path — Preserve-Existing (Tier 5.5.2, choice 1)"
@@ -735,7 +735,7 @@ quality:
     depends_on: [quality.walkthrough_existing_profile_edge, quality.walkthrough_smart_v5_full]
     docs: tests/e2e/09-onboarding-complete-only.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/09-onboarding-complete-only.test.sh
+      - tests/e2e/integrations/claude-code/09-onboarding-complete-only.test.sh
     known_issues:
       - "Tolerant on question order — agent may ask Q3/Q4/Q43 in any sequence. Answers (3-7/allein/Cloud-LLMs) work across all orderings."
       - "Save-confirmation turn 8 is conservative — some flows may auto-save without prompting. Harmless if not prompted."
@@ -750,7 +750,7 @@ quality:
     depends_on: [quality.walkthrough_existing_profile_edge, quality.walkthrough_multi_turn]
     docs: tests/e2e/07-onboarding-overwrite-reject-confirm.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/07-onboarding-overwrite-reject-confirm.test.sh
+      - tests/e2e/integrations/claude-code/07-onboarding-overwrite-reject-confirm.test.sh
     known_issues:
       - "Reject path covered; actual confirmed-overwrite path (choice 2 → 'j' → full walkthrough) is Tier 5.5.3b — higher cost (~10 USD) because it chains a fresh walkthrough."
       - "Confirm-gate wording match uses tolerant regex (sicher|wirklich|überschreiben|confirm|sure|[j/n]|[y/n]). Exact phrasing from mydex-agent is the PRIMARY match; others accept LLM paraphrasing."
@@ -766,7 +766,7 @@ quality:
     depends_on: [quality.walkthrough_multi_turn, onboarding.smart_v5]
     docs: tests/e2e/06-onboarding-existing-profile.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/06-onboarding-existing-profile.test.sh
+      - tests/e2e/integrations/claude-code/06-onboarding-existing-profile.test.sh
     known_issues:
       - "First slice covers choice 4 (cancel) only. Choice 1 (complete-only partial fill-in) = Tier 5.5.2; Choice 2 (confirmed overwrite + confirmation-gate functioning) = Tier 5.5.3."
       - "Live assertions use tolerant phrasing matches (bereits|schon|existing|already). Not strict wording checks."
@@ -781,7 +781,7 @@ quality:
     depends_on: [quality.walkthrough_multi_turn, onboarding.smart_v5, onboarding.data_handling_gate]
     docs: tests/e2e/03-onboarding-smart-v5-full-walk.test.sh + tests/e2e/README.md
     tests:
-      - tests/e2e/03-onboarding-smart-v5-full-walk.test.sh
+      - tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
     validated_at: "2026-04-20"
     validation_notes: "18/18 assertions green on first proper run (after permission-mode fix, see note 1). Profile produced: version=1.2, name=Alex, language=de, experience=intermediate (derived from 3-7), team_size=solo, data_handling_policy=cloud_llm_allowed, consents=[]."
     known_issues:

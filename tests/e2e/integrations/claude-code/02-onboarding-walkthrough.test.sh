@@ -18,9 +18,10 @@
 
 set -u
 
-HARNESS="$(cd "$(dirname "$0")/harness" && pwd)"
+HARNESS="$(cd "$(dirname "$0")/../../harness" && pwd)"
+CC_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$HARNESS/assertion-lib.sh"
-source "$HARNESS/claude-runner.sh"
+source "$CC_DIR/claude-runner.sh"
 
 ensure_beta_root
 test_banner "02 Onboarding SMART v5.0 multi-turn walkthrough (opt-in)"

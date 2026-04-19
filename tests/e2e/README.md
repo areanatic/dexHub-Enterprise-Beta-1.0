@@ -20,31 +20,48 @@ These tests are the mechanism that bridges that gap. Every user-facing feature g
 ```
 tests/e2e/
 ├── harness/
-│   ├── assertion-lib.sh      # pass/fail/assert_* helpers
-│   └── claude-runner.sh      # Claude Code headless mode wrapper
-├── fixtures/                 # Test data (sample PDFs, mock configs, scripted answers)
-├── NN-*.test.sh              # Individual tests (numbered for order)
-├── run-all.sh                # Master runner
-└── README.md                 # This file
+│   └── assertion-lib.sh            # pass/fail/assert_* helpers + platform stubs
+├── integrations/                   # REMOVABLE integration modules
+│   └── claude-code/                # Claude-Code-CLI-requiring tests
+│       ├── README.md               # Module self-description
+│       ├── claude-runner.sh        # Claude CLI harness
+│       └── NN-*.test.sh            # 6 live-portion tests (gated opt-in)
+├── NN-*.test.sh                    # CORE tests (platform-agnostic)
+├── fixtures/                       # Test data
+├── run-all.sh                      # Master runner (--enterprise flag skips integrations/)
+└── README.md                       # This file
 ```
+
+Per `.dexCore/_dev/docs/PLATFORM-POLICY.md`:
+- **Core tests** (directly in `tests/e2e/`) are platform-agnostic and ship in every Beta bundle.
+- **Integration tests** (under `tests/e2e/integrations/<platform>/`) require a specific platform's tooling. They are stripped by `build-for-enterprise.sh` before any enterprise push.
 
 ## Running locally
 
 ```bash
-# Structural tests only (fast, no API cost) — DEFAULT
+# Default: core + integration modules, structural only (no API cost)
 bash tests/e2e/run-all.sh
 
 # Structural + LIVE claude-runner assertions (opt-in, uses API tokens)
 bash tests/e2e/run-all.sh --live
 
+# Simulate enterprise build: core only, skip integrations/ entirely
+# Use this to verify core tests still pass with all integration modules stripped
+bash tests/e2e/run-all.sh --enterprise
+
 # Single test
 bash tests/e2e/00-fresh-install.test.sh
+bash tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
 
-# Verbose (show claude stderr etc.)
+# Verbose
 bash tests/e2e/run-all.sh --verbose
-# or:
-CLAUDE_E2E_VERBOSE=1 bash tests/e2e/run-all.sh
 ```
+
+## Integration module structure (new 2026-04-20)
+
+Tests that require specific platform tooling live in `tests/e2e/integrations/<platform>/`. Currently only `claude-code/`. These tests exist for the areanatic playground but are **stripped by `build-for-enterprise.sh`** before any enterprise push — per `.dexCore/_dev/docs/PLATFORM-POLICY.md`.
+
+Core tests (directly in `tests/e2e/`) remain platform-agnostic and ship in every bundle.
 
 ### Live mode — what it does
 
