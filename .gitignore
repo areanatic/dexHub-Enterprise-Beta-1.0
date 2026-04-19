@@ -41,6 +41,11 @@ myDex/projects/dhl-ui-library-kb/.dex/inputs/
 myDex/.dex/agent-state/*
 !myDex/.dex/agent-state/README.md
 
+# User L1 Wiki (private entries, framework-shipped README tracked)
+myDex/.dex/wiki/*
+!myDex/.dex/wiki/README.md
+!myDex/.dex/wiki/*.example.md
+
 # DexMemory session state (private, FEATURE-012)
 myDex/.dex/CONTEXT.md
 myDex/.dex/chronicle/*

@@ -289,15 +289,31 @@ agents:
 # ─────────────────────────────────────────────────────────────────────────
 knowledge:
   - id: knowledge.l1_wiki
-    name: "L1 Wiki (myDex/.dex/wiki/)"
-    description: "Markdown truth-files injected at session start (NexusGram pattern)"
-    status: deferred
+    name: "L1 Wiki (myDex/.dex/wiki/) — scaffold"
+    description: "Scaffold for Markdown truth-files: pattern doc, framework-shipped templates, user-wiki README. Session-start injection pipeline remains deferred (see knowledge.ingest_pipeline, Phase 5.2.d)."
+    status: enabled
     phase: 5.2.a
     enterprise_compliance: ok
     requires: []
     depends_on: []
-    docs: pending
-    tests: []
+    docs: .dexCore/_dev/docs/L1-WIKI-PATTERN.md
+    tests:
+      - tests/e2e/04-knowledge-l1-wiki-scaffold.test.sh
+    known_issues:
+      - "Entries authored here are NOT auto-loaded at session start yet — that's knowledge.ingest_pipeline (5.2.d)"
+      - "Templates are recommendations; user can deviate. Validator only checks scaffold existence."
+
+  - id: knowledge.l1_wiki_templates
+    name: "L1 Wiki framework-shipped templates"
+    description: "Three templates in .dexCore/core/wiki-templates/: institutional-knowledge, project-glossary, architecture-notes. Users copy into myDex/.dex/wiki/ and fill in."
+    status: enabled
+    phase: 5.2.a
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [knowledge.l1_wiki]
+    docs: .dexCore/core/wiki-templates/README.md
+    tests:
+      - tests/e2e/04-knowledge-l1-wiki-scaffold.test.sh
 
   - id: knowledge.l2_tank_sqlite
     name: "L2 Tank (native SQLite + Chunker + Semantic Search)"
