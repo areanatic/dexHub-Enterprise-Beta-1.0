@@ -52,10 +52,13 @@ echo ""
 echo -e "${BOLD}[1/24] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
-if [ "$BYTES" -le 30500 ]; then
-  pass "copilot-instructions.md: ${BYTES} bytes (limit: 30,500)"
+# Limit raised 2026-04-20 from 30,500 to 35,000 to accommodate Phase 5.2.d
+# L1 Wiki injection (per user's wiki authoring, up to WIKI_MAX_COPILOT=1000 bytes).
+# Headroom: ~4,500 bytes for natural SSOT + wiki growth.
+if [ "$BYTES" -le 35000 ]; then
+  pass "copilot-instructions.md: ${BYTES} bytes (limit: 35,000)"
 else
-  fail "copilot-instructions.md: ${BYTES} bytes EXCEEDS 30,500 limit"
+  fail "copilot-instructions.md: ${BYTES} bytes EXCEEDS 35,000 limit"
 fi
 
 # ==================== SECTION 2: Bug Status ====================

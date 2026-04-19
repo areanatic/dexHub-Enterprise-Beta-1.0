@@ -119,10 +119,10 @@ The script filters `status: archived` out — only `active` (or missing status f
 ## Phase milestones (ORDERED BY BETA PRIORITY — Copilot first)
 
 - ✅ **5.2.a** (2026-04-20 morning, commit `019af7c`) — authoring scaffold: pattern doc, templates, user README
-- ✅ **5.2.d-scaffold** (2026-04-20 late, commit `bac8bd0`) — load-wiki.sh + design doc + test 10 structural verification (platform-agnostic)
-- ⬜ **5.2.d-wire-copilot** (NEXT, PRIMARY) — bake wiki content into `.github/copilot-instructions.md` via SSOT compile step. This is the Beta-target integration. Ships as core Beta feature.
+- ✅ **5.2.d-scaffold** (2026-04-20 late, commit `bac8bd0`) — load-wiki.sh + design doc + test 10 structural verification (platform-agnostic). Loader fix at commit `f9fae…` (default wiki path resolution one level too shallow — fixed).
+- ✅ **5.2.d-wire-copilot** (2026-04-20 evening, PRIMARY Beta activation) — SSOT compile step invokes load-wiki.sh and appends output to `.github/copilot-instructions.md`. Verified by test 11 (16 assertions, 3 fixture-based scenarios: empty → no inject, fixture installed → content reaches Copilot, fixture removed → content gone). Size cap `WIKI_MAX_COPILOT=1000 bytes`; copilot cap raised from 30,500 → 35,000 in validate.sh §1 to accommodate.
+- ✅ **5.2.d-wire-claude-code** (same commit, OPTIONAL INTEGRATION MODULE) — same SSOT step also appends to `.claude/CLAUDE.md` with larger cap (WIKI_MAX_CLAUDE=4096). This tail is stripped from enterprise builds per `PLATFORM-POLICY.md`; the dev playground keeps it. No dedicated test (integration_module: claude-code tag; covered structurally via test 11).
 - ⬜ **5.2.b** — L2 Tank (SQLite + chunker + semantic search) for anything too big for L1
-- ⬜ **5.2.d-wire-claude-code** (OPTIONAL INTEGRATION MODULE) — append load-wiki.sh output to CONTEXT.md at Claude Code session start. Lives in `.claude/hooks/SessionStart` or similar. Stripped from enterprise builds per `PLATFORM-POLICY.md`.
 
 ## Enterprise Build Constraint
 

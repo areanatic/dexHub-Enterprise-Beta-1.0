@@ -36,9 +36,11 @@ MAX_TOTAL=20480   # 20 KB
 MAX_FILE=2048     # 2 KB per file (per L1-WIKI-PATTERN.md)
 SUMMARY_ONLY=0
 
-# Resolve default wiki dir from project root (parent-parent of this script)
+# Resolve default wiki dir from project root.
+# Script lives at: <repo>/.dexCore/core/knowledge/load-wiki.sh
+# Project root is three levels up from SCRIPT_DIR.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEFAULT_WIKI="$(cd "$SCRIPT_DIR/../.." && pwd)/myDex/.dex/wiki"
+DEFAULT_WIKI="$(cd "$SCRIPT_DIR/../../.." && pwd)/myDex/.dex/wiki"
 
 # ─── Arg parsing ───────────────────────────────────────────
 while [ $# -gt 0 ]; do

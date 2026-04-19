@@ -306,6 +306,36 @@ knowledge:
       - "Entries authored here are NOT auto-loaded at session start yet — that's knowledge.ingest_pipeline (5.2.d)"
       - "Templates are recommendations; user can deviate. Validator only checks scaffold existence."
 
+  - id: knowledge.l1_wiki_injection_copilot
+    name: "L1 Wiki → GitHub Copilot Injection (Phase 5.2.d wire-copilot)"
+    description: "Primary Beta activation of L1 Wiki. SSOT compile step (build-instructions.sh) invokes load-wiki.sh and appends output to .github/copilot-instructions.md. Wiki entries automatically reach every Copilot session. Cap: WIKI_MAX_COPILOT=1000 bytes (balances user room vs 35KB instruction-file limit). Empty wiki = no injection (no pollution on fresh installs). Drift-check includes wiki content in hash."
+    status: enabled
+    phase: 5.2.d-wire-copilot
+    enterprise_compliance: ok
+    requires: [bash]
+    depends_on: [knowledge.l1_wiki, knowledge.l1_wiki_injection]
+    docs: .dexCore/_dev/docs/L1-WIKI-INJECTION.md
+    tests:
+      - tests/e2e/11-wiki-copilot-injection.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Copilot cap (1000 bytes) is conservative. Can be bumped if real wiki usage needs more. Trade-off: total copilot-instructions.md cap (35KB) vs wiki room."
+      - "Drift-check is filesystem-state-dependent: if wiki file changes, build output changes, drift check catches it — by design."
+
+  - id: knowledge.l1_wiki_injection_claude_code
+    name: "L1 Wiki → Claude Code Injection (optional integration module)"
+    description: "Parallel wire for Claude Code integration. SSOT compile step appends wiki content to .claude/CLAUDE.md. Cap: WIKI_MAX_CLAUDE=4096 bytes (more lenient than Copilot due to Claude context-window headroom). Per PLATFORM-POLICY.md, Claude Code is a removable integration module — this feature rides in areanatic dev repo but the CLAUDE.md target is stripped by build-for-enterprise.sh for enterprise pushes."
+    status: enabled
+    phase: 5.2.d-wire-claude-code
+    enterprise_compliance: ok
+    requires: [bash]
+    depends_on: [knowledge.l1_wiki_injection]
+    docs: .dexCore/_dev/docs/L1-WIKI-INJECTION.md
+    tests: []
+    integration_module: claude-code
+    known_issues:
+      - "No dedicated test (would be a Claude-tail-specific test in integrations/claude-code/). Structural check via knowledge.l1_wiki_injection_copilot test 11 covers the build-instructions.sh wire that handles both tails."
+
   - id: knowledge.l1_wiki_injection
     name: "L1 Wiki Session-Start Injection — scaffold (loader layer)"
     description: "Activates knowledge.l1_wiki from authoring-surface to runtime-loadable. Ships .dexCore/core/knowledge/load-wiki.sh which enumerates myDex/.dex/wiki/*.md (skipping README.md + *.template.md + status:archived entries), respects 2KB per-file + 20KB total caps, and outputs a formatted session-prompt block. Platform-specific wiring to Claude Code (via CONTEXT.md or SSOT compile) and Copilot (via copilot-instructions.md compile) is the follow-up slice."
@@ -964,14 +994,19 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 70
+  total: 72
   by_status:
     always_on: 6
-    enabled: 31
+    enabled: 33
     disabled: 0
     deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 late-5 (Phase 5.2.d wire-copilot + wire-claude-code):
+  # - knowledge.l1_wiki_injection_copilot NEW enabled (Primary Beta activation)
+  # - knowledge.l1_wiki_injection_claude_code NEW enabled (integration_module: claude-code)
+  # Net: total 70→72, enabled 31→33.
+  # L1 Wiki pipeline now complete: author (5.2.a) → enumerate (5.2.d-scaffold) → inject (5.2.d-wire).
   # Updated 2026-04-20 late-4 (Phase 5.2.d first slice — L1 Wiki Injection scaffold):
   # - knowledge.l1_wiki_injection NEW enabled (load-wiki.sh + design doc + test 10)
   # Net this turn: total 69→70, enabled 30→31.
