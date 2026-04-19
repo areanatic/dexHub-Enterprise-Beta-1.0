@@ -46,6 +46,13 @@ myDex/.dex/wiki/*
 !myDex/.dex/wiki/README.md
 !myDex/.dex/wiki/*.example.md
 
+# User L2 Tank (SQLite DB is private user data, framework-shipped README tracked)
+myDex/.dex/l2/tank.sqlite
+myDex/.dex/l2/tank.sqlite-wal
+myDex/.dex/l2/tank.sqlite-shm
+myDex/.dex/l2/*.sqlite
+!myDex/.dex/l2/README.md
+
 # DexMemory session state (private, FEATURE-012)
 myDex/.dex/CONTEXT.md
 myDex/.dex/chronicle/*

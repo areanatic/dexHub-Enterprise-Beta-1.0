@@ -89,6 +89,7 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 | 09 | `09-onboarding-complete-only.test.sh` | Claude CLI for live | 3 structural (choice 1 spec: load profile + determine missing + Q&A only missing) | — | Live (opt-in): PARTIAL fixture (2/5 filled) + ~7 turns answering 3 missing SMART v5 questions. Asserts existing name+language PRESERVED + experience/team/data_handling ADDED + hash CHANGED (additive update). Costs ~5 USD. |
 | 10 | `10-knowledge-l1-wiki-injection.test.sh` | Ruby or python3 + perl (size cap test) | ~20 structural + functional (design doc, load-wiki.sh executable + syntax-valid, 7 fixture-based cases: silent-on-empty, user-entry loads, template skipped, archived skipped, size-cap truncates, summary counts, nonexistent dir exit 0) | — | — |
 | 11 | `11-wiki-copilot-injection.test.sh` | bash | 16 structural + functional (build-instructions.sh wire exists, 3 fixture-round-trip scenarios: empty→no-inject, fixture installed→content reaches copilot-instructions.md, fixture removed→content gone; drift-check passes in all states; size cap 35KB honored) | — | — |
+| 12 | `12-knowledge-l2-tank-scaffold.test.sh` | bash + sqlite3 | ~22 structural + functional (design doc + schema SQL parses, l2-init.sh creates valid DB with all tables + FTS5 queryable + schema_version=1, stubs emit [L2 STUB] honesty signal, gitignore protects tank.sqlite, features.yaml declares sub-features) | — | — |
 
 ### Opt-in walkthroughs
 

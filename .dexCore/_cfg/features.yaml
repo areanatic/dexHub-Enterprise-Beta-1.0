@@ -365,15 +365,97 @@ knowledge:
       - tests/e2e/04-knowledge-l1-wiki-scaffold.test.sh
 
   - id: knowledge.l2_tank_sqlite
-    name: "L2 Tank (native SQLite + Chunker + Semantic Search)"
-    description: "Native implementation, NOT Memory-Keeper-MCP"
-    status: deferred
+    name: "L2 Tank (native SQLite + Chunker + Semantic Search) — parent"
+    description: "Parent feature. Broken into 6 sub-features tracked independently: schema, init, ingest, embed, query, wire-copilot. See .dexCore/_dev/docs/L2-TANK.md for architecture + architectural-fit review."
+    status: enabled
     phase: 5.2.b
     enterprise_compliance: ok
     requires: [sqlite3]
     depends_on: []
-    docs: pending
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+    primary_target: github_copilot
+
+  - id: knowledge.l2_tank_schema
+    name: "L2 Tank — SQLite Schema v1"
+    description: "Schema defining chunks, chunks_fts (FTS5), embeddings, meta, ingest_runs tables + sync triggers. Applied by l2-init.sh. Verified by test 12 (parses to fresh sqlite3 in-memory DB + tables exist + FTS5 queryable)."
+    status: enabled
+    phase: 5.2.b-scaffold
+    enterprise_compliance: ok
+    requires: [sqlite3]
+    depends_on: [knowledge.l2_tank_sqlite]
+    docs: .dexCore/core/knowledge/l2/schema.sql
+    tests:
+      - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+    primary_target: github_copilot
+
+  - id: knowledge.l2_tank_init
+    name: "L2 Tank — init script (l2-init.sh)"
+    description: "Creates/validates tank.sqlite at myDex/.dex/l2/. Idempotent (re-applying schema is safe). Has --check mode for CI/validation. Test 12 verifies fixture DB creation + --check workflow + all expected tables."
+    status: enabled
+    phase: 5.2.b-scaffold
+    enterprise_compliance: ok
+    requires: [sqlite3]
+    depends_on: [knowledge.l2_tank_schema]
+    docs: .dexCore/core/knowledge/l2/l2-init.sh
+    tests:
+      - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+    primary_target: github_copilot
+
+  - id: knowledge.l2_tank_ingest
+    name: "L2 Tank — ingest script (l2-ingest.sh)"
+    description: "SCAFFOLD STUB. Emits [L2 STUB] signal. Real implementation (chunker + embedder) ships in phases 5.2.b-ingest + 5.2.b-embed. Future contract: chunk markdown sources via heading-aware sliding window (2KB chunks, 200-byte overlap), SHA-256 for dedup, Ollama/nomic-embed-text default."
+    status: experimental
+    phase: 5.2.b-scaffold
+    enterprise_compliance: ok
+    requires: [bash, sqlite3]
+    depends_on: [knowledge.l2_tank_init]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Stub only — no real ingest. All invocations are no-ops. [L2 STUB] signal emitted so no downstream consumer mistakes scaffold for working pipeline."
+
+  - id: knowledge.l2_tank_query
+    name: "L2 Tank — query script (l2-query.sh)"
+    description: "SCAFFOLD STUB. Emits [L2 STUB] signal. Real implementation (FTS5 + embedding cosine hybrid) ships in phase 5.2.b-query. Future contract: markdown-formatted top-N chunks with source path + relevance score, optimized for LLM readability."
+    status: experimental
+    phase: 5.2.b-scaffold
+    enterprise_compliance: ok
+    requires: [bash, sqlite3]
+    depends_on: [knowledge.l2_tank_init]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Stub only — no real query. [L2 STUB] signal emitted."
+
+  - id: knowledge.l2_tank_wire_copilot
+    name: "L2 Tank → Copilot injection (deferred)"
+    description: "Future: build-instructions.sh invokes l2-query at build time, bakes top-N chunks into copilot-instructions.md under '## L2 TANK (retrieved)' section. Mirrors L1 Wiki injection pattern (commit 27e9dba) but with seed-query driven retrieval rather than everything-loaded. Ships in 5.2.b-wire-copilot."
+    status: deferred
+    phase: 5.2.b-wire-copilot
+    enterprise_compliance: ok
+    requires: [bash, sqlite3]
+    depends_on: [knowledge.l2_tank_query, knowledge.l1_wiki_injection_copilot]
+    docs: .dexCore/_dev/docs/L2-TANK.md
     tests: []
+    primary_target: github_copilot
+
+  - id: knowledge.l2_tank_enterprise_compliance
+    name: "L2 Tank — enterprise compliance enforcement (deferred)"
+    description: "Script-level enforcement: l2-ingest.sh + l2-query.sh read profile.company.data_handling_policy and block non-compliant embedding backends. Default: Ollama local (compliant with local_only). OpenAI/cloud backends: blocked unless cloud_llm_allowed + explicit consent. Overridable via *force-override (audit chronicle entry). Ships in 5.2.b-enterprise-audit."
+    status: deferred
+    phase: 5.2.b-enterprise-audit
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [knowledge.l2_tank_ingest, knowledge.l2_tank_query, onboarding.data_handling_gate]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests: []
+    primary_target: github_copilot
 
   - id: knowledge.l3_chronicle
     name: "L3 Chronicle + CONTEXT.md"
@@ -994,14 +1076,24 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 72
+  total: 78
   by_status:
     always_on: 6
-    enabled: 33
+    enabled: 36
     disabled: 0
-    deferred: 33
+    deferred: 34
     broken: 0
-    experimental: 0
+    experimental: 2
+  # Updated 2026-04-20 late-6 (Phase 5.2.b-scaffold: L2 Tank first slice):
+  # - knowledge.l2_tank_sqlite: deferred → enabled (parent, wraps sub-features)
+  # - knowledge.l2_tank_schema NEW enabled (SQLite schema v1)
+  # - knowledge.l2_tank_init NEW enabled (working init script, idempotent)
+  # - knowledge.l2_tank_ingest NEW experimental (STUB — honest label)
+  # - knowledge.l2_tank_query NEW experimental (STUB — honest label)
+  # - knowledge.l2_tank_wire_copilot NEW deferred (future 5.2.b-wire)
+  # - knowledge.l2_tank_enterprise_compliance NEW deferred (future 5.2.b-audit)
+  # Net: total 72→78 (+6 sub-features, parent re-categorized enabled),
+  #      enabled 33→36 (+3), deferred 33→34 (+1), experimental 0→2 (+2).
   # Updated 2026-04-20 late-5 (Phase 5.2.d wire-copilot + wire-claude-code):
   # - knowledge.l1_wiki_injection_copilot NEW enabled (Primary Beta activation)
   # - knowledge.l1_wiki_injection_claude_code NEW enabled (integration_module: claude-code)
