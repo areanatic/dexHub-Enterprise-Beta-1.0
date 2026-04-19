@@ -100,14 +100,15 @@ Codebase Analyzer, Pattern Detector, API Documenter, Data Analyst, Requirements 
 
 ## Feature Matrix
 
-DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 60 features today, classified by status:
+DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 61 features today, classified by status:
 
 | Status | Count | What it means |
 |---|---|---|
-| `always_on` | 6 | Core infrastructure (DexMaster, SSOT compile, validate.sh) |
-| `enabled` | 14 | Shipped and tested — covered by this README |
-| `deferred` | 34 | Planned for 1.1 or later (Knowledge Layer, Parser, Agent Packs) |
-| `broken` | 6 | Known bugs — tracked, not shipping claims (Workflow Runner backend, Atlassian MCP 7-layer bug, GitHub Models API deprecated endpoint) |
+| `always_on` | 6 | Core infrastructure (DexMaster, SSOT compile, validate.sh, D1 state model) |
+| `enabled` | 20 | Shipped and tested — covered by this README |
+| `deferred` | 34 | Planned for 1.1 or later (Knowledge Layer, Parser Pattern B, Agent Pack toggle enforcement) |
+| `experimental` | 1 | Enterprise Mode status display (`*enterprise-mode` command) — full filter enforcement remains Tier 3 follow-up |
+| `broken` | 0 | No known-broken shipping features. 3 P0/P1 "bugs" inherited from Playground tracking were reclassified 2026-04-19: 2 were Playground-only (app/server.js never ported to Beta), 1 was fixed (Atlassian MCP install.sh v2.0 interactive wizard). |
 
 **Honest label for Beta 1.0 scope:** What ships today is a DexHub core framework (SSOT compile, agent boundary state model, onboarding variants, guardrails, 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh quality gate). **The Knowledge Layer, Document Parser, native Workflow-Runner backend, and Agent Pack UX are explicitly on the roadmap — see `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining build plan (Phases 5.2–5.4).**
 
@@ -155,7 +156,7 @@ Setup wizards that guide you through connecting your tools. No hardcoded URLs �
 
 | Integration | What you get | Setup | Status |
 |-------------|-------------|-------|--------|
-| **Atlassian** (Jira + Confluence) | Search issues, read pages, create content | `@atlassian-onboarding` | ⚠️ Known P0 bug: 7-layer MCP-config issue on Copilot/VS-Code path — fix pending, see [bugs.md](.dexCore/_dev/todos/bugs.md) |
+| **Atlassian** (Jira + Confluence) | Search issues, read pages, create content | `@atlassian-onboarding` | ✅ Enabled (wizard v2.0 — interactive, Cloud/Server auto-detect, modern MCP config paths) |
 | **GitHub Enterprise** | Repos, PRs, issues, CI/CD workflows | `@github-onboarding` | ✅ Enabled |
 | **Figma** | Design files, components, tokens | `@figma-onboarding` | ✅ Enabled |
 
