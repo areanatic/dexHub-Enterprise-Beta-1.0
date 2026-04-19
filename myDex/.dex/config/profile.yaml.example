@@ -1,10 +1,10 @@
 # DexHub Developer Profile
-# Generated from myDex Enhanced Onboarding (v4.2)
-# Schema: profile-schema-v1.0.yaml
+# Generated from myDex Onboarding (v4.3.1 SMART | v5.0 SMART/VOLLSTÄNDIG)
+# Schema: profile-schema-v1.0.yaml (current active version: 1.1 as of 2026-04-19)
 # Copy this to profile.yaml after running onboarding
 
 # TOP-LEVEL METADATA
-version: "1.0"
+version: "1.1"
 created_at: "2025-11-16T10:30:00Z"   # Set on first onboarding interaction
 updated_at: "2025-11-16T10:45:00Z"   # Updated on every save
 
@@ -59,8 +59,11 @@ identity:
   experience_years: "3-7"            # Q3 - Transformed to technical.experience_level
   team_size: "small"                 # Q4 - solo|small|medium|large
 
-# CATEGORY 6: Company & Team (Q5-Q13 - VOLLSTÄNDIG only)
+# CATEGORY 6: Company & Team
+# v1.0 fields (Q5-Q13 from v4.3.1 VOLLSTÄNDIG)
+# v1.1 fields (Q43-Q49 from v5.0 — enterprise compliance)
 company:
+  # v1.0 culture/team context (legacy, v4.3.1 opt-in)
   tool_adoption: "early_adopters"    # Q5 - innovators|early_adopters|pragmatic|skeptical|resistant
   communication_issues:              # Q6 - Max 2 selections
     - knowledge_not_documented
@@ -81,6 +84,20 @@ company:
     - training
     - time
   onboarding_duration: "1-2_months"  # Q13 - VOLLSTÄNDIG only
+
+  # v1.1 enterprise compliance (Q43-Q49, populated by onboarding v5.0)
+  data_handling_policy: "cloud_llm_allowed"   # Q43 SMART - local_only|lan_only|cloud_llm_allowed|hybrid (P0 GATE)
+  approved_llm_providers:                      # Q44 VOLLSTÄNDIG - multi-select
+    - ollama_local
+    - copilot_enterprise
+  available_connectors:                        # Q45 VOLLSTÄNDIG - multi-select
+    - github_enterprise
+    - atlassian_cloud
+  audit_requirements: "not_required"           # Q46 VOLLSTÄNDIG - enum
+  network_topology: "direct_internet"          # Q47 VOLLSTÄNDIG - enum
+  compliance_certifications:                   # Q48 VOLLSTÄNDIG - multi-select
+    - none
+  forbidden_git_targets: []                    # Q49 VOLLSTÄNDIG - list of URLs/patterns that must not be pushed to
 
 # CATEGORY 7: Workflow (Q18-Q21)
 workflow:
@@ -124,6 +141,8 @@ work:
   company: "Acme Corp"               # Q35 - Optional
   team: "Platform Team"              # Q36 - Optional
   domain: "web"                      # Q37 - Optional: web|mobile|backend|devops|data|ml|embedded|other
+
+# (company.* enterprise fields moved into CATEGORY 6 above to avoid duplicate YAML key)
 
 # CATEGORY 12: Custom Instructions (EA-1.0.1)
 # User-defined rules and context for AI agents

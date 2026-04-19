@@ -11,17 +11,19 @@
 > does it on a given session is a function of whether the LLM follows the spec.
 >
 > **Spec is defined for:**
-> - Onboarding question flow (questions database in `.dexCore/_cfg/onboarding-questions.yaml`, current version v4.3 with 42 questions)
-> - Profile generation against `myDex/.dex/config/profile.yaml.example` template
-> - 3 Onboarding variants: MINIMAL (5q) / SMART (16q) / VOLLSTAENDIG (~42q)
+> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v4.3.1, 42 questions total) AND `.dexCore/_cfg/onboarding-questions-v5.0.yaml` (v5.0, 3-layer model)
+> - Profile generation against `myDex/.dex/config/profile.yaml.example` template (schema v1.1)
+> - Onboarding routing (v5.0 is DEFAULT, v4.3.1 is legacy/opt-in):
+>   - `*mydex` or `*onboarding` → v5.0 variants (SMART 5q / VOLLSTÄNDIG 12q / MINIMAL 2q)
+>   - `*mydex-advanced` → v4.3.1 legacy (SMART 18q / VOLLSTÄNDIG 42q) for engagement-deep personalization
 > - Welcome + completion prompts, bilingual DE/EN
 > - Integration hooks for project-manager and dex-master
 >
 > **Known gaps between spec and reality:**
-> - Schema drift between `profile-schema-v1.0.yaml` and `profile.yaml.example` — see `FIX-PLAN-PROFILE-SCHEMA.md` in `myDex/drafts/` for the 3 remaining surgical fixes (Phase 2 Block 3 scope)
+> - Full walkthrough tests for v5.0 SMART end-to-end pending (Phase 5.1.a.2 Multi-Turn claude-runner)
 > - Chronicle / decisions / CONTEXT.md writes are **agent-driven during the turn**, not automatic. See SHARED.md § DexMemory for honest description.
-> - End-to-end runs of SMART and VOLLSTÄNDIG variants never validated
 > - Edge cases (cancel mid-flow, invalid input, existing profile) defined but not tested
+> - Q43-Q49 enterprise fields produce `company.*` block (v1.1 schema); v1.0 profiles remain valid (all new fields optional)
 >
 > **The table at the top (previously labeled "✅ Implemented") conflated "spec written" with "runtime verified". Those are different things. Read this header before trusting any checkmark deeper in the file.**
 >
@@ -196,11 +198,19 @@
     - Profile is USER'S personal data - treat with respect and privacy
 
     <!-- ONBOARDING EXECUTION RULES (Priority-Based) -->
-    <rule priority="CRITICAL" id="R1">
-      ALWAYS read onboarding-questions.yaml BEFORE starting Q&A.
-      File path: {project-root}/.dexCore/_cfg/onboarding-questions.yaml
-      NEVER proceed if file is missing or invalid.
+    <rule priority="CRITICAL" id="R1-routing">
+      Two onboarding question sets exist. Choose per user invocation:
+      - Default `*mydex` / `*onboarding` → load .dexCore/_cfg/onboarding-questions-v5.0.yaml
+        (v5.0 — SMART 5q, VOLLSTÄNDIG 12q, MINIMAL 2q; includes Q43 enterprise gate)
+      - Legacy `*mydex-advanced` → load .dexCore/_cfg/onboarding-questions.yaml
+        (v4.3.1 — SMART 18q, VOLLSTÄNDIG 42q; deep engagement survey)
+      NEVER proceed if the chosen file is missing or invalid.
       On error: Show friendly message + exit gracefully.
+    </rule>
+
+    <rule priority="CRITICAL" id="R1">
+      ALWAYS read the selected questions-YAML file BEFORE starting Q&A
+      (per R1-routing). Parse variant list and walk through in order.
     </rule>
 
     <rule priority="CRITICAL" id="R2">

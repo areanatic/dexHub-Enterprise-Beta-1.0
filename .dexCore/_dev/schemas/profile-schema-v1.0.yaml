@@ -1,9 +1,13 @@
-# DexHub Personal Profile Schema v1.0
+# DexHub Personal Profile Schema v1.1
 # Single Source of Truth for profile.yaml structure
 
-schema_version: "1.0"
+schema_version: "1.1"
 created: "2025-11-16"
+updated: "2026-04-19"
 status: "active"
+# v1.1 (2026-04-19): added company.* block (Q43-Q49 enterprise compliance fields)
+#                    for onboarding v5.0. Backward-compatible — all new fields
+#                    are optional; v1.0 profiles remain valid.
 
 # CONTRACT DEFINITION
 contract:
@@ -349,6 +353,99 @@ fields:
           max_length: 2000
         default: ""
 
+  # COMPANY / ENTERPRISE COMPLIANCE SECTION (v1.1, added 2026-04-19)
+  # Populated by onboarding v5.0 Q43-Q49 (data_handling_policy required in SMART,
+  # others optional and typically VOLLSTÄNDIG-only).
+  # All fields are optional — profile remains valid without company.* block.
+  company_v11:
+    type: object
+    required: false
+    description: "Enterprise compliance context — populated by onboarding v5.0"
+    version_added: "v1.1"
+    target_yaml_key: "company"
+
+    fields:
+      data_handling_policy:
+        type: enum
+        required: false
+        values: ["local_only", "lan_only", "cloud_llm_allowed", "hybrid"]
+        description: "P0 enterprise gate. Locks cloud-LLM vs local-only. Filters all downstream feature availability."
+        example: "local_only"
+        producer_source: "Q43 in onboarding-questions-v5.0.yaml (SMART + VOLLSTÄNDIG + MINIMAL)"
+        consumer_usage: "{profile_data_handling} - every cloud feature checks this before surfacing"
+        enterprise_compliance_priority: "P0"
+
+      approved_llm_providers:
+        type: array
+        item_type: enum
+        required: false
+        values: ["ollama_local", "copilot_enterprise", "claude_api", "openai_public", "none"]
+        description: "Which LLM providers the organization has approved for use"
+        example: ["ollama_local", "copilot_enterprise"]
+        producer_source: "Q44 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Filters LLM integration menu — only approved providers appear"
+        enterprise_compliance_priority: "P0"
+        default: []
+
+      available_connectors:
+        type: array
+        item_type: enum
+        required: false
+        values: ["github_enterprise", "atlassian_cloud", "atlassian_server", "figma", "internal_git", "none"]
+        description: "Which tool integrations are approved and reachable"
+        example: ["github_enterprise", "atlassian_server"]
+        producer_source: "Q45 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Connector wizard menu filters against this list"
+        enterprise_compliance_priority: "P0"
+        default: []
+
+      audit_requirements:
+        type: enum
+        required: false
+        values: ["not_required", "local_logs_only", "soc2", "iso27001", "hipaa", "dhl_supply_chain", "other"]
+        description: "Audit/compliance framework the user operates under"
+        example: "dhl_supply_chain"
+        producer_source: "Q46 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Drives chronicle format + commit signing + log retention"
+        enterprise_compliance_priority: "P0"
+
+      network_topology:
+        type: enum
+        required: false
+        values: ["direct_internet", "corporate_proxy", "vpn_required", "air_gapped", "hybrid"]
+        description: "Network access pattern for outbound calls"
+        example: "vpn_required"
+        producer_source: "Q47 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Every MCP connector + cloud-LLM call respects this"
+        enterprise_compliance_priority: "P1"
+
+      compliance_certifications:
+        type: array
+        item_type: enum
+        required: false
+        values: ["gdpr", "hipaa", "sox", "iso27001", "pci_dss", "none"]
+        description: "Regulations that apply to the work"
+        example: ["gdpr"]
+        producer_source: "Q48 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Agent output avoids regulation-violating patterns"
+        enterprise_compliance_priority: "P1"
+        default: []
+
+      forbidden_git_targets:
+        type: array
+        item_type: string
+        required: false
+        max_items: 20
+        description: "Git remotes/URLs that must not be pushed to (e.g. tombstoned enterprise targets)"
+        example: ["git.dhl.com/azamani1/*", "gitlab.legacy.corp/archive/*"]
+        producer_source: "Q49 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        consumer_usage: "Pre-push guard: warn/block if destination matches"
+        enterprise_compliance_priority: "P1"
+        default: []
+        validation:
+          max_items: 20
+          item_max_length: 200
+
 # VALIDATION RULES
 validation:
   on_produce:
@@ -383,11 +480,15 @@ evolution:
       - "New onboarding questions Q40-Q42"
       - "New workflow variables: {profile_custom_always_do}, {profile_custom_never_do}, {profile_custom_domain}"
 
-  v1.1_planned:
-    date: "TBD"
-    changes: "Add company/team profile tiers"
+  v1.1:
+    date: "2026-04-19"
+    changes: "Add company.* block for enterprise compliance (Q43-Q49 from onboarding v5.0)"
     breaking_changes: []
-    note: "V1.3 feature - multi-tier profiles"
+    notes:
+      - "7 new fields: data_handling_policy, approved_llm_providers, available_connectors, audit_requirements, network_topology, compliance_certifications, forbidden_git_targets"
+      - "All optional — v1.0 profiles remain valid without company.* block"
+      - "data_handling_policy is P0 enterprise gate (in SMART v5)"
+      - "Other 6 are P0/P1 compliance context (VOLLSTÄNDIG v5 only)"
 
   v2.0_planned:
     date: "TBD"

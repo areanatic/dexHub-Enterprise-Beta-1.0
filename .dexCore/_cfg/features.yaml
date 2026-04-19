@@ -133,22 +133,23 @@ onboarding:
 
   - id: onboarding.smart_v5
     name: "SMART onboarding v5.0 (5 questions, 60-90 sec)"
-    description: "3-layer model redesign: Layer A only (asked). Includes Q43 data_handling_policy as P0 enterprise gate"
-    status: experimental
+    description: "3-layer model DEFAULT onboarding flow. Layer A asked explicitly. Q43 data_handling_policy is P0 enterprise gate. mydex-agent R1-routing now targets this YAML by default."
+    status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator]
     docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml + .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
     tests:
-      - "tests/e2e/01-onboarding-smart.test.sh (structural, covers v4.3.1 + v5.0 count-range)"
+      - tests/e2e/01-onboarding-smart.test.sh
     known_issues:
-      - "Walkthrough test for v5.0 pending — needs multi-turn claude-runner design-spike"
+      - "Walkthrough test for v5.0 pending — Tier 5, needs multi-turn claude-runner design-spike"
+      - "Produces profile v1.1 (company.* block); v1.0 profiles remain valid"
 
   - id: onboarding.vollstandig_v5
     name: "VOLLSTÄNDIG onboarding v5.0 (12 questions, 3-5 min)"
-    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41)"
-    status: experimental
+    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41). Active via *mydex variant selection"
+    status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
@@ -180,19 +181,21 @@ onboarding:
 
   - id: onboarding.data_handling_gate
     name: "Data-handling policy P0 gate (Q43)"
-    description: "Enterprise-compliance gate question in SMART v5. Filters feature availability downstream"
-    status: experimental
+    description: "Enterprise-compliance gate question in SMART v5. Populates profile.company.data_handling_policy (schema v1.1). Filter-enforcement pending Tier 3."
+    status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
     depends_on: [onboarding.smart_v5, meta.features_yaml]
     docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md §3
     tests: []
+    known_issues:
+      - "Question is asked and stored; feature-filter that consumes it (Enterprise Mode Filter) is Tier 3 pending"
 
   - id: onboarding.legacy_path_preserved
     name: "Legacy *mydex-advanced command"
-    description: "Existing users + engagement seekers can still run the 42-question v4.3 flow"
-    status: deferred
+    description: "Existing users + engagement seekers can still run the 42-question v4.3.1 flow via *mydex-advanced (wired in mydex-agent R1-routing)"
+    status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
@@ -824,13 +827,17 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 66
+  total: 65
   by_status:
     always_on: 6
-    enabled: 14
+    enabled: 19
     disabled: 0
-    deferred: 36
+    deferred: 34
     broken: 6
-    experimental: 4
-  # Updated 2026-04-19 Phase 5.1.b: +6 onboarding features (3 experimental + 3 deferred)
-  # minus 1 absorbed (questions_v5_holistic_review → split into experimental entries)
+    experimental: 0
+  # Updated 2026-04-19 Phase 5.1.b wiring (Tier 2 commit):
+  # - onboarding.smart_v5 promoted experimental → enabled (wired as default)
+  # - onboarding.vollstandig_v5 promoted experimental → enabled
+  # - onboarding.data_handling_gate promoted experimental → enabled
+  # - onboarding.legacy_path_preserved promoted deferred → enabled (wired *mydex-advanced)
+  # Walkthrough test (Tier 5) remains pending; filter enforcement (Tier 3) pending.

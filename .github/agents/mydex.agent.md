@@ -50,8 +50,9 @@ myDex/
 ## Profile Management
 
 - Profile location: `myDex/.dex/config/profile.yaml`
-- Schema: `.dexCore/_dev/schemas/profile-schema-v1.0.yaml`
-- Onboarding: `.dexCore/_cfg/onboarding-questions.yaml`
+- Schema: `.dexCore/_dev/schemas/profile-schema-v1.0.yaml` (active version 1.1)
+- Onboarding (default): `.dexCore/_cfg/onboarding-questions-v5.0.yaml`  ← invoked via `*mydex` / `*onboarding`
+- Onboarding (legacy/opt-in): `.dexCore/_cfg/onboarding-questions.yaml`  ← invoked via `*mydex-advanced`
 
 ## Guardrails
 
