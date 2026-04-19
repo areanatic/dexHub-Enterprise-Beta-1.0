@@ -1,9 +1,11 @@
 # Onboarding Holistic Review — 21/42 Question Set
 
 **Date:** 2026-04-19
-**Author:** Claude Opus 4.7 (synthesized from 4 parallel research agents + verification)
-**Status:** REVIEW — decision-ready, not yet implemented
-**Feeds into:** Phase 5.1.b (NEXT_SESSION_PROMPT_PHASE_5_1_2026_04_19.md)
+**Author:** Claude Opus 4.7 (4 parallel research agents)
+**Status:** CONSUMED — research inputs integrated into `bab2ed6` Phase 5.1.b v5.0 design
+**Feeds into:** Phase 5.1.b (actually delivered on 2026-04-19 evening)
+
+> **PROVENANCE NOTE (added 2026-04-19 evening):** This file was committed as `d4782d0` on `main` by a parallel RZP session that mis-routed DexHub work into the Beta repo. The authoring session documented its own cross-repo violation in `~/.claude/projects/-Users-az-Downloads-test-1911-0349-dexHub-Enterprise-Alpha-1-0-master/memory/SESSION_ERROR_2026_04_19_RZP_CROSSED_INTO_BETA_PHASE5.md`. The DexHub session (this repo's 5.1.b committer) reviewed the content, verified the core findings independently (Q21/Q22 collision, competitor-zero-question baseline, 0-of-7 enterprise-compliance gap), and integrated them into `bab2ed6`. File retained rather than reverted because content is verified and already load-bearing for downstream work. See also: `MEMORY.md` Ground Rule #7 (extended 2026-04-19) and #9 (new, "worktree-anchor beats phase-name").
 
 ---
 
