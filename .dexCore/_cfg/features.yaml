@@ -697,6 +697,33 @@ quality:
     known_issues:
       - "First iteration proves plumbing only. Full 5-answer walk + profile.yaml-produced assertion is quality.walkthrough_smart_v5_full (Tier 5.2)."
 
+  - id: quality.walkthrough_view_profile
+    name: "View-Profile Path (Tier 5.5.4, choice 3)"
+    description: "Smallest slice in existing-profile menu. User picks '3 Profil anzeigen' → agent displays content, returns to menu, profile UNCHANGED. Tests that view is a pure read operation — any mutation here would be a bug. Structural: mydex-agent.md has 'Read and display profile.yaml (formatted), return to menu'. Live (opt-in): fixture + 4 turns + hash-equality post-view."
+    status: enabled
+    phase: 5.1.c-tier5.5.4
+    enterprise_compliance: cloud_with_consent
+    requires: [claude-code]
+    depends_on: [quality.walkthrough_existing_profile_edge]
+    docs: tests/e2e/08-onboarding-view-profile.test.sh + tests/e2e/README.md
+    tests:
+      - tests/e2e/08-onboarding-view-profile.test.sh
+
+  - id: quality.walkthrough_complete_only
+    name: "Complete-Only Path — Preserve-Existing (Tier 5.5.2, choice 1)"
+    description: "The data-preservation path: user has partial profile, picks '1 Profil vervollständigen', agent asks ONLY the missing questions. New answers added, existing answers survive. Unique to this test: hash EXPECTED to change (additive update), strict assertions on field-level preservation of TestUser09 name + de language + addition of experience/team/data_handling fields. Structural: mydex-agent.md has 'Load profile, determine missing questions, start Q&A with only missing'. Live (opt-in): fixture with 2/5 filled + ~7 turns."
+    status: enabled
+    phase: 5.1.c-tier5.5.2
+    enterprise_compliance: cloud_with_consent
+    requires: [claude-code]
+    depends_on: [quality.walkthrough_existing_profile_edge, quality.walkthrough_smart_v5_full]
+    docs: tests/e2e/09-onboarding-complete-only.test.sh + tests/e2e/README.md
+    tests:
+      - tests/e2e/09-onboarding-complete-only.test.sh
+    known_issues:
+      - "Tolerant on question order — agent may ask Q3/Q4/Q43 in any sequence. Answers (3-7/allein/Cloud-LLMs) work across all orderings."
+      - "Save-confirmation turn 8 is conservative — some flows may auto-save without prompting. Harmless if not prompted."
+
   - id: quality.walkthrough_overwrite_reject_confirm
     name: "Overwrite Confirm-Gate Reject Path (Tier 5.5.3)"
     description: "Companion to walkthrough_existing_profile_edge. Goes ONE level deeper: user picks '2 Neu beginnen' → confirm-gate fires ('Sicher? Aktuelles Profil wird überschrieben. [j/n]') → user answers 'n' → profile MUST survive unchanged. Structural: mydex-agent.md has confirm-gate wording + branch logic. Live (opt-in): 5 turns + SHA-256 equality check pre-confirm AND post-reject. Catches a class of safety bug test 06 cannot: confirm-gate bypassed before user answers."
@@ -921,14 +948,20 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 67
+  total: 69
   by_status:
     always_on: 6
-    enabled: 28
+    enabled: 30
     disabled: 0
     deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 late-3 (Tier 5.5 closure — slices 2 + 4):
+  # - quality.walkthrough_view_profile NEW enabled (choice 3 pure-read)
+  # - quality.walkthrough_complete_only NEW enabled (choice 1 preserve-existing + add-missing)
+  # Net this turn: total 67→69, enabled 28→30.
+  # Tier 5.5 branches covered: 4 of 4 (cancel + view + reject-confirm + complete-only).
+  # Not covered yet: 5.5.3b (confirmed-overwrite "j" → full walkthrough chain, ~10 USD).
   # Updated 2026-04-20 late-2 (Tier 5.5.3):
   # - quality.walkthrough_overwrite_reject_confirm NEW enabled (confirm-gate reject-path,
   #   5 structural + opt-in live; complementary to existing_profile_edge test 06)

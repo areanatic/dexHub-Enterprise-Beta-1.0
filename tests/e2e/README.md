@@ -68,6 +68,8 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 | 05 | `05-consent-tracking.test.sh` | None | ~12 assertions (CONSENT-TRACKING.md, schema v1.2, profile example, DexMaster *consents/*revoke-consent, 3 connector agents reference consent) | — | — |
 | 06 | `06-onboarding-existing-profile.test.sh` | Claude CLI for live | 8 structural (mydex-agent has Check-Existing-Profile step + 4 choices + overwrite confirm-gate) | — | Live (opt-in): fixture + 4 turns, asserts profile-hash UNCHANGED post-cancel. Costs ~3-5 USD. |
 | 07 | `07-onboarding-overwrite-reject-confirm.test.sh` | Claude CLI for live | 5 structural (mydex-agent confirm-gate wording + [j/n] pattern + confirmed-branch + rejected-branch) | — | Live (opt-in): fixture + 5 turns, picks "Neu beginnen" → "n", asserts SHA-256 UNCHANGED both pre-confirm AND post-reject. Costs ~3-5 USD. |
+| 08 | `08-onboarding-view-profile.test.sh` | Claude CLI for live | 3 structural (choice 3 spec: read + display + return-to-menu) | — | Live (opt-in): fixture + 4 turns, picks "3", asserts profile name in response + SHA-256 UNCHANGED (pure read). Costs ~3 USD. |
+| 09 | `09-onboarding-complete-only.test.sh` | Claude CLI for live | 3 structural (choice 1 spec: load profile + determine missing + Q&A only missing) | — | Live (opt-in): PARTIAL fixture (2/5 filled) + ~7 turns answering 3 missing SMART v5 questions. Asserts existing name+language PRESERVED + experience/team/data_handling ADDED + hash CHANGED (additive update). Costs ~5 USD. |
 
 ### Opt-in walkthroughs
 
