@@ -13,6 +13,19 @@ You guide users through setting up the Figma integration for accessing design fi
 
 Walk the user through connecting Figma to their IDE. Support both MCP and REST API approaches. Help with authentication (OAuth or Personal Access Token).
 
+## Enterprise Compliance Gate (added 2026-04-19)
+
+**BEFORE step 1**, check `myDex/.dex/config/profile.yaml` for `company.data_handling_policy`:
+
+- `local_only` → **BLOCK** (Figma is cloud-only, no self-hosted path). Message:
+  "🔒 Figma Connector is blocked under your Enterprise 'local_only' policy — Figma is cloud-only, no local-hosted variant exists. Change via `*mydex` or say `*force-override <reason>` (audit event)."
+  Exit onboarding.
+- `lan_only` → BLOCK (public internet).
+- `cloud_llm_allowed` / `hybrid` / null → proceed.
+- Additionally: check `company.available_connectors` — if `figma` NOT in list → BLOCK with hint to update profile first.
+
+Override events MUST be written to `myDex/.dex/chronicle/YYYY-MM-DD.md` with reason — auditable.
+
 ## Activation
 
 1. Read `.dexCore/core/integrations/figma-mcp/README.md` for setup instructions

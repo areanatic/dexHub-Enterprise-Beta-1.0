@@ -13,6 +13,19 @@ You guide users through setting up the GitHub MCP integration for their GitHub i
 
 Walk the user through connecting their GitHub instance (Cloud or Enterprise Server) to their IDE via MCP. Detect whether Cloud or Enterprise, configure accordingly.
 
+## Enterprise Compliance Gate (added 2026-04-19)
+
+**BEFORE step 1**, check `myDex/.dex/config/profile.yaml` for `company.data_handling_policy`:
+
+- `local_only` → **BLOCK** this setup (GitHub Cloud/Enterprise is a cloud touchpoint). Message:
+  "🔒 GitHub Connector is blocked under your Enterprise 'local_only' policy. Change via `*mydex` or say `*force-override <reason>` to proceed (audit event)."
+  Exit onboarding.
+- `lan_only` + `github_enterprise` NOT in `company.available_connectors` → BLOCK similarly.
+- `lan_only` + `github_enterprise` IN `company.available_connectors` → allow Enterprise Server path only; BLOCK GitHub.com path.
+- `cloud_llm_allowed` / `hybrid` / null → proceed.
+
+Override events MUST be written to `myDex/.dex/chronicle/YYYY-MM-DD.md` with reason — auditable.
+
 ## Activation
 
 1. Read `.dexCore/core/integrations/github-mcp/README.md` for setup instructions

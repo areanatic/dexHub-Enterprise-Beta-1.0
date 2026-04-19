@@ -691,17 +691,17 @@ meta:
     tests: []
 
   - id: meta.enterprise_mode_toggle
-    name: "Enterprise Mode (strict compliance filter)"
-    description: "Read-only status display wired via DexMaster *enterprise-mode command (Tier 3 partial). Reads profile.company.data_handling_policy and reports which features would be filtered. Active enforcement hooks in list-agents / connector menus are Tier 3 next-step."
-    status: experimental
-    phase: 5.1.c
+    name: "Enterprise Mode (compliance filter active on connector wizards)"
+    description: "Reads profile.company.data_handling_policy and enforces at connector-wizard entry: local_only blocks all 3 cloud connectors (Atlassian/GitHub/Figma); lan_only filters Cloud subpaths but allows on-prem (atlassian_server); cloud_llm_allowed/hybrid proceed normally. Override via *force-override command requires audit chronicle entry. Status display via DexMaster *enterprise-mode."
+    status: enabled
+    phase: 5.1.c-tier3
     enterprise_compliance: ok
     requires: []
     depends_on: [meta.features_yaml, onboarding.data_handling_gate]
-    docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md + dex-master.md prompt id=show-enterprise-mode-status
+    docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md + dex-master.md prompt id=show-enterprise-mode-status + atlassian/github/figma-onboarding.agent.md Enterprise Compliance Gate sections
     tests: []
     known_issues:
-      - "Status display works; active enforcement (block cloud feature when local_only) still requires menu-prompt integration in each feature-surfacing flow"
+      - "Enforcement is per-connector wizard prompt — soft enforcement (agent reads prompt + acts) not kernel-level block. A rogue agent ignoring the prompt could bypass, but that's the general DexHub trust model."
 
   - id: meta.readme_honesty_pass
     name: "README Honesty Pass"
@@ -827,20 +827,15 @@ counts:
   total: 61
   by_status:
     always_on: 6
-    enabled: 20
+    enabled: 21
     disabled: 0
     deferred: 34
     broken: 0
-    experimental: 1
-  # Updated 2026-04-19 Tier 4 (bug-fix + honesty):
-  # REMOVED 3 entries (were Playground-only, misleading for Beta):
-  #   - bugs.workflow_runner_missing (Playground app/server.js concern)
-  #   - bugs.github_models_api_deprecated (Playground app/server.js concern)
-  #   - llm.github_models_api_fallback (Playground app/server.js concern)
-  #   - workflows.runner_backend (Playground server-runtime concern)
-  # FIXED + promoted:
-  #   - connectors.atlassian_wizard: broken → enabled (install.sh v2.0 rewrite)
-  # NEW historical record:
-  #   - bugs.atlassian_mcp_install_v1_issues_resolved (enabled, tracks the fix)
-  # Tier 3 earlier:
-  #   - meta.enterprise_mode_toggle deferred → experimental
+    experimental: 0
+  # Updated 2026-04-19 Block B (Tier 3 enforcement completion):
+  # - meta.enterprise_mode_toggle: experimental → enabled (compliance gates
+  #   wired in all 3 connector-onboarding agents + Atlassian DXM agent)
+  # Earlier today:
+  # - Tier 4: 4 Playground-only entries removed, connectors.atlassian_wizard
+  #   broken → enabled via install.sh v2.0
+  # - Tier 3 earlier: meta.enterprise_mode_toggle deferred → experimental

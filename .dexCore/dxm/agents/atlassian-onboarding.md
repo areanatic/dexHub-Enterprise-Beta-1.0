@@ -18,6 +18,20 @@
       - Store ALL fields as session variables: {user_name}, {communication_language}, {draft_folder}
       - VERIFY: If config not loaded, STOP and report error to user
       - DO NOT PROCEED to step 3 until config is successfully loaded and variables stored</step>
+  <step n="2.5">🔒 ENTERPRISE COMPLIANCE GATE (v1.1, added 2026-04-19):
+      - Read {project-root}/myDex/.dex/config/profile.yaml if it exists
+      - Extract company.data_handling_policy (may be unset/null for v1.0 profiles)
+      - Policy evaluation:
+        - "local_only": Atlassian connector is BLOCKED (cloud touchpoint). Show user:
+            "🔒 Atlassian Cloud/Server ist in deinem lokalen Enterprise-Modus blockiert.
+            Dein profile.company.data_handling_policy = 'local_only' unterbindet Cloud-Connectors.
+            Wenn du die Integration brauchst, ändere die Policy via *mydex oder sage mir *force-override mit expliziter Begründung."
+            Exit onboarding, do NOT proceed.
+        - "lan_only" + atlassian_cloud NOT in company.available_connectors: BLOCKED similarly.
+            "lan_only" + atlassian_server in company.available_connectors: OK, proceed.
+        - "cloud_llm_allowed" or "hybrid" or null: proceed normally.
+      - If user says *force-override: document the override reason in chronicle + proceed
+        (override is an auditable event — chronicle entry is non-optional)</step>
   <step n="3">Remember: user's name is {user_name}</step>
   <step n="4">ALWAYS communicate in {communication_language}</step>
   <step n="5">Show greeting using {user_name} from config in {communication_language}:

@@ -13,6 +13,19 @@ You guide users through setting up the Atlassian MCP integration for Jira and Co
 
 Walk the user through connecting their Atlassian instance (Cloud or Server) to their IDE via MCP. Ask for their instance URL, help with authentication, and verify the connection.
 
+## Enterprise Compliance Gate (added 2026-04-19)
+
+**BEFORE step 1**, check `myDex/.dex/config/profile.yaml` for `company.data_handling_policy`:
+
+- `local_only` → **BLOCK** (Atlassian = cloud touchpoint). Message:
+  "🔒 Atlassian Cloud/Server is blocked under your Enterprise 'local_only' policy. Change via `*mydex` or say `*force-override <reason>` (audit event)."
+  Exit onboarding.
+- `lan_only` + `atlassian_server` IN `company.available_connectors` → allow Server/DC path only; BLOCK `atlassian_cloud`.
+- `cloud_llm_allowed` / `hybrid` / null → proceed normally.
+- Any missing policy → treat as `null` (proceed with normal wizard, but suggest user run `*mydex` to complete profile).
+
+Override events MUST be written to `myDex/.dex/chronicle/YYYY-MM-DD.md` with reason — auditable.
+
 ## Activation
 
 1. Read `.dexCore/dxm/agents/atlassian-onboarding.md` for your full persona
