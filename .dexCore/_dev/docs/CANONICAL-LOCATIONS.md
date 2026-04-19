@@ -4,8 +4,32 @@
 
 If you are an AI agent in a new session: read this file first when you need to write, read, archive, or back up anything. If two other docs disagree about where something lives, this file wins.
 
-**Last reviewed:** 2026-04-13
+**Last reviewed:** 2026-04-19
 **Mirror on AstronOne:** `/Volumes/AstronOne/shared-memory/dexhub/ARCHITECTURE.md` (longer, includes recovery procedures)
+
+---
+
+## 0. ⚠️ WORKTREE IDENTITY CHECK (read BEFORE any write)
+
+At any given time, the user may have **multiple parallel Claude Code sessions** active, each anchored in a different worktree. Cross-session commits into the wrong repo HAVE HAPPENED (2026-04-19 incident — RZP session committed DexHub Phase 5.1 work into Beta repo during a "next phase" ambiguity).
+
+**Protocol before any file write:**
+1. Read `.dexcore-session-anchor` at the repo root. It declares `expected_origin`, `expected_worktree_path_contains`, `expected_branches`.
+2. Verify: `git config --get remote.origin.url` matches `expected_origin`.
+3. Verify: `pwd` contains `expected_worktree_path_contains`.
+4. Verify: `git rev-parse --abbrev-ref HEAD` is in `expected_branches`.
+5. If any mismatch OR the user's request is ambiguous across worktrees: **STOP, ASK, DON'T GUESS.**
+
+`validate.sh §24` checks the anchor consistency automatically. If §24 fails, something is structurally wrong with the repo — investigate before acting.
+
+**Known parallel worktrees (not this repo):**
+- RZP POC work → `/Users/az/Downloads/rzp-alba-flowable-konform/` (Flowable-konform branch)
+- RZP worktree (exp-cleanup) → `/Users/az/Downloads/rzp-alba-prototyp-worktree-exp-cleanup/`
+- DexHub Alpha (tombstoned, read-only) → `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/`
+
+**This repo (Beta) is at:** `/Users/az/Documents/A+/AVX/AI_Workspace/dexHub-Enterprise-Beta-1.0/`
+
+See: `SESSION_ERROR_2026_04_19_RZP_CROSSED_INTO_BETA_PHASE5.md` in memory for the incident writeup + MEMORY.md Ground Rule #9 ("Worktree-anchor beats phase-name").
 
 ---
 

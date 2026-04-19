@@ -1,0 +1,54 @@
+# DexHub Session Anchor — Worktree Identity Declaration
+#
+# PURPOSE: This file exists so any session (human or AI) can disambiguate
+# "which repo am I actually in?" before doing work. It directly addresses
+# the 2026-04-19 cross-repo incident where a parallel session misinterpreted
+# "next phase" across worktrees and committed DexHub Phase-5.1 work into
+# the wrong repository.
+#
+# HOW TO USE (session-start protocol):
+# 1. Read this file first
+# 2. Verify repo == expected_repo
+# 3. Verify git remote origin matches expected_origin
+# 4. Verify branch is in expected_branches
+# 5. If ANY mismatch: STOP, run worktree-check, ask user before any write
+#
+# CHECKED BY: .dexCore/_dev/tools/validate.sh §24 (anchor consistency)
+
+repo_name: "dexHub-Enterprise-Beta-1.0"
+repo_role: "Beta product — platform-agnostic instruction set (DexHub framework)"
+expected_origin: "git@github.com:areanatic/dexHub-Enterprise-Beta-1.0.git"
+expected_origin_alternate: "https://github.com/areanatic/dexHub-Enterprise-Beta-1.0.git"
+expected_branches: ["main"]
+expected_worktree_path_contains: "dexHub-Enterprise-Beta-1.0"
+
+scope: |
+  This repo contains the DexHub Beta product:
+    - SHARED.md + platform tails (SSOT compile)
+    - 46 .agent.md agents + 46 workflows + 12 skills
+    - .dexCore/_cfg/features.yaml feature registry
+    - Guardrails G1-G9 + validate.sh 23 sections
+    - onboarding-questions.yaml (v4.3.1) + onboarding-questions-v5.0.yaml
+    - Integration wizards (atlassian-mcp, github-mcp, figma-mcp)
+    - tests/e2e/ structural + live harness
+
+not_this_repo: |
+  - RZP work (Flowable-konform POC screens) → /Users/az/Downloads/rzp-alba-flowable-konform/
+  - RZP worktree (exp-cleanup) → /Users/az/Downloads/rzp-alba-prototyp-worktree-exp-cleanup/
+  - DexHub Alpha (tombstoned reference, read-only) → /Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/
+  - Old azamani1 targets (tombstoned) → push URL no_push://
+  - AstronOne mirror (memory-only, not a working repo) → /Volumes/AstronOne/shared-memory/dexhub/
+
+parallel_session_warning: |
+  At any given time, user may have multiple Claude Code sessions open, each
+  anchored in a different worktree. NEVER assume a "Phase X" request from
+  the user context applies to THIS repo — verify worktree match first.
+  If the user's intent is ambiguous across worktrees, ASK (don't guess).
+
+  Specifically: RZP sessions never write into this Beta repo; this Beta
+  session never writes into RZP worktrees. Shared discovery (e.g. Parser
+  Pattern B) flows through memory files (`~/.claude/projects/.../memory/`),
+  not through direct cross-repo commits.
+
+last_updated: "2026-04-19"
+incident_reference: "SESSION_ERROR_2026_04_19_RZP_CROSSED_INTO_BETA_PHASE5.md (cross-repo violation by parallel RZP session)"

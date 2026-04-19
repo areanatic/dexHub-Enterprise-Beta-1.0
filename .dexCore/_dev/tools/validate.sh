@@ -35,7 +35,7 @@ echo -e "${BOLD}========================================${NC}"
 echo ""
 
 # ==================== SECTION 1: Byte Limits ====================
-echo -e "${BOLD}[1/23] Byte Limits${NC}"
+echo -e "${BOLD}[1/24] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
 if [ "$BYTES" -le 30500 ]; then
@@ -45,7 +45,7 @@ else
 fi
 
 # ==================== SECTION 2: Bug Status ====================
-echo -e "\n${BOLD}[2/23] Bug Status${NC}"
+echo -e "\n${BOLD}[2/24] Bug Status${NC}"
 
 OPEN_BUGS=$(grep -c 'status: open\|status: confirmed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
 OPEN_BUGS=$(echo "$OPEN_BUGS" | tr -d '[:space:]')
@@ -71,7 +71,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/23] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/24] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 # GREETING action — check state model references in both
 if grep -q 'GREETING' .claude/CLAUDE.md && \
@@ -121,7 +121,7 @@ else
 fi
 
 # ==================== SECTION 4: File Existence ====================
-echo -e "\n${BOLD}[4/23] Critical File Existence${NC}"
+echo -e "\n${BOLD}[4/24] Critical File Existence${NC}"
 
 FILES=(
   ".dexCore/core/agents/dex-master.md"
@@ -154,7 +154,7 @@ for f in "${FILES[@]}"; do
 done
 
 # ==================== SECTION 5: Feature Validation ====================
-echo -e "\n${BOLD}[5/23] Feature Artifact Validation${NC}"
+echo -e "\n${BOLD}[5/24] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
@@ -230,7 +230,7 @@ else
 fi
 
 # ==================== SECTION 6: Architecture Rules ====================
-echo -e "\n${BOLD}[6/23] Architecture Rules${NC}"
+echo -e "\n${BOLD}[6/24] Architecture Rules${NC}"
 
 # G3: No files in root (except allowed)
 ALLOWED_ROOT="CONTRIBUTING.md|LICENSE|NOTICE|README.md|.gitignore|.gitattributes|myDex|tests"
@@ -256,7 +256,7 @@ else
 fi
 
 # ==================== SECTION 7: Sanity Checks ====================
-echo -e "\n${BOLD}[7/23] Sanity Checks${NC}"
+echo -e "\n${BOLD}[7/24] Sanity Checks${NC}"
 
 # Agent count
 AGENT_FILES=$(find .dexCore/dxm/agents -name "*.md" 2>/dev/null | wc -l)
@@ -274,7 +274,7 @@ else
 fi
 
 # ==================== SECTION 8: Agent File Validation ====================
-echo -e "\n${BOLD}[8/23] Agent File Validation${NC}"
+echo -e "\n${BOLD}[8/24] Agent File Validation${NC}"
 
 # Check all .agent.md files have required frontmatter
 for agent_file in .github/agents/*.agent.md; do
@@ -299,7 +299,7 @@ else
 fi
 
 # ==================== SECTION 9: Skill Validation ====================
-echo -e "\n${BOLD}[9/23] Skill Validation${NC}"
+echo -e "\n${BOLD}[9/24] Skill Validation${NC}"
 
 SKILL_COUNT=$(find .github/skills -name "SKILL.md" 2>/dev/null | wc -l)
 pass "Copilot Skills found: $SKILL_COUNT"
@@ -323,7 +323,7 @@ for skill_dir in .github/skills/*/; do
 done
 
 # ==================== SECTION 10: Manifest Sync ====================
-echo -e "\n${BOLD}[10/23] Manifest Sync${NC}"
+echo -e "\n${BOLD}[10/24] Manifest Sync${NC}"
 
 # Workflow manifest paths should use .dexCore/ not dex/
 BAD_PATHS=$(grep -c '"dex/' .dexCore/_cfg/workflow-manifest.csv 2>/dev/null || echo 0)
@@ -346,7 +346,7 @@ else
 fi
 
 # ==================== SECTION 11: Platform Hygiene ====================
-echo -e "\n${BOLD}[11/23] Platform Hygiene${NC}"
+echo -e "\n${BOLD}[11/24] Platform Hygiene${NC}"
 
 # No Claude Code refs in user-facing files
 CC_REFS=0
@@ -388,7 +388,7 @@ else
 fi
 
 # ==================== SECTION 12: Number Consistency ====================
-echo -e "\n${BOLD}[12/23] Number Consistency${NC}"
+echo -e "\n${BOLD}[12/24] Number Consistency${NC}"
 
 # Count actual values
 ACTUAL_AGENTS=$(tail -n +2 .dexCore/_cfg/agent-manifest.csv | wc -l | tr -d ' ')
@@ -421,7 +421,7 @@ else
 fi
 
 # ==================== SECTION 13: Workflow YAML Validation ====================
-echo -e "\n${BOLD}[13/23] Workflow YAML Validation${NC}"
+echo -e "\n${BOLD}[13/24] Workflow YAML Validation${NC}"
 
 WORKFLOW_PASS=0
 WORKFLOW_FAIL=0
@@ -447,7 +447,7 @@ if [ "$WORKFLOW_FAIL" -gt 0 ]; then
 fi
 
 # ==================== SECTION 14: Agent Persona Consistency ====================
-echo -e "\n${BOLD}[14/23] Agent Persona Consistency${NC}"
+echo -e "\n${BOLD}[14/24] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
@@ -468,7 +468,7 @@ for agent_file in .github/agents/*.agent.md; do
 done
 
 # ==================== SECTION 15: Cross-Reference Integrity ====================
-echo -e "\n${BOLD}[15/23] Cross-Reference Integrity${NC}"
+echo -e "\n${BOLD}[15/24] Cross-Reference Integrity${NC}"
 
 # Check key paths mentioned in copilot-instructions.md
 CRITICAL_PATHS=(
@@ -490,7 +490,7 @@ for ref_path in "${CRITICAL_PATHS[@]}"; do
 done
 
 # ==================== SECTION 16: Onboarding Logic ====================
-echo -e "\n${BOLD}[16/23] Onboarding Logic${NC}"
+echo -e "\n${BOLD}[16/24] Onboarding Logic${NC}"
 
 QUESTIONS_FILE=".dexCore/_cfg/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
@@ -532,7 +532,7 @@ else
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
-echo -e "\n${BOLD}[17/23] Guardrail Pattern Enforcement${NC}"
+echo -e "\n${BOLD}[17/24] Guardrail Pattern Enforcement${NC}"
 
 # Check G3 enforcement in CLAUDE.md
 if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
@@ -574,7 +574,7 @@ else
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
-echo -e "\n${BOLD}[18/23] DexMemory & Chronicle Structure${NC}"
+echo -e "\n${BOLD}[18/24] DexMemory & Chronicle Structure${NC}"
 
 # DexMemory infrastructure
 if [ -d "myDex/.dex/chronicle" ]; then
@@ -641,7 +641,7 @@ else
 fi
 
 # ==================== SECTION 19: SSOT Instruction Drift Detection ====================
-echo -e "\n${BOLD}[19/23] SSOT Instruction Drift Detection${NC}"
+echo -e "\n${BOLD}[19/24] SSOT Instruction Drift Detection${NC}"
 
 if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
   if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
@@ -663,7 +663,7 @@ for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
 done
 
 # ==================== SECTION 20: Files-Manifest Integrity ====================
-echo -e "\n${BOLD}[20/23] Files-Manifest Integrity${NC}"
+echo -e "\n${BOLD}[20/24] Files-Manifest Integrity${NC}"
 
 if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
   MANIFEST_TOTAL=$(tail -n +2 .dexCore/_cfg/files-manifest.csv | wc -l | tr -d ' ')
@@ -731,7 +731,7 @@ else
 fi
 
 # ==================== SECTION 21: Source File Semantic Consistency ====================
-echo -e "\n${BOLD}[21/23] Source File Semantic Consistency (SHARED vs peer files)${NC}"
+echo -e "\n${BOLD}[21/24] Source File Semantic Consistency (SHARED vs peer files)${NC}"
 
 # Detect contradictions between SHARED.md and the platform-specific tails.
 # Catches the class of bug where SHARED.md asserts a new paradigm but a tail
@@ -795,7 +795,7 @@ if [ "$CONSISTENCY_ISSUES" -eq 0 ]; then
 fi
 
 # ==================== SECTION 22: CONTEXT.md Session State Schema (D1 Layer-2) ====================
-echo -e "\n${BOLD}[22/23] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
+echo -e "\n${BOLD}[22/24] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
 
 # CONTEXT.md is gitignored per-user state. Check schema ONLY if file exists.
 # Does not FAIL if absent (fresh users won't have one).
@@ -861,7 +861,7 @@ else
 fi
 
 # ==================== SECTION 23: Feature Registry Consistency ====================
-echo -e "\n${BOLD}[23/23] Feature Registry (features.yaml) Consistency${NC}"
+echo -e "\n${BOLD}[23/24] Feature Registry (features.yaml) Consistency${NC}"
 
 FEATURES_FILE=".dexCore/_cfg/features.yaml"
 
@@ -1015,6 +1015,60 @@ print('MISSING_TEST=' + '; '.join(missing_test[:3]))
     else
       fail "features.yaml: $MT enabled features reference missing test files: $(echo "$REGISTRY_REPORT" | grep '^MISSING_TEST=' | cut -d= -f2-)"
     fi
+  fi
+fi
+
+# ==================== SECTION 24: Session Anchor Consistency ====================
+# Exists to catch the 2026-04-19 cross-repo incident pattern: a session
+# operating in worktree X committing content meant for worktree Y.
+# Anchor file declares this repo's identity; §24 verifies runtime context
+# matches that declaration.
+echo -e "\n${BOLD}[24/24] Session Anchor (worktree-identity consistency)${NC}"
+
+ANCHOR_FILE=".dexcore-session-anchor"
+
+if [ ! -f "$ANCHOR_FILE" ]; then
+  fail "Session-anchor missing — expected $ANCHOR_FILE (see 2026-04-19 cross-repo incident)"
+else
+  pass "Session-anchor file present"
+
+  EXPECTED_ORIGIN=$(grep -E "^expected_origin:" "$ANCHOR_FILE" | head -1 | sed -E 's/^expected_origin: *"?([^"]*)"?/\1/')
+  EXPECTED_ORIGIN_ALT=$(grep -E "^expected_origin_alternate:" "$ANCHOR_FILE" | head -1 | sed -E 's/^expected_origin_alternate: *"?([^"]*)"?/\1/')
+  EXPECTED_PATH_FRAG=$(grep -E "^expected_worktree_path_contains:" "$ANCHOR_FILE" | head -1 | sed -E 's/^expected_worktree_path_contains: *"?([^"]*)"?/\1/')
+
+  # Check git remote origin
+  ACTUAL_ORIGIN=$(git config --get remote.origin.url 2>/dev/null || echo "")
+  if [ -z "$ACTUAL_ORIGIN" ]; then
+    warn "Session-anchor: git remote.origin.url not set (CI checkout?)"
+  elif [ "$ACTUAL_ORIGIN" = "$EXPECTED_ORIGIN" ] || [ "$ACTUAL_ORIGIN" = "$EXPECTED_ORIGIN_ALT" ]; then
+    pass "Session-anchor: git remote origin matches expected ($ACTUAL_ORIGIN)"
+  else
+    fail "Session-anchor: remote origin '$ACTUAL_ORIGIN' does NOT match expected '$EXPECTED_ORIGIN' — wrong repo?"
+  fi
+
+  # Check worktree path contains expected fragment
+  ACTUAL_PATH=$(pwd)
+  if [ -n "$EXPECTED_PATH_FRAG" ] && echo "$ACTUAL_PATH" | grep -q "$EXPECTED_PATH_FRAG"; then
+    pass "Session-anchor: worktree path contains expected fragment ('$EXPECTED_PATH_FRAG')"
+  elif [ -z "$EXPECTED_PATH_FRAG" ]; then
+    warn "Session-anchor: no expected_worktree_path_contains declared"
+  else
+    fail "Session-anchor: worktree '$ACTUAL_PATH' missing expected fragment '$EXPECTED_PATH_FRAG' — wrong worktree?"
+  fi
+
+  # Check current branch is in expected_branches (list)
+  EXPECTED_BRANCHES=$(grep -E "^expected_branches:" "$ANCHOR_FILE" | head -1 | sed -E 's/^expected_branches: *\[(.*)\]/\1/' | tr -d '"' | tr ',' ' ')
+  ACTUAL_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  BRANCH_OK=0
+  for b in $EXPECTED_BRANCHES; do
+    # Strip whitespace
+    b_trim=$(echo "$b" | tr -d '[:space:]')
+    [ "$b_trim" = "$ACTUAL_BRANCH" ] && BRANCH_OK=1 && break
+  done
+  if [ "$BRANCH_OK" -eq 1 ]; then
+    pass "Session-anchor: current branch ($ACTUAL_BRANCH) in expected_branches list"
+  else
+    warn "Session-anchor: branch '$ACTUAL_BRANCH' not in expected list '$EXPECTED_BRANCHES' — may be feature branch or wrong repo"
   fi
 fi
 
