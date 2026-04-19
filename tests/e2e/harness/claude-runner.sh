@@ -74,12 +74,21 @@ walkthrough_mode_enabled() {
 #   start_conversation "prompt text"
 #   session_id=$LAST_CLAUDE_SESSION_ID
 #   response=$LAST_CLAUDE_RESPONSE
+#
+# Permission mode: acceptEdits — the walkthrough may legitimately write
+# myDex/.dex/config/profile.yaml. Default mode blocks this without a tty
+# prompt (child claude can't interact), so the walkthrough hangs on the
+# write step. We pass acceptEdits unconditionally for the test runner —
+# it's gated behind CLAUDE_E2E_LIVE* opt-ins at the test level.
 start_conversation() {
   local prompt="$1"
   if ! check_claude_installed; then return 1; fi
 
   local raw
-  raw=$(env -u CLAUDECODE claude -p "$prompt" --output-format=json 2>/dev/null)
+  raw=$(env -u CLAUDECODE claude -p "$prompt" \
+    --permission-mode acceptEdits \
+    --add-dir "$(pwd)" \
+    --output-format=json 2>/dev/null)
 
   if [ -z "$raw" ]; then
     export LAST_CLAUDE_SESSION_ID=""
@@ -116,7 +125,11 @@ resume_conversation() {
   [ -z "$session_id" ] && return 1
 
   local raw
-  raw=$(env -u CLAUDECODE claude -p "$prompt" --resume "$session_id" --output-format=json 2>/dev/null)
+  raw=$(env -u CLAUDECODE claude -p "$prompt" \
+    --resume "$session_id" \
+    --permission-mode acceptEdits \
+    --add-dir "$(pwd)" \
+    --output-format=json 2>/dev/null)
 
   local parsed
   parsed=$(echo "$raw" | ruby -rjson -e '

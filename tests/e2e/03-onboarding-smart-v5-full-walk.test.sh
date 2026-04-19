@@ -159,12 +159,14 @@ if [ -f "$PROFILE_PATH" ]; then
   assert_file_contains "$PROFILE_PATH" "cloud_llm_allowed" \
     "Post-walk: profile has cloud_llm_allowed value (Q43 answer)"
 
-  # Schema-version hint — v1.1 expected (since Q43 was asked)
-  if grep -qE "version:[[:space:]]*\"?1\.1" "$PROFILE_PATH"; then
-    pass "Post-walk: profile declares schema v1.1 (company.* block)"
+  # Schema-version hint — accept v1.x (v1.0, v1.1, or v1.2).
+  # Agent may emit 1.2 (current schema), 1.1 (prior version with company.*),
+  # or 1.0 (base); all are valid for a profile that answered Q43.
+  if grep -qE "version:[[:space:]]*\"?1\.[012]" "$PROFILE_PATH"; then
+    pass "Post-walk: profile declares schema v1.x"
   else
-    # v1.0 fallback acceptable; agent may have emitted earlier schema marker.
-    echo -e "\033[1;33m  ⚠ Post-walk: schema-version did not match '1.1' — may be v1.0 default\033[0m"
+    fail "Post-walk: schema version not in {1.0, 1.1, 1.2}" \
+      "unexpected version string — inspect $PROFILE_PATH"
   fi
 else
   fail "Post-walk: profile.yaml not created at $PROFILE_PATH" \

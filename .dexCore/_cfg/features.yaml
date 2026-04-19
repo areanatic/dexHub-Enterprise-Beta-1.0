@@ -142,9 +142,12 @@ onboarding:
     docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml + .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
     tests:
       - tests/e2e/01-onboarding-smart.test.sh
+      - tests/e2e/03-onboarding-smart-v5-full-walk.test.sh
+    validated_at: "2026-04-20"
+    validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Content correct, but see known_issues note re variant-label cosmetic drift."
     known_issues:
-      - "Walkthrough test for v5.0 pending — Tier 5, needs multi-turn claude-runner design-spike"
-      - "Produces profile v1.1 (company.* block); v1.0 profiles remain valid"
+      - "Observed 2026-04-20 live: agent labeled the run as 'v4.3.1 SMART — partial' in the generated profile's onboarding.version / variant / completion_percentage, even though the actual questions were v5.0 SMART (including Q43 which v4.3.1 doesn't have). Answers are correct; label is misleading. Fix candidate: tighten mydex-agent R1-routing prompt to set profile.onboarding.version='v5.0' when v5.0 YAML is used."
+      - "Produces profile v1.2 (with company.* + consents[]); v1.0/v1.1 profiles remain valid"
 
   - id: onboarding.vollstandig_v5
     name: "VOLLSTÄNDIG onboarding v5.0 (12 questions, 3-5 min)"
@@ -695,18 +698,21 @@ quality:
       - "First iteration proves plumbing only. Full 5-answer walk + profile.yaml-produced assertion is quality.walkthrough_smart_v5_full (Tier 5.2)."
 
   - id: quality.walkthrough_smart_v5_full
-    name: "SMART v5 Full Walkthrough Test (Tier 5.2, opt-in)"
-    description: "Full 5-answer SMART v5 conversation → profile.yaml produced and schema-validated. Pre-walk backup + post-walk restore of user's existing profile. Tolerant semantic assertions on end-state fields (Q0 name, Q1 language, Q3 experience, Q4 team_size, Q43 data_handling_policy). Costs ~3-7 USD per run. Gated CLAUDE_E2E_LIVE_WALKTHROUGH=1."
+    name: "SMART v5 Full Walkthrough Test (Tier 5.2, opt-in) — VALIDATED 2026-04-20"
+    description: "Full 5-answer SMART v5 conversation → profile.yaml produced and schema-validated. Pre-walk backup + post-walk restore of user's existing profile. Tolerant semantic assertions on end-state fields (Q0 name, Q1 language, Q3 experience, Q4 team_size, Q43 data_handling_policy). Costs ~3-7 USD per run. Gated CLAUDE_E2E_LIVE_WALKTHROUGH=1. Live-validated 2026-04-20: 18/18 green — agent produced valid v1.2 profile with all 5 answers populated."
     status: enabled
     phase: 5.1.c-tier5.2
     enterprise_compliance: cloud_with_consent
     requires: [claude-code, ruby]
     depends_on: [quality.walkthrough_multi_turn, onboarding.smart_v5, onboarding.data_handling_gate]
-    docs: tests/e2e/03-onboarding-smart-v5-full-walk.test.sh + .dexCore/_dev/docs/L1-WIKI-PATTERN.md (no — this is walkthrough; see tests/e2e/README.md)
+    docs: tests/e2e/03-onboarding-smart-v5-full-walk.test.sh + tests/e2e/README.md
     tests:
       - tests/e2e/03-onboarding-smart-v5-full-walk.test.sh
+    validated_at: "2026-04-20"
+    validation_notes: "18/18 assertions green on first proper run (after permission-mode fix, see note 1). Profile produced: version=1.2, name=Alex, language=de, experience=intermediate (derived from 3-7), team_size=solo, data_handling_policy=cloud_llm_allowed, consents=[]."
     known_issues:
-      - "First live run may expose assertion-tolerance tuning needs (LLM phrasing variance). Test designed to degrade gracefully: default-mode always skips + passes, live-mode reports diagnostic detail on mismatch."
+      - "Note 1 (solved 2026-04-20): claude -p default permission-mode blocks Write without tty. Runner now passes --permission-mode acceptEdits + --add-dir for the opt-in walkthrough tests. Structural tests unaffected."
+      - "Note 2 (observed 2026-04-20, not blocking): agent loaded v4.3.1 variant metadata (onboarding.version='v4.3.1') even when user said 'SMART Onboarding' — suggests mydex-agent R1-routing to v5.0 default is unreliable in headless mode. Answered questions were correct; variant-labeling is cosmetic. Investigate under onboarding.smart_v5 known_issues."
       - "VOLLSTÄNDIG v5 (12 answers) and legacy v4.3.1 (42 answers) walkthroughs are Tier 5.3 / 5.4 follow-ups."
 
 # ─────────────────────────────────────────────────────────────────────────
