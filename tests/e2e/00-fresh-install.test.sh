@@ -51,9 +51,9 @@ assert_dir_exists "myDex/inbox" "Inbox dir present"
 assert_dir_exists "myDex/drafts" "Drafts dir present"
 
 # 7. Onboarding configuration available
-assert_file_exists "myDex/.dex/config/onboarding-questions.yaml" "Onboarding questions YAML present"
+assert_file_exists ".dexCore/_cfg/onboarding-questions.yaml" "Onboarding questions YAML present"
 assert_file_exists "myDex/.dex/config/profile.yaml.example" "Profile YAML example present (template)"
-assert_yaml_valid "myDex/.dex/config/onboarding-questions.yaml" "onboarding-questions.yaml is valid YAML"
+assert_yaml_valid ".dexCore/_cfg/onboarding-questions.yaml" "onboarding-questions.yaml is valid YAML"
 
 # 8. Agent manifest present and non-trivial
 assert_file_exists ".dexCore/_cfg/agent-manifest.csv" "Agent manifest CSV present"

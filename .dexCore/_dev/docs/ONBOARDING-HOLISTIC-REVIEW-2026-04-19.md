@@ -215,7 +215,7 @@ Remaining open questions I could not answer without more work:
 
 ## Appendix — Input artifacts
 
-- `myDex/.dex/config/onboarding-questions.yaml` (Beta, 921 lines)
+- `.dexCore/_cfg/onboarding-questions.yaml` (Beta, 921 lines)
 - `myDex/.dex/config/profile.yaml.example` (Beta)
 - `.dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md` (Beta, referenced)
 - `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/FIX-PLAN-PROFILE-SCHEMA.md` (Playground, older state)

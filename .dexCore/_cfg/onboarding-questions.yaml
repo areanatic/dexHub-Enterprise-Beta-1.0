@@ -1,0 +1,924 @@
+# DexHub myDex Onboarding Questions
+# Version: 4.3.1
+# Total Questions: 42
+# Variants: SMART (18 questions) | VOLLSTÄNDIG (42 questions)
+# 2026-04-19: Q40-42 (custom instructions) moved out of SMART per holistic review
+#             (they are expert-user features, not essential onboarding).
+#             See .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md for the v5.0 direction.
+
+metadata:
+  version: "4.3.1"
+  date: "2026-04-19"
+  total_questions: 42
+  variants:
+    smart:
+      question_count: 18
+      time_estimate: "5-6 minutes"
+      completion_percentage: 43
+      questions: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, "18a", 20, 21, 31, 38, 39]
+    vollständig:
+      question_count: 42
+      time_estimate: "17-22 minutes"
+      completion_percentage: 100
+
+# CATEGORY 0: Personalization (FIRST QUESTIONS)
+questions:
+  - id: 0
+    category: personalization
+    text_de: "Wie möchtest du angesprochen werden?"
+    text_en: "What should we call you?"
+    type: text
+    required: true
+    variants: [smart, vollständig]
+    placeholder_de: "Dein Name oder Nickname..."
+    placeholder_en: "Your name or nickname..."
+    help_text_de: "Du kannst deinen echten Namen oder einen Nickname verwenden - ganz wie du möchtest."
+    help_text_en: "You can use your real name or a nickname - whatever you prefer."
+    profile_path: "personalization.name"
+
+  - id: 1
+    category: personalization
+    text_de: "In welcher Sprache möchtest du mit DexHub arbeiten?"
+    text_en: "Which language would you like to use with DexHub?"
+    type: single_select
+    required: true
+    variants: [smart, vollständig]
+    options:
+      - value: de
+        label_de: "Deutsch 🇩🇪 (Alle Agents, Dokumentation, Workflows)"
+        label_en: "Deutsch 🇩🇪 (All agents, docs, workflows)"
+      - value: en
+        label_de: "English 🇬🇧 (All agents, docs, workflows)"
+        label_en: "English 🇬🇧 (All agents, docs, workflows)"
+      - value: bilingual
+        label_de: "Bilingual 🌍 (Mix je nach Kontext)"
+        label_en: "Bilingual 🌍 (Mix based on context)"
+    profile_path: "personalization.language"
+
+  # CATEGORY 1: Identity
+  - id: 2
+    category: identity
+    text_de: "Was beschreibt deine Rolle am besten?"
+    text_en: "What best describes your role?"
+    type: single_select
+    required: true
+    variants: [smart, vollständig]
+    options:
+      - value: developer
+        label_de: "Developer (Ich schreibe Code)"
+        label_en: "Developer (I write code)"
+      - value: team_lead
+        label_de: "Team Lead (Führe + Code)"
+        label_en: "Team Lead (Lead + Code)"
+      - value: architect
+        label_de: "Architect (Design + Strategy)"
+        label_en: "Architect (Design + Strategy)"
+      - value: product_manager
+        label_de: "Product Manager (Requirements + Roadmap)"
+        label_en: "Product Manager (Requirements + Roadmap)"
+      - value: designer
+        label_de: "Designer (UX/UI)"
+        label_en: "Designer (UX/UI)"
+      - value: other
+        label_de: "Anders (hybrid oder spezialisiert)"
+        label_en: "Other (hybrid or specialized)"
+    profile_path: "personalization.role"
+
+  - id: 3
+    category: identity
+    text_de: "Wie viele Jahre Erfahrung hast du in deinem Bereich?"
+    text_en: "How many years of experience do you have in your field?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: "0-2"
+        label_de: "0-2 Jahre (Junior)"
+        label_en: "0-2 years (Junior)"
+      - value: "3-7"
+        label_de: "3-7 Jahre (Mid-Level)"
+        label_en: "3-7 years (Mid-Level)"
+      - value: "8-15"
+        label_de: "8-15 Jahre (Senior)"
+        label_en: "8-15 years (Senior)"
+      - value: "15+"
+        label_de: "15+ Jahre (Expert/Lead)"
+        label_en: "15+ years (Expert/Lead)"
+    profile_path: "identity.experience_years"
+
+  - id: 4
+    category: identity
+    text_de: "Wie groß ist dein Team?"
+    text_en: "How big is your team?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: solo
+        label_de: "Solo (nur ich)"
+        label_en: "Solo (just me)"
+      - value: small
+        label_de: "Klein (2-5 Personen)"
+        label_en: "Small (2-5 people)"
+      - value: medium
+        label_de: "Mittel (6-15 Personen)"
+        label_en: "Medium (6-15 people)"
+      - value: large
+        label_de: "Groß (16+ oder mehrere Teams)"
+        label_en: "Large (16+ or multiple teams)"
+    profile_path: "identity.team_size"
+
+  # CATEGORY 2: Company & Team
+  - id: 5
+    category: company
+    text_de: "Wie würdest du dein Team/Firma beim Thema neue Tools einordnen?"
+    text_en: "How would you categorize your team/company regarding new tools?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: innovators
+        label_de: "Innovators (Wir probieren alles zuerst aus)"
+        label_en: "Innovators (We try everything first)"
+      - value: early_adopters
+        label_de: "Early Adopters (Neue Tools nach kurzer Validierung)"
+        label_en: "Early Adopters (New tools after brief validation)"
+      - value: pragmatic
+        label_de: "Pragmatisch (Nur wenn klarer Business-Nutzen)"
+        label_en: "Pragmatic (Only with clear business value)"
+      - value: skeptical
+        label_de: "Skeptisch (Lieber bewährte Tools)"
+        label_en: "Skeptical (Prefer proven tools)"
+      - value: resistant
+        label_de: "Resistent (Änderungen werden blockiert)"
+        label_en: "Resistant (Changes get blocked)"
+    profile_path: "company.tool_adoption"
+
+  - id: 6
+    category: company
+    text_de: "Welche 2 Probleme behindern die Zusammenarbeit in deinem Team am meisten?"
+    text_en: "Which 2 problems hinder collaboration in your team the most?"
+    type: multi_select
+    max_selections: 2
+    variants: [smart, vollständig]
+    options:
+      - value: knowledge_not_documented
+        label_de: "Wissen ist nicht dokumentiert"
+        label_en: "Knowledge is not documented"
+      - value: too_many_meetings
+        label_de: "Zu viele Meetings"
+        label_en: "Too many meetings"
+      - value: unclear_responsibilities
+        label_de: "Unklare Verantwortlichkeiten"
+        label_en: "Unclear responsibilities"
+      - value: lacking_feedback_culture
+        label_de: "Fehlende Feedback-Kultur"
+        label_en: "Lacking feedback culture"
+      - value: silos
+        label_de: "Silos (Teams arbeiten isoliert)"
+        label_en: "Silos (Teams work isolated)"
+      - value: tool_chaos
+        label_de: "Tool-Chaos (zu viele verschiedene Tools)"
+        label_en: "Tool chaos (too many different tools)"
+    profile_path: "company.communication_issues"
+
+  - id: 7
+    category: company
+    text_de: "Wie steht deine Organisation zu AI-Tools?"
+    text_en: "What's your organization's stance on AI tools?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: championed
+        label_de: "Aktiv gefördert (AI-First Strategie)"
+        label_en: "Actively promoted (AI-First strategy)"
+      - value: supported
+        label_de: "Unterstützt (Budget + Zeit dafür)"
+        label_en: "Supported (Budget + time for it)"
+      - value: neutral
+        label_de: "Neutral (jeder macht sein Ding)"
+        label_en: "Neutral (everyone does their thing)"
+      - value: skeptical
+        label_de: "Skeptisch (Bedenken wegen Kosten/Qualität)"
+        label_en: "Skeptical (concerns about cost/quality)"
+      - value: blocked
+        label_de: "Blockiert (Compliance/Security Gründe)"
+        label_en: "Blocked (compliance/security reasons)"
+    profile_path: "company.ai_culture"
+
+  - id: 8
+    category: company
+    text_de: "Worauf verschwendest du die meiste Zeit? (Wähle max. 3)"
+    text_en: "What do you waste most time on? (Choose max. 3)"
+    type: multi_select
+    max_selections: 3
+    variants: [smart, vollständig]
+    options:
+      - value: meetings
+        label_de: "Meetings (zu viele, zu lang)"
+      - value: legacy_code
+        label_de: "Legacy Code verstehen"
+      - value: unclear_requirements
+        label_de: "Unklare Anforderungen klären"
+      - value: context_switching
+        label_de: "Context Switching zwischen Tasks"
+      - value: waiting
+        label_de: "Warten (auf Reviews, Deployments, andere Teams)"
+      - value: repetitive_tasks
+        label_de: "Repetitive Tasks (manuell)"
+    profile_path: "company.time_wasted_on"
+
+  - id: 9
+    category: company
+    text_de: "Wenn du 10% produktiver wärst, würdest du diese Zeit nutzen für...? (Max. 2)"
+    text_en: "If you were 10% more productive, you'd use that time for...? (Max. 2)"
+    type: multi_select
+    max_selections: 2
+    variants: [smart, vollständig]
+    options:
+      - value: more_features
+        label_de: "Mehr Features bauen"
+      - value: improve_quality
+        label_de: "Qualität verbessern (Tests, Refactoring)"
+      - value: learn_new_skills
+        label_de: "Neue Skills lernen"
+      - value: innovation
+        label_de: "Innovation / Experimente"
+      - value: work_life_balance
+        label_de: "Work-Life Balance (früher Feierabend)"
+      - value: mentoring
+        label_de: "Andere unterstützen / Mentoring"
+    profile_path: "company.productivity_use"
+
+  - id: 10
+    category: company
+    text_de: "Welche 2 Skill-Gaps siehst du in deinem Team/Firma am kritischsten?"
+    text_en: "Which 2 skill gaps do you see as most critical in your team/company?"
+    type: multi_select
+    max_selections: 2
+    variants: [vollständig]
+    options:
+      - value: ai_tool_competence
+        label_de: "AI-Tool-Kompetenz"
+      - value: system_thinking
+        label_de: "System Thinking (Architektur, Design)"
+      - value: soft_skills
+        label_de: "Soft Skills (Kommunikation, Kollaboration)"
+      - value: domain_expertise
+        label_de: "Domain-Expertise (Business-Verständnis)"
+      - value: critical_thinking
+        label_de: "Critical Thinking (Anforderungen hinterfragen)"
+      - value: modern_stack
+        label_de: "Moderne Tech (Cloud, K8s, neue Frameworks)"
+    profile_path: "company.skill_gaps"
+
+  - id: 11
+    category: company
+    text_de: "Wie läuft AI-Adoption in deiner Firma?"
+    text_en: "How is AI adoption happening in your company?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: top_down
+        label_de: "Top-Down (Management pushed AI-Strategie)"
+      - value: bottom_up
+        label_de: "Bottom-Up (Devs nutzen Tools, Management folgt)"
+      - value: middle_out
+        label_de: "Middle-Out (Team Leads treiben es)"
+      - value: isolated_experiments
+        label_de: "Isolierte Experimente (keine koordinierte Strategie)"
+      - value: none
+        label_de: "Gar nicht (noch kein AI-Einsatz)"
+    profile_path: "company.ai_adoption_driver"
+
+  - id: 12
+    category: company
+    text_de: "Was braucht dein Team am meisten, um mit AI durchzustarten? (Max. 2)"
+    text_en: "What does your team need most to get started with AI? (Max. 2)"
+    type: multi_select
+    max_selections: 2
+    variants: [vollständig]
+    options:
+      - value: training
+        label_de: "Training (Workshops, Schulungen)"
+      - value: time
+        label_de: "Zeit (zum Experimentieren)"
+      - value: clear_guidelines
+        label_de: "Klare Guidelines (Wann AI nutzen, wann nicht)"
+      - value: success_stories
+        label_de: "Success Stories (von anderen Teams)"
+      - value: tools_access
+        label_de: "Tools & Budget (Zugang zu AI-Tools)"
+      - value: management_support
+        label_de: "Management Buy-In"
+    profile_path: "company.ai_breakthrough_needs"
+
+  - id: 13
+    category: company
+    text_de: "Wie lange dauert bei euch typisches Developer-Onboarding?"
+    text_en: "How long does typical developer onboarding take at your company?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: "<2_weeks"
+        label_de: "<2 Wochen (extrem schnell)"
+      - value: "2-4_weeks"
+        label_de: "2-4 Wochen (zügig)"
+      - value: "1-2_months"
+        label_de: "1-2 Monate (normal)"
+      - value: "2-3_months"
+        label_de: "2-3 Monate (komplex)"
+      - value: "3+_months"
+        label_de: "3+ Monate (sehr komplex oder unstrukturiert)"
+    profile_path: "company.onboarding_duration"
+
+  # CATEGORY 3: AI Journey
+  - id: 14
+    category: ai
+    text_de: "Wo stehst du bei AI-Tools?"
+    text_en: "Where are you with AI tools?"
+    type: single_select
+    required: true
+    variants: [smart, vollständig]
+    options:
+      - value: ai_curious
+        label_de: "AI-Curious (gehört, noch nicht genutzt)"
+        label_en: "AI-Curious (heard about it, haven't used it)"
+      - value: ai_experimenting
+        label_de: "AI-Experimenting (probiere Tools aus)"
+        label_en: "AI-Experimenting (trying tools)"
+      - value: ai_integrating
+        label_de: "AI-Integrating (nutze es täglich)"
+        label_en: "AI-Integrating (using it daily)"
+      - value: ai_dependent
+        label_de: "AI-Dependent (kann mir Arbeit ohne AI nicht mehr vorstellen)"
+        label_en: "AI-Dependent (can't imagine work without AI)"
+    profile_path: "ai.readiness_level"
+
+  - id: 15
+    category: ai
+    text_de: "Welche AI-Tools nutzt du bereits? (Mehrfachauswahl)"
+    text_en: "Which AI tools are you already using? (Multiple selections)"
+    type: multi_select
+    variants: [smart, vollständig]
+    options:
+      - value: chatgpt
+        label_de: "ChatGPT / GPT-4"
+      - value: github_copilot
+        label_de: "GitHub Copilot"
+      - value: claude
+        label_de: "Claude (Anthropic)"
+      - value: cursor
+        label_de: "Cursor IDE"
+      - value: tabnine
+        label_de: "Tabnine"
+      - value: codeium
+        label_de: "Codeium"
+      - value: other
+        label_de: "Andere Tools"
+      - value: none
+        label_de: "Noch keine"
+    profile_path: "ai.tools_used"
+
+  - id: 16
+    category: ai
+    text_de: "Was sind deine Top 3 Bedenken bei AI im Coding?"
+    text_en: "What are your top 3 concerns about AI in coding?"
+    type: multi_select
+    max_selections: 3
+    variants: [vollständig]
+    options:
+      - value: quality_trust
+        label_de: "Code-Qualität (kann ich dem Output vertrauen?)"
+      - value: learning_curve
+        label_de: "Learning Curve (zu kompliziert?)"
+      - value: job_security
+        label_de: "Job-Security (werde ich ersetzt?)"
+      - value: productivity_pressure
+        label_de: "Produktivitätsdruck (muss ich jetzt 10x schneller sein?)"
+      - value: vendor_lock_in
+        label_de: "Vendor Lock-In (abhängig von Tools?)"
+      - value: privacy
+        label_de: "Privacy (was passiert mit meinem Code?)"
+    profile_path: "ai.concerns"
+
+  - id: 17
+    category: ai
+    text_de: "Welchen AI-bezogenen Skill willst du in 6 Monaten meistern?"
+    text_en: "Which AI-related skill do you want to master in 6 months?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: prompt_engineering
+        label_de: "Prompt Engineering (bessere Ergebnisse aus AI holen)"
+      - value: ai_code_review
+        label_de: "AI Code Reviews (AI sinnvoll in Reviews einsetzen)"
+      - value: ai_testing
+        label_de: "AI-gestütztes Testing (Test-Generierung, Coverage)"
+      - value: architecture_with_ai
+        label_de: "Architektur mit AI (AI in Design-Prozess nutzen)"
+      - value: custom_agents
+        label_de: "Custom Agents (eigene AI-Workflows bauen)"
+    profile_path: "ai.skill_goal"
+
+  - id: "17a"
+    category: ai
+    text_de: "Wie erwartest du, dass AI deine Arbeit in 3 Jahren verändert?"
+    text_en: "How do you expect AI to change your work in 3 years?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: automated_routine
+        label_de: "Routine-Tasks sind automatisiert, ich fokussiere auf Design"
+      - value: pair_programming
+        label_de: "AI als Pair-Programming Partner (50/50 Zusammenarbeit)"
+      - value: human_oversight
+        label_de: "AI schreibt Code, ich reviewe und kuratiere nur noch"
+      - value: new_role
+        label_de: "Meine Rolle wird sich komplett verändern (noch unklar wie)"
+      - value: minimal_change
+        label_de: "Wenig Änderung (AI bleibt Tool, kein Game-Changer)"
+    profile_path: "ai.transformation_expectation"
+
+  # CATEGORY 4: Daily Work
+  - id: 18
+    category: workflow
+    text_de: "Worauf verbringst du die meiste Zeit? (Wähle max. 3)"
+    text_en: "What do you spend most time on? (Choose max. 3)"
+    type: multi_select
+    max_selections: 3
+    variants: [vollständig]
+    options:
+      - value: writing_code
+        label_de: "Code schreiben (neue Features)"
+      - value: debugging
+        label_de: "Debugging (Fehler fixen)"
+      - value: code_review
+        label_de: "Code Reviews"
+      - value: meetings
+        label_de: "Meetings (Planning, Standups, etc.)"
+      - value: documentation
+        label_de: "Dokumentation schreiben"
+      - value: learning
+        label_de: "Lernen (neue Tools, Technologien)"
+    profile_path: "workflow.time_spent_on"
+
+  - id: "18a"
+    category: workflow
+    text_de: "An wie vielen Projekten arbeitest du aktuell?"
+    text_en: "How many projects are you currently working on?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: "1"
+        label_de: "1 Projekt (voller Fokus)"
+        label_en: "1 project (full focus)"
+      - value: "2-3"
+        label_de: "2-3 Projekte parallel"
+        label_en: "2-3 projects in parallel"
+      - value: "4-6"
+        label_de: "4-6 Projekte (viel Context Switching)"
+        label_en: "4-6 projects (lots of context switching)"
+      - value: "7+"
+        label_de: "7+ Projekte (extrem fragmentiert)"
+        label_en: "7+ projects (extremely fragmented)"
+      - value: varies
+        label_de: "Variiert stark (mal fokussiert, mal verteilt)"
+        label_en: "Varies greatly (sometimes focused, sometimes distributed)"
+      - value: no_fixed
+        label_de: "Keine festen Projekte (Ad-hoc Tasks)"
+        label_en: "No fixed projects (ad-hoc tasks)"
+    profile_path: "workflow.current_project_count"
+
+  - id: "18b"
+    category: workflow
+    text_de: "Wie würdest du GERNE arbeiten?"
+    text_en: "How would you LIKE to work?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: deep_work
+        label_de: "Deep Work (4h fokussierte Blöcke, wenig Unterbrechung)"
+      - value: sprints
+        label_de: "Sprints (intensive Phasen, dann Pause/Review)"
+      - value: flow_state
+        label_de: "Flow State (flexible Zeiten, aber konzentriert wenn ich arbeite)"
+      - value: async_collaboration
+        label_de: "Async Collaboration (wenig Meetings, viel asynchrone Kommunikation)"
+      - value: pair_mob
+        label_de: "Pair/Mob Programming (kollaborativ, synchron)"
+    profile_path: "workflow.ideal_work_mode"
+
+  - id: 19
+    category: workflow
+    text_de: "Was nervt dich täglich am meisten?"
+    text_en: "What frustrates you most on a daily basis?"
+    type: single_select
+    variants: [vollständig]
+    role_based: true
+    options:
+      developer:
+        - value: understanding_legacy_code
+          label_de: "Legacy Code verstehen"
+        - value: unclear_requirements
+          label_de: "Unklare Requirements"
+        - value: slow_feedback_loops
+          label_de: "Langsame Feedback-Loops (CI/CD, Reviews)"
+        - value: context_switching
+          label_de: "Context Switching zwischen Tasks"
+        - value: technical_debt
+          label_de: "Technical Debt (kann nie aufgeräumt werden)"
+      team_lead:
+        - value: aligning_team
+          label_de: "Team-Alignment (alle auf gleichen Stand bringen)"
+        - value: prioritization_conflicts
+          label_de: "Priorisierungskonflikte"
+        - value: resource_constraints
+          label_de: "Ressourcen-Engpässe"
+        - value: balancing_delivery_quality
+          label_de: "Balance zwischen Delivery und Qualität"
+      architect:
+        - value: communicating_architecture
+          label_de: "Architektur-Entscheidungen kommunizieren"
+        - value: technical_debt_decisions
+          label_de: "Tech Debt vs. neue Features priorisieren"
+        - value: stakeholder_management
+          label_de: "Stakeholder Management (nicht-technische Zielgruppe)"
+    profile_path: "workflow.biggest_frustration"
+
+  - id: 20
+    category: workflow
+    text_de: "Wie viel Zeit verlierst du pro Woche durch [pain point from Q19]?"
+    text_en: "How much time do you lose per week due to [pain point from Q19]?"
+    type: single_select
+    variants: [smart, vollständig]
+    options:
+      - value: "<2_hours"
+        label_de: "<2 Stunden (klein, aber nervig)"
+        label_en: "<2 hours (small but annoying)"
+      - value: "2-5_hours"
+        label_de: "2-5 Stunden (spürbar)"
+        label_en: "2-5 hours (noticeable)"
+      - value: "5-10_hours"
+        label_de: "5-10 Stunden (großer Faktor)"
+        label_en: "5-10 hours (major factor)"
+      - value: "10-20_hours"
+        label_de: "10-20 Stunden (dominiert meine Woche)"
+        label_en: "10-20 hours (dominates my week)"
+      - value: "20+_hours"
+        label_de: "20+ Stunden (fast Vollzeit mit Workarounds)"
+        label_en: "20+ hours (almost full-time on workarounds)"
+    profile_path: "workflow.time_lost_weekly"
+
+  - id: 21
+    category: workflow
+    text_de: "Was würdest du mit 10 Extra-Stunden pro Woche machen? (Max. 2)"
+    text_en: "What would you do with 10 extra hours per week? (Max. 2)"
+    type: multi_select
+    max_selections: 2
+    variants: [smart, vollständig]
+    options:
+      - value: learn_new_skills
+        label_de: "Neue Skills lernen"
+        label_en: "Learn new skills"
+      - value: improve_quality
+        label_de: "Code-Qualität verbessern (Refactoring, Tests)"
+        label_en: "Improve code quality (refactoring, tests)"
+      - value: innovation_time
+        label_de: "Innovationsprojekte (eigene Ideen umsetzen)"
+        label_en: "Innovation projects (implement own ideas)"
+      - value: mentoring
+        label_de: "Andere unterstützen / Mentoring"
+        label_en: "Support others / mentoring"
+      - value: strategic_work
+        label_de: "Strategische Arbeit (Planung, Architektur)"
+        label_en: "Strategic work (planning, architecture)"
+      - value: work_life_balance
+        label_de: "Work-Life Balance (früher Feierabend)"
+        label_en: "Work-life balance (leave earlier)"
+    profile_path: "workflow.extra_time_use"
+
+  # CATEGORY 5: Tech Stack
+  - id: 22
+    category: tech
+    text_de: "Was ist dein primärer Tech Stack? (Wähle max. 3)"
+    text_en: "What is your primary tech stack? (Choose max. 3)"
+    type: multi_select
+    max_selections: 3
+    variants: [vollständig]
+    options:
+      - value: javascript
+        label_de: "JavaScript/TypeScript"
+      - value: python
+        label_de: "Python"
+      - value: java
+        label_de: "Java/Kotlin"
+      - value: csharp
+        label_de: "C#/.NET"
+      - value: go
+        label_de: "Go"
+      - value: rust
+        label_de: "Rust"
+      - value: react
+        label_de: "React"
+      - value: vue
+        label_de: "Vue"
+      - value: angular
+        label_de: "Angular"
+      - value: node
+        label_de: "Node.js"
+      - value: other
+        label_de: "Andere"
+    profile_path: "tech.primary_stack"
+
+  - id: 23
+    category: tech
+    text_de: "Welche IDE nutzt du hauptsächlich?"
+    text_en: "Which IDE do you primarily use?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: vscode
+        label_de: "VS Code"
+      - value: jetbrains
+        label_de: "JetBrains (IntelliJ, WebStorm, PyCharm)"
+      - value: cursor
+        label_de: "Cursor"
+      - value: vim_neovim
+        label_de: "Vim/Neovim"
+      - value: emacs
+        label_de: "Emacs"
+      - value: other
+        label_de: "Andere"
+    profile_path: "tech.ide"
+
+  - id: 24
+    category: tech
+    text_de: "Wie zufrieden bist du mit deinem aktuellen Tool-Setup?"
+    text_en: "How satisfied are you with your current tool setup?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: love_it
+        label_de: "Love it (optimal für meinen Workflow)"
+      - value: okay
+        label_de: "Okay (funktioniert, könnte besser sein)"
+      - value: frustrated
+        label_de: "Frustriert (viele Reibungspunkte)"
+      - value: stuck
+        label_de: "Stuck (würde gerne wechseln, kann aber nicht)"
+    profile_path: "tech.tool_satisfaction"
+
+  # CATEGORY 6: Growth
+  - id: 25
+    category: growth
+    text_de: "Wie lernst du am besten? (Max. 2)"
+    text_en: "How do you learn best? (Max. 2)"
+    type: multi_select
+    max_selections: 2
+    variants: [vollständig]
+    options:
+      - value: interactive_sandboxes
+        label_de: "Interactive Sandboxes (hands-on, sofort ausprobieren)"
+      - value: video_tutorials
+        label_de: "Video-Tutorials (step-by-step Erklärungen)"
+      - value: reading_docs
+        label_de: "Dokumentation lesen (strukturiert, selbstgesteuert)"
+      - value: code_first
+        label_de: "Code First (direkt ins Projekt, learning by doing)"
+      - value: pair_learning
+        label_de: "Pair Learning (mit anderen zusammen)"
+      - value: courses
+        label_de: "Kurse/Zertifizierungen (strukturiertes Curriculum)"
+    profile_path: "growth.learning_style"
+
+  - id: 26
+    category: growth
+    text_de: "Welches Skill-Ziel hast du für die nächsten 6 Monate?"
+    text_en: "What's your skill goal for the next 6 months?"
+    type: single_select
+    variants: [vollständig]
+    role_based: true
+    options:
+      developer:
+        - value: master_new_framework
+          label_de: "Neues Framework/Technologie meistern"
+        - value: system_design
+          label_de: "System Design lernen"
+        - value: ai_tools
+          label_de: "AI-Tools effektiv nutzen lernen"
+        - value: soft_skills
+          label_de: "Soft Skills (Kommunikation, Präsentation)"
+      team_lead:
+        - value: technical_leadership
+          label_de: "Technical Leadership (Team technisch führen)"
+        - value: prioritization
+          label_de: "Priorisierung & Roadmap-Management"
+        - value: coaching
+          label_de: "Coaching & Mentoring"
+      architect:
+        - value: master_system_design
+          label_de: "Advanced System Design Patterns"
+        - value: strategic_thinking
+          label_de: "Strategic Thinking & Business Alignment"
+        - value: communication
+          label_de: "Architektur-Kommunikation (Stakeholder Management)"
+    profile_path: "growth.six_month_goal"
+
+  - id: "26a"
+    category: growth
+    text_de: "Welche Fähigkeit wird in 5 Jahren für Devs am kritischsten sein?"
+    text_en: "Which skill will be most critical for devs in 5 years?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: creative_thinking
+        label_de: "Creative Thinking (AI kann Code, nicht Kreativität)"
+      - value: system_architecture
+        label_de: "System Architecture (AI braucht klare Strukturen)"
+      - value: domain_expertise
+        label_de: "Domain-Expertise (Business-Logik verstehen)"
+      - value: ai_orchestration
+        label_de: "AI Orchestration (AI-Tools koordinieren)"
+      - value: human_collaboration
+        label_de: "Human Collaboration (Teamwork wird wichtiger)"
+    profile_path: "growth.future_critical_skill"
+
+  # CATEGORY 7: AI Zeitgeist
+  - id: 27
+    category: zeitgeist
+    text_de: "Wie fühlst du dich mit Blick auf deine Tech-Karriere?"
+    text_en: "How do you feel about your tech career?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: very_hopeful
+        label_de: "Sehr optimistisch (AI eröffnet neue Möglichkeiten)"
+      - value: moderately_hopeful
+        label_de: "Moderat optimistisch (sehe Chancen, aber auch Risiken)"
+      - value: uncertain
+        label_de: "Unsicher (zu viel ändert sich zu schnell)"
+      - value: worried
+        label_de: "Besorgt (Angst vor Disruption meiner Skills)"
+      - value: indifferent
+        label_de: "Gleichgültig (passt sich an, egal was kommt)"
+    profile_path: "zeitgeist.career_sentiment"
+
+  - id: "27a"
+    category: zeitgeist
+    text_de: "Wenn du an die Zukunft mit AI denkst: Welches Gefühl dominiert?"
+    text_en: "When you think about the future with AI: Which feeling dominates?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: excitement
+        label_de: "Excitement (kann es kaum erwarten!)"
+      - value: optimistic
+        label_de: "Optimistisch (insgesamt positiv)"
+      - value: cautious
+        label_de: "Vorsichtig optimistisch (Chancen, aber wachsam)"
+      - value: anxious
+        label_de: "Ängstlich (mehr Bedenken als Hoffnung)"
+      - value: overwhelmed
+        label_de: "Overwhelmed (zu viel, zu schnell)"
+    profile_path: "zeitgeist.future_emotion"
+
+  - id: 28
+    category: zeitgeist
+    text_de: "Wie stellst du dir deine ideale Zukunft mit AI vor?"
+    text_en: "How do you envision your ideal future with AI?"
+    type: single_select
+    variants: [vollständig]
+    options:
+      - value: ai_augmented
+        label_de: "AI-Augmented (ich bleibe lead, AI ist Werkzeug)"
+      - value: ai_partner
+        label_de: "AI-Partner (50/50 Zusammenarbeit, AI als Kollege)"
+      - value: ai_curator
+        label_de: "AI-Curator (AI generiert, ich kuratiere und reviewe)"
+      - value: human_orchestrator
+        label_de: "Human Orchestrator (ich koordiniere AI-Agents)"
+      - value: new_role
+        label_de: "Neue Rolle (noch unklar, aber spannend)"
+    profile_path: "zeitgeist.future_vision"
+
+  # CATEGORY 8: Vision (Free Text)
+  - id: 29
+    category: vision
+    text_de: "Wenn du dir EINE Sache wünschen könntest, die AI in deinem Job transformiert - was wäre das?"
+    text_en: "If you could wish for ONE thing that AI transforms in your job - what would it be?"
+    type: text
+    multiline: true
+    variants: [vollständig]
+    placeholder_de: "z.B. 'Legacy Code verstehen und dokumentieren' oder 'Automatische Test-Generierung für meine Codebase'"
+    placeholder_en: "e.g. 'Understanding and documenting legacy code' or 'Automatic test generation for my codebase'"
+    profile_path: "vision.ai_transformation_wish"
+
+  - id: 30
+    category: vision
+    text_de: "Was ist dein Karriere-Traum für die nächsten 3-5 Jahre?"
+    text_en: "What's your career dream for the next 3-5 years?"
+    type: text
+    multiline: true
+    variants: [vollständig]
+    placeholder_de: "z.B. 'Tech Lead werden, der noch 50% coded' oder 'Eigenes AI-Produkt launchen'"
+    placeholder_en: "e.g. 'Become a Tech Lead who still codes 50%' or 'Launch my own AI product'"
+    profile_path: "vision.career_dream"
+
+  - id: 31
+    category: vision
+    text_de: "Gibt es noch etwas, das wir wissen sollten?"
+    text_en: "Is there anything else we should know?"
+    type: text
+    multiline: true
+    required: false
+    variants: [smart, vollständig]
+    placeholder_de: "Optional: Kontext zu deinem Projekt, besondere Herausforderungen, etc."
+    placeholder_en: "Optional: Context about your project, special challenges, etc."
+    profile_path: "vision.additional_context"
+
+  # CATEGORY 9: Technical Preferences (NEW in v4.2 - EA-1.0)
+  - id: 38
+    category: technical
+    text_de: "Welchen Code-Style bevorzugst du?"
+    text_en: "Which code style do you prefer?"
+    type: single_select
+    required: true
+    variants: [smart, vollständig]
+    options:
+      - value: airbnb
+        label_de: "Airbnb Style Guide (strikt, opinionated)"
+        label_en: "Airbnb Style Guide (strict, opinionated)"
+      - value: google
+        label_de: "Google Style Guide (enterprise-fokussiert)"
+        label_en: "Google Style Guide (enterprise-focused)"
+      - value: standard
+        label_de: "Standard.js (zero config, einfach)"
+        label_en: "Standard.js (zero config, simple)"
+      - value: custom
+        label_de: "Custom/Team-spezifisch"
+        label_en: "Custom/team-specific"
+    help_text_de: "DexHub Agents zeigen dir Code-Beispiele in diesem Style"
+    help_text_en: "DexHub agents will show code examples in this style"
+    profile_path: "technical.code_style"
+
+  - id: 39
+    category: technical
+    text_de: "Wie detailliert sollen Agent-Antworten sein?"
+    text_en: "How detailed should agent responses be?"
+    type: single_select
+    required: true
+    variants: [smart, vollständig]
+    options:
+      - value: concise
+        label_de: "Concise (kurz & knapp, nur Essentials)"
+        label_en: "Concise (short & sweet, essentials only)"
+      - value: balanced
+        label_de: "Balanced (mittel, Kontext + Code)"
+        label_en: "Balanced (medium, context + code)"
+      - value: detailed
+        label_de: "Detailed (ausführlich mit Erklärungen)"
+        label_en: "Detailed (comprehensive with explanations)"
+    help_text_de: "Du kannst das später in deinem Profil anpassen"
+    help_text_en: "You can adjust this later in your profile"
+    profile_path: "technical.verbosity"
+
+  # CATEGORY 10: Custom Instructions (NEW in v4.3 - EA-1.0.1)
+  - id: 40
+    category: custom_instructions
+    text_de: "Gibt es Regeln, die DexHub Agents IMMER befolgen sollen?"
+    text_en: "Are there rules DexHub agents should ALWAYS follow?"
+    type: multi_text
+    max_items: 5
+    required: false
+    variants: [smart, vollständig]
+    placeholder_de: "z.B. 'TypeScript strict mode', 'Tests schreiben', 'Airbnb Style Guide'"
+    placeholder_en: "e.g. 'TypeScript strict mode', 'Write tests', 'Airbnb Style Guide'"
+    help_text_de: "Diese Regeln werden von allen Agents in ihren Antworten berücksichtigt (max. 5)"
+    help_text_en: "These rules will be followed by all agents in their responses (max. 5)"
+    profile_path: "custom_instructions.always_do"
+
+  - id: 41
+    category: custom_instructions
+    text_de: "Gibt es Dinge, die Agents NIEMALS tun sollen?"
+    text_en: "Are there things agents should NEVER do?"
+    type: multi_text
+    max_items: 5
+    required: false
+    variants: [smart, vollständig]
+    placeholder_de: "z.B. 'var keyword nutzen', 'Secrets committen', 'Code-Reviews überspringen'"
+    placeholder_en: "e.g. 'Use var keyword', 'Commit secrets', 'Skip code reviews'"
+    help_text_de: "Diese Dinge werden von allen Agents vermieden (max. 5)"
+    help_text_en: "These will be avoided by all agents (max. 5)"
+    profile_path: "custom_instructions.never_do"
+
+  - id: 42
+    category: custom_instructions
+    text_de: "Kontext zu deinem Projekt/Team?"
+    text_en: "Context about your project/team?"
+    type: text
+    multiline: true
+    required: false
+    variants: [smart, vollständig]
+    placeholder_de: "z.B. 'E-Commerce Platform, Payment Processing (Stripe, PayPal), Microservices'"
+    placeholder_en: "e.g. 'E-Commerce Platform, Payment Processing (Stripe, PayPal), Microservices'"
+    help_text_de: "Projekt-/Team-spezifisches Wissen für kontextbezogene Unterstützung (max. 2000 Zeichen)"
+    help_text_en: "Project/team-specific knowledge for context-aware assistance (max. 2000 chars)"
+    profile_path: "custom_instructions.domain_knowledge"

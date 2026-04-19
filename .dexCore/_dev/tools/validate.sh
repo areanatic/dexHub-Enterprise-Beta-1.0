@@ -492,7 +492,7 @@ done
 # ==================== SECTION 16: Onboarding Logic ====================
 echo -e "\n${BOLD}[16/22] Onboarding Logic${NC}"
 
-QUESTIONS_FILE="myDex/.dex/config/onboarding-questions.yaml"
+QUESTIONS_FILE=".dexCore/_cfg/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
   pass "Onboarding questions file exists"
   TOTAL_Q=$(grep -c "^  - id:" "$QUESTIONS_FILE" 2>/dev/null || grep -c "^- id:" "$QUESTIONS_FILE" 2>/dev/null || echo 0)

@@ -17,7 +17,7 @@ source "$HARNESS/claude-runner.sh"
 ensure_beta_root
 test_banner "01 Onboarding SMART (21 questions)"
 
-ONBOARDING_YAML="myDex/.dex/config/onboarding-questions.yaml"
+ONBOARDING_YAML=".dexCore/_cfg/onboarding-questions.yaml"
 PROFILE_EXAMPLE="myDex/.dex/config/profile.yaml.example"
 
 # 1. File existence + validity
@@ -58,8 +58,10 @@ print(len(data.get('metadata', {}).get('variants', {}).get('smart', {}).get('que
 " 2>/dev/null)
   fi
 
-  if [ -n "$SMART_QUESTIONS" ] && [ "$SMART_QUESTIONS" -ge 15 ] && [ "$SMART_QUESTIONS" -le 25 ]; then
-    pass "SMART variant has $SMART_QUESTIONS questions (expected ~21)"
+  # v4.3.1: SMART is 18 (Q40-42 removed, per holistic review 2026-04-19)
+  # v5.0 draft: SMART will be 5 (3-layer model) — test will be updated when v5.0 activates
+  if [ -n "$SMART_QUESTIONS" ] && [ "$SMART_QUESTIONS" -ge 5 ] && [ "$SMART_QUESTIONS" -le 25 ]; then
+    pass "SMART variant has $SMART_QUESTIONS questions (expected 18 in v4.3.1 / 5 in v5.0)"
   else
     fail "SMART variant question count unexpected" "Got: '$SMART_QUESTIONS'"
   fi

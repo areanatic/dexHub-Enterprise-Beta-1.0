@@ -95,32 +95,31 @@ core:
 # ONBOARDING — user's first 5 minutes with DexHub
 # ─────────────────────────────────────────────────────────────────────────
 onboarding:
-  - id: onboarding.smart_v4_3
-    name: "SMART onboarding v4.3 (21 questions, 6-7 min)"
-    description: "Current shipped SMART variant — structurally validated, not live-walkthrough-tested"
+  - id: onboarding.smart_v4_3_1
+    name: "SMART onboarding v4.3.1 (18 questions, 5-6 min)"
+    description: "Current shipped SMART variant. v4.3.1 patch (2026-04-19): Q40-42 custom instructions removed from SMART (moved to VOLLSTÄNDIG only, per holistic review)"
     status: enabled
     phase: 5.1
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator]
-    docs: myDex/.dex/config/onboarding-questions.yaml
+    docs: .dexCore/_cfg/onboarding-questions.yaml
     tests:
       - tests/e2e/01-onboarding-smart.test.sh (structural 15 + live 4)
     known_issues:
       - "Full walkthrough end-to-end NOT yet tested with scripted answers → profile.yaml produced"
+      - "v5.0 draft supersedes this; v4.3.1 kept as legacy engagement path via *mydex-advanced"
 
   - id: onboarding.vollstandig_v4_3
     name: "VOLLSTÄNDIG onboarding v4.3 (42 questions, 17-22 min)"
-    description: "Full variant — structurally defined, untested at scale"
+    description: "Full legacy variant — preserved as *mydex-advanced opt-in engagement path"
     status: enabled
     phase: 5.1
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator]
-    docs: myDex/.dex/config/onboarding-questions.yaml
+    docs: .dexCore/_cfg/onboarding-questions.yaml
     tests: []
-    known_issues:
-      - "Possible schema drift between profile-schema-v1.0.yaml and profile.yaml.example (see drafts/FIX-PLAN-PROFILE-SCHEMA.md)"
 
   - id: onboarding.minimal_v4_3
     name: "MINIMAL onboarding (ultra-fast)"
@@ -129,18 +128,76 @@ onboarding:
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator]
-    docs: myDex/.dex/config/onboarding-questions.yaml
+    docs: .dexCore/_cfg/onboarding-questions.yaml
     tests: []
 
-  - id: onboarding.questions_v5_holistic_review
-    name: "Onboarding Questions Holistic Review v5.0"
-    description: "Remove redundant questions, add gaps (Figma, tools, interfaces, enterprise policies, skill level)"
+  - id: onboarding.smart_v5
+    name: "SMART onboarding v5.0 (5 questions, 60-90 sec)"
+    description: "3-layer model redesign: Layer A only (asked). Includes Q43 data_handling_policy as P0 enterprise gate"
+    status: experimental
+    phase: 5.1.b
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml + .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
+    tests:
+      - "tests/e2e/01-onboarding-smart.test.sh (structural, covers v4.3.1 + v5.0 count-range)"
+    known_issues:
+      - "Walkthrough test for v5.0 pending — needs multi-turn claude-runner design-spike"
+
+  - id: onboarding.vollstandig_v5
+    name: "VOLLSTÄNDIG onboarding v5.0 (12 questions, 3-5 min)"
+    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41)"
+    status: experimental
+    phase: 5.1.b
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator, onboarding.smart_v5]
+    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml
+    tests: []
+
+  - id: onboarding.inferred_layer_b
+    name: "Layer B: Inferred-and-confirmed profile (repo scanner)"
+    description: "Auto-detect language/framework/tests/build/commit-style from repo; show batch confirm"
+    status: deferred
+    phase: 5.2
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [onboarding.smart_v5]
+    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml (inferred_layer_b_candidates section)
+    tests: []
+
+  - id: onboarding.progressive_layer_c
+    name: "Layer C: Progressive disclosure (event-triggered questions)"
+    description: "Ask the gating question only when user first triggers the feature"
+    status: deferred
+    phase: 5.2
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [onboarding.smart_v5]
+    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml (progressive_disclosure_triggers section)
+    tests: []
+
+  - id: onboarding.data_handling_gate
+    name: "Data-handling policy P0 gate (Q43)"
+    description: "Enterprise-compliance gate question in SMART v5. Filters feature availability downstream"
+    status: experimental
+    phase: 5.1.b
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [onboarding.smart_v5, meta.features_yaml]
+    docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md §3
+    tests: []
+
+  - id: onboarding.legacy_path_preserved
+    name: "Legacy *mydex-advanced command"
+    description: "Existing users + engagement seekers can still run the 42-question v4.3 flow"
     status: deferred
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
-    depends_on: []
-    docs: myDex/drafts/ (pending — ONBOARDING-QUESTIONS-REVIEW-2026-04-20.md)
+    depends_on: [onboarding.vollstandig_v4_3]
+    docs: .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
     tests: []
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -767,11 +824,13 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 60
+  total: 66
   by_status:
     always_on: 6
     enabled: 14
     disabled: 0
-    deferred: 34
+    deferred: 36
     broken: 6
-    experimental: 0
+    experimental: 4
+  # Updated 2026-04-19 Phase 5.1.b: +6 onboarding features (3 experimental + 3 deferred)
+  # minus 1 absorbed (questions_v5_holistic_review → split into experimental entries)

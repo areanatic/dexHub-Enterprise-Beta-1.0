@@ -51,7 +51,7 @@ myDex/
 
 - Profile location: `myDex/.dex/config/profile.yaml`
 - Schema: `.dexCore/_dev/schemas/profile-schema-v1.0.yaml`
-- Onboarding: `myDex/.dex/config/onboarding-questions.yaml`
+- Onboarding: `.dexCore/_cfg/onboarding-questions.yaml`
 
 ## Guardrails
 

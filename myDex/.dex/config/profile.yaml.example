@@ -29,12 +29,15 @@ tech:
   secondary_stack: []                # Q16 - Optional
   interests: []                      # Q17 - Optional
 
-# CATEGORY 3: AI Preferences (Q14-Q15, Q21, Q22)
+# CATEGORY 3: AI Preferences (Q14-Q15)
+# NOTE: copilot_enabled and preferred_model are NOT mapped to Q21/Q22 in v4.3 —
+# those IDs belong to workflow.extra_time_use (Q21) and tech.primary_stack (Q22).
+# These two fields are set by agent inference or user edit, not onboarding Q-direct.
 ai:
   readiness: "intermediate"          # Q14 - beginner|intermediate|advanced|expert (NEW: transformed from ai_experimenting)
   readiness_level: "ai_experimenting" # OLD FORMAT (kept for backward compatibility, Q14 raw value)
-  copilot_enabled: false             # Q21 - true|false
-  preferred_model: "claude"          # Q22 - Optional: claude|gpt4|gemini|local|other
+  copilot_enabled: false             # Set by agent / user edit (not asked in v4.3 onboarding)
+  preferred_model: "claude"          # Set by agent / user edit (not asked in v4.3 onboarding)
   tools_used:                        # Q15 - Multiple selections allowed
     - chatgpt
     - github_copilot

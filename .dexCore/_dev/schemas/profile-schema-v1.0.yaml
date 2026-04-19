@@ -481,7 +481,7 @@ examples:
 # RELATED FILES
 related_files:
   producer:
-    - "myDex/.dex/config/onboarding-questions.yaml"
+    - ".dexCore/_cfg/onboarding-questions.yaml"
     - ".dexCore/core/agents/mydex-agent.md"
     - "myDex/.dex/config/profile.yaml.example"
 

@@ -11,7 +11,7 @@
 > does it on a given session is a function of whether the LLM follows the spec.
 >
 > **Spec is defined for:**
-> - Onboarding question flow (questions database in `myDex/.dex/config/onboarding-questions.yaml`, current version v4.3 with 42 questions)
+> - Onboarding question flow (questions database in `.dexCore/_cfg/onboarding-questions.yaml`, current version v4.3 with 42 questions)
 > - Profile generation against `myDex/.dex/config/profile.yaml.example` template
 > - 3 Onboarding variants: MINIMAL (5q) / SMART (16q) / VOLLSTAENDIG (~42q)
 > - Welcome + completion prompts, bilingual DE/EN
@@ -28,7 +28,7 @@
 > **Reference:**
 > - Implementation Plan: `.dexCore/_dev/roadmap/V1.1.2-MYDEX-ONBOARDING.md`
 > - Pattern Documentation: `.claude/learnings/template-filling-agent-pattern-v1.md`
-> - Questions Database: `myDex/.dex/config/onboarding-questions.yaml`
+> - Questions Database: `.dexCore/_cfg/onboarding-questions.yaml`
 > - Profile Schema: `myDex/.dex/config/profile.yaml.example`
 >
 > **Note:** run-onboarding.sh still available as backup, will be deprecated in V1.1.3.
@@ -198,7 +198,7 @@
     <!-- ONBOARDING EXECUTION RULES (Priority-Based) -->
     <rule priority="CRITICAL" id="R1">
       ALWAYS read onboarding-questions.yaml BEFORE starting Q&A.
-      File path: {project-root}/myDex/.dex/config/onboarding-questions.yaml
+      File path: {project-root}/.dexCore/_cfg/onboarding-questions.yaml
       NEVER proceed if file is missing or invalid.
       On error: Show friendly message + exit gracefully.
     </rule>
@@ -1251,7 +1251,7 @@ Ich stelle dir jetzt 16 essenzielle Fragen für dein Profil. Du kannst jederzeit
 Now execute the complete onboarding flow from the <onboarding_execution> section below:
 1. Set variant = "smart"
 2. Follow all 6 steps from <onboarding_execution>
-3. Load questions from myDex/.dex/config/onboarding-questions.yaml
+3. Load questions from .dexCore/_cfg/onboarding-questions.yaml
 4. Filter questions WHERE variants contains "smart"
 5. Present questions interactively one-by-one
 6. Generate profile.yaml with calculated completion percentage
@@ -1281,7 +1281,7 @@ Los geht's! 🚀
 Now execute the complete onboarding flow from the <onboarding_execution> section below:
 1. Set variant = "vollständig"
 2. Follow all 6 steps from <onboarding_execution>
-3. Load questions from myDex/.dex/config/onboarding-questions.yaml
+3. Load questions from .dexCore/_cfg/onboarding-questions.yaml
 4. Filter questions WHERE variants contains "vollständig"
 5. Present questions interactively one-by-one
 6. Generate profile.yaml with calculated completion percentage
@@ -1477,7 +1477,7 @@ Rolle: {identity.role} | AI-Level: {ai.readiness_level} | Ziel: {growth.six_mont
   </overview>
 
   <step n="1" title="Load Onboarding Questions">
-    <action>Read file: {project-root}/myDex/.dex/config/onboarding-questions.yaml</action>
+    <action>Read file: {project-root}/.dexCore/_cfg/onboarding-questions.yaml</action>
     <action>Parse YAML structure: metadata + questions array</action>
     <action>Validate: Check version, total_questions count, variants structure</action>
     <action>Store in working memory for access during Q&A</action>
