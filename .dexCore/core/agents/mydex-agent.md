@@ -240,6 +240,52 @@
       On write error: Offer alternative save location or clipboard copy.
     </rule>
 
+    <rule priority="CRITICAL" id="R5-metadata">
+      When writing profile.yaml, the `onboarding.*` metadata block MUST
+      reflect the ACTUAL questions-YAML that was walked through (per
+      R1-routing). Do NOT copy metadata from profile.yaml.example
+      verbatim — update it to match the loaded file.
+
+      Mapping (loaded file → output metadata):
+
+      | Loaded YAML                                          | onboarding.variant | onboarding.version | variant_total (denominator for completion_percentage) |
+      |------------------------------------------------------|--------------------|--------------------|-------------------------------------------------------|
+      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (SMART) | smart_v5           | v5.0               | 5                                                     |
+      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (VOLL.) | vollstandig_v5     | v5.0               | 12                                                    |
+      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (MIN.)  | minimal_v5         | v5.0               | 2                                                     |
+      | .dexCore/_cfg/onboarding-questions.yaml (legacy SMART)| smart             | v4.3.1             | 18                                                    |
+      | .dexCore/_cfg/onboarding-questions.yaml (legacy VOLL)| vollständig        | v4.3.1             | 42                                                    |
+
+      Fields:
+        - onboarding.variant: MUST be exact value from column 2
+        - onboarding.version: MUST be exact value from column 3
+        - onboarding.questions_answered: count of questions the user actually answered (do NOT skip this even if user quit early)
+        - onboarding.questions_skipped: variant_total − questions_answered (may be 0)
+        - onboarding.completion_percentage: (questions_answered ÷ variant_total) × 100, rounded to 1 decimal
+
+      Example — user ran v5.0 SMART, answered all 5 questions:
+        onboarding:
+          variant: "smart_v5"
+          version: "v5.0"
+          questions_answered: 5
+          questions_skipped: 0
+          completion_percentage: 100.0
+
+      Example — user ran v5.0 SMART, answered only 3 then quit:
+        onboarding:
+          variant: "smart_v5"
+          version: "v5.0"
+          questions_answered: 3
+          questions_skipped: 2
+          completion_percentage: 60.0
+
+      Anti-pattern (observed 2026-04-20, now prohibited): labeling a
+      v5.0 SMART run as "variant: smart / version: v4.3.1 / skipped: 13"
+      because the agent blindly copied profile.yaml.example defaults.
+      The user's Q&A path IS the source of truth — metadata follows it,
+      not the template.
+    </rule>
+
     <rule priority="HIGH" id="R6">
       ALWAYS map answers to correct profile_path.
       Example: profile_path: "company.ai_culture" → profile[company][ai_culture] = answer

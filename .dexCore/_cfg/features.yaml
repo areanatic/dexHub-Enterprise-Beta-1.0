@@ -144,9 +144,9 @@ onboarding:
       - tests/e2e/01-onboarding-smart.test.sh
       - tests/e2e/03-onboarding-smart-v5-full-walk.test.sh
     validated_at: "2026-04-20"
-    validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Content correct, but see known_issues note re variant-label cosmetic drift."
+    validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Content correct. Cosmetic drift (variant-label mislabeled as v4.3.1) patched same day via mydex-agent R5-metadata rule + profile.yaml.example defaults — re-verification pending live re-run."
     known_issues:
-      - "Observed 2026-04-20 live: agent labeled the run as 'v4.3.1 SMART — partial' in the generated profile's onboarding.version / variant / completion_percentage, even though the actual questions were v5.0 SMART (including Q43 which v4.3.1 doesn't have). Answers are correct; label is misleading. Fix candidate: tighten mydex-agent R1-routing prompt to set profile.onboarding.version='v5.0' when v5.0 YAML is used."
+      - "FIXED 2026-04-20 (live re-verification pending): variant-label cosmetic drift — agent was copying profile.yaml.example's v4.3.1 defaults into output. Patched via (a) new CRITICAL rule R5-metadata in mydex-agent.md with explicit loaded-YAML→variant/version/count mapping table, (b) profile.yaml.example onboarding block defaults changed to v5.0/smart_v5/5 with the mapping table as comment. Kernel-level enforcement not possible (agent writes via prompt); next live run will confirm prompt sticks."
       - "Produces profile v1.2 (with company.* + consents[]); v1.0/v1.1 profiles remain valid"
 
   - id: onboarding.vollstandig_v5

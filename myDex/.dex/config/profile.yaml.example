@@ -162,14 +162,27 @@ custom_instructions:
     Kubernetes deployment on AWS EKS
 
 # METADATA
+# Variant labels MUST match the loaded questions-YAML. Agent writes the
+# variant/version/question-count that corresponds to the file it walked
+# through (see mydex-agent R5-metadata rule). Valid combinations:
+#
+#   Loaded file                                      | variant          | version  | total-questions
+#   -------------------------------------------------|------------------|----------|----------------
+#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | smart_v5         | v5.0     | 5
+#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | vollstandig_v5   | v5.0     | 12
+#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | minimal_v5       | v5.0     | 2
+#   .dexCore/_cfg/onboarding-questions.yaml (legacy) | smart            | v4.3.1   | 18
+#   .dexCore/_cfg/onboarding-questions.yaml (legacy) | vollständig      | v4.3.1   | 42
+#
+# completion_percentage = (questions_answered / total_for_variant) * 100.
 onboarding:
-  variant: "vollständig"             # "smart" or "vollständig"
+  variant: "smart_v5"                # See table above — default path is v5.0 SMART
   started_at: "2025-11-16T10:30:00Z"  # When onboarding began
   completed_at: "2025-11-16T10:45:00Z"  # null if not finished
-  questions_answered: 42             # 39 original + 3 custom instructions (Q40-Q42)
+  questions_answered: 5              # Count against the VARIANT's total, not a shared scale
   questions_skipped: 0
-  completion_percentage: 100.0
-  version: "v4.3"                    # Updated for custom instructions support
+  completion_percentage: 100.0       # (answered / variant_total) × 100
+  version: "v5.0"                    # Default v5.0; legacy v4.3.1 when *mydex-advanced
 
 # CATEGORY 13: Saved Consents (v1.2, added 2026-04-20)
 # Records which cloud features / connectors the user has explicitly granted consent for.
