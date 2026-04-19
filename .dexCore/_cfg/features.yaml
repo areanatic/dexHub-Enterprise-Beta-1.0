@@ -306,6 +306,22 @@ knowledge:
       - "Entries authored here are NOT auto-loaded at session start yet — that's knowledge.ingest_pipeline (5.2.d)"
       - "Templates are recommendations; user can deviate. Validator only checks scaffold existence."
 
+  - id: knowledge.l1_wiki_injection
+    name: "L1 Wiki Session-Start Injection — scaffold (loader layer)"
+    description: "Activates knowledge.l1_wiki from authoring-surface to runtime-loadable. Ships .dexCore/core/knowledge/load-wiki.sh which enumerates myDex/.dex/wiki/*.md (skipping README.md + *.template.md + status:archived entries), respects 2KB per-file + 20KB total caps, and outputs a formatted session-prompt block. Platform-specific wiring to Claude Code (via CONTEXT.md or SSOT compile) and Copilot (via copilot-instructions.md compile) is the follow-up slice."
+    status: enabled
+    phase: 5.2.d-scaffold
+    enterprise_compliance: ok
+    requires: [bash]
+    depends_on: [knowledge.l1_wiki]
+    docs: .dexCore/_dev/docs/L1-WIKI-INJECTION.md
+    tests:
+      - tests/e2e/10-knowledge-l1-wiki-injection.test.sh
+    known_issues:
+      - "Loader is standalone and testable today. Automatic session-start hookup (Claude Code hook / Copilot SSOT compile step) is Phase 5.2.d-wire follow-up."
+      - "No content-quality validation — tool checks size + syntax, not whether an entry is genuinely L1-worthy."
+      - "Filesystem-order enumeration: users wanting specific order must prefix filenames (01-foo.md, 02-bar.md)."
+
   - id: knowledge.l1_wiki_templates
     name: "L1 Wiki framework-shipped templates"
     description: "Three templates in .dexCore/core/wiki-templates/: institutional-knowledge, project-glossary, architecture-notes. Users copy into myDex/.dex/wiki/ and fill in."
@@ -948,14 +964,18 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 69
+  total: 70
   by_status:
     always_on: 6
-    enabled: 30
+    enabled: 31
     disabled: 0
     deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 late-4 (Phase 5.2.d first slice — L1 Wiki Injection scaffold):
+  # - knowledge.l1_wiki_injection NEW enabled (load-wiki.sh + design doc + test 10)
+  # Net this turn: total 69→70, enabled 30→31.
+  # Platform wiring (Claude Code + Copilot integration) deferred to 5.2.d-wire slice.
   # Updated 2026-04-20 late-3 (Tier 5.5 closure — slices 2 + 4):
   # - quality.walkthrough_view_profile NEW enabled (choice 3 pure-read)
   # - quality.walkthrough_complete_only NEW enabled (choice 1 preserve-existing + add-missing)
