@@ -1,12 +1,12 @@
 # DexHub Developer Profile
 # Generated from myDex Onboarding (v4.3.1 SMART | v5.0 SMART/VOLLSTÄNDIG)
-# Schema: profile-schema-v1.0.yaml (current active version: 1.1 as of 2026-04-19)
+# Schema: profile-schema-v1.0.yaml (current active version: 1.2 as of 2026-04-20)
 # Copy this to profile.yaml after running onboarding
 
 # TOP-LEVEL METADATA
-version: "1.1"
+version: "1.2"
 created_at: "2025-11-16T10:30:00Z"   # Set on first onboarding interaction
-updated_at: "2025-11-16T10:45:00Z"   # Updated on every save
+updated_at: "2026-04-20T12:00:00Z"   # Updated on every save
 
 # CATEGORY 0: Personalization (Q0-Q1, Q2)
 personalization:
@@ -170,6 +170,19 @@ onboarding:
   questions_skipped: 0
   completion_percentage: 100.0
   version: "v4.3"                    # Updated for custom instructions support
+
+# CATEGORY 13: Saved Consents (v1.2, added 2026-04-20)
+# Records which cloud features / connectors the user has explicitly granted consent for.
+# Connector wizards read this BEFORE asking, so previously-granted consent isn't re-requested.
+# A consent becomes invalid if company.data_handling_policy changes — agent re-asks.
+# Protocol: see .dexCore/_dev/docs/CONSENT-TRACKING.md
+consents:
+  - feature_id: "connectors.github_wizard"         # Feature ID from features.yaml
+    granted_at: "2026-04-20T10:15:00Z"             # ISO-8601 timestamp
+    granted_by_command: "*github-setup"            # Which DexHub command surfaced the ask
+    data_handling_context: "cloud_llm_allowed"     # company.data_handling_policy AT GRANT time
+    expires_at: null                                # null = no expiry; ISO-8601 if set
+    notes: "Initial setup. User confirmed cloud policy."
 
 # PRIVACY
 # This file stays 100% local. Nothing is sent anywhere.

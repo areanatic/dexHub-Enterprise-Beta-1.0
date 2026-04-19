@@ -181,6 +181,8 @@
     <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents)</item>
     <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 41 structured workflows (*list-workflows)</item>
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
+    <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
+    <item cmd="*revoke-consent" action="#revoke-consent" hidden="true">🚫 Revoke Consent (*revoke-consent &lt;feature_id&gt;) - drop a consent entry</item>
     <item cmd="*council-mode" workflow="{project-root}/.dexCore/core/workflows/council-mode/workflow.yaml">🏛️  Multi-agent expert collaboration (*council-mode)</item>
     <item cmd="*about" action="#about-dexhub">📖 Learn about the platform (*about)</item>
     <item cmd="*exit">👋 Exit DexHub (*exit)</item>
@@ -389,6 +391,27 @@ What would you like to do?
         - null or missing → "❓ Enterprise Mode: UNCONFIGURED — run *mydex to answer Q43 (data_handling_policy)"
       Then display a short list of features that would be FILTERED OUT under the current policy (cross-reference features.yaml enterprise_compliance field).
       This is a read-only status display. The actual enforcement hook lives in the feature-surfacing prompts (list-agents-from-registry filter, connector menu filter — Tier 3 scope).
+    </prompt>
+
+    <prompt id="show-consents">
+      Load myDex/.dex/config/profile.yaml. Read consents[] array (schema v1.2).
+      If missing / empty: say "📭 Noch keine gespeicherten Consents. Connector-Wizards fragen beim ersten Use."
+      Else: render a table in {communication_language}:
+        | feature_id | granted_at | data_handling_context | expires_at | notes |
+      Also read company.data_handling_policy and mark entries where data_handling_context ≠ current policy as "⚠️ stale (policy changed)".
+      Close with: "Revoke single entry via *revoke-consent &lt;feature_id&gt;."
+      If profile.yaml is missing: "❓ No profile yet. Run *mydex to create one."
+    </prompt>
+
+    <prompt id="revoke-consent">
+      Input: feature_id string (from user command).
+      Load myDex/.dex/config/profile.yaml. Find consents[] entry where feature_id matches.
+      If not found: "🔍 Kein Consent für '{feature_id}' gespeichert — nichts zu widerrufen."
+      If found:
+        1. Remove the entry (or move to revoked_consents[] if archive-pattern preferred)
+        2. Write profile.yaml
+        3. Confirm: "🚫 Consent für '{feature_id}' widerrufen. Beim nächsten Use des Features wird neu gefragt."
+      See .dexCore/_dev/docs/CONSENT-TRACKING.md for protocol.
     </prompt>
   </prompts>
 </agent>

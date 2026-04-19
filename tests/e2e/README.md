@@ -63,16 +63,23 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 | 00 | `00-fresh-install.test.sh` | None | 36 assertions | — | — |
 | 01 | `01-onboarding-smart.test.sh` | Ruby / Python+YAML | 15 assertions | 4 assertions (DexMaster greeting, menu render, *mydex entrypoint) | — |
 | 02 | `02-onboarding-walkthrough.test.sh` | Claude CLI + OPT-IN | — | — | 6 assertions via session-resume (DexMaster → *mydex → "Alex" name). Costs ~2-5 USD. |
+| 03 | `03-onboarding-smart-v5-full-walk.test.sh` | Claude CLI + OPT-IN | 1 (gate skipped) | — | ~15 assertions via 9-turn walkthrough. Produces valid profile.yaml with 5 SMART v5 answers. Pre-walk backup + post-walk restore. Costs ~3-7 USD. |
+| 04 | `04-knowledge-l1-wiki-scaffold.test.sh` | None | ~15 assertions (pattern doc, 3 templates, user wiki README, gitignore, features.yaml claim) | — | — |
+| 05 | `05-consent-tracking.test.sh` | None | ~12 assertions (CONSENT-TRACKING.md, schema v1.2, profile example, DexMaster *consents/*revoke-consent, 3 connector agents reference consent) | — | — |
 
-### Opt-in walkthrough
+### Opt-in walkthroughs
 
 ```bash
 # Default: skipped (cost protection)
-bash tests/e2e/02-onboarding-walkthrough.test.sh   # → SKIPPED
+bash tests/e2e/02-onboarding-walkthrough.test.sh                 # → SKIPPED (plumbing)
+bash tests/e2e/03-onboarding-smart-v5-full-walk.test.sh          # → SKIPPED (full walkthrough)
 
 # Opt-in (real API cost)
-CLAUDE_E2E_LIVE_WALKTHROUGH=1 bash tests/e2e/02-onboarding-walkthrough.test.sh
+CLAUDE_E2E_LIVE_WALKTHROUGH=1 bash tests/e2e/02-onboarding-walkthrough.test.sh      # ~2-5 USD
+CLAUDE_E2E_LIVE_WALKTHROUGH=1 bash tests/e2e/03-onboarding-smart-v5-full-walk.test.sh  # ~3-7 USD
 ```
+
+Test 03 extends Test 02 to prove **behavior** (produces valid `profile.yaml` with expected fields), not just plumbing. It safely backs up any existing profile before running, and restores on exit.
 
 Opt-in tests use `claude -p --output-format=json` to capture `session_id` + `claude --resume <id>` to chain multi-turn conversations. Implementation: `harness/claude-runner.sh` functions `start_conversation` / `resume_conversation`.
 

@@ -23,9 +23,9 @@
 # Rule: Changes to this file require validate.sh and bash tests/e2e/run-all.sh green before commit.
 
 schema_version: "1.0"
-registry_version: "0.1.0"
-updated_at: "2026-04-19"
-last_audit: "2026-04-19"
+registry_version: "0.2.0"
+updated_at: "2026-04-20"
+last_audit: "2026-04-20"
 
 # ─────────────────────────────────────────────────────────────────────────
 # CORE INFRASTRUCTURE — always_on, no toggle
@@ -759,6 +759,21 @@ meta:
     docs: pending
     tests: []
 
+  - id: meta.saved_consent_tracking
+    name: "Saved Consent Tracking (profile.yaml consents[] array)"
+    description: "Connector wizards check profile.yaml consents[] before asking. Re-asking avoided when data_handling_context matches current policy. Protocol: schema v1.2 + CONSENT-TRACKING.md + 3 connector-agent updates + DexMaster *consents + *revoke-consent. Spec-level enforcement; kernel-level out of scope per DexHub trust model."
+    status: enabled
+    phase: 5.1.c-tier3.1
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [meta.enterprise_mode_toggle, onboarding.data_handling_gate]
+    docs: .dexCore/_dev/docs/CONSENT-TRACKING.md
+    tests:
+      - tests/e2e/05-consent-tracking.test.sh
+    known_issues:
+      - "Live behavior (user grants consent → next session skips ask) verified only by connector-agent spec contract, not by live multi-session test. Tier 5.3 candidate."
+      - "Policy-change invalidation: when company.data_handling_policy changes, prior consents become stale but are not auto-removed — user sees ⚠️ stale marker in *consents output and is asked again on next feature use."
+
 # ─────────────────────────────────────────────────────────────────────────
 # KNOWN BUGS (promoted to feature-level for visibility)
 # ─────────────────────────────────────────────────────────────────────────
@@ -869,14 +884,20 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 62
+  total: 65
   by_status:
     always_on: 6
-    enabled: 22
+    enabled: 26
     disabled: 0
-    deferred: 34
+    deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 (Tier 5.2 + Phase 5.2.a + Tier 3.1):
+  # - quality.walkthrough_smart_v5_full NEW enabled (full 5-answer walkthrough test)
+  # - knowledge.l1_wiki deferred → enabled (scaffold shipped — pattern + templates + user README)
+  # - knowledge.l1_wiki_templates NEW enabled (3 framework-shipped templates)
+  # - meta.saved_consent_tracking NEW enabled (profile v1.2 consents[] + 3 connector agents + DexMaster commands)
+  # Net: +3 new enabled, +1 deferred→enabled = total 62→65, enabled 22→26, deferred 34→33.
   # Updated 2026-04-19 Block C (Tier 5 Walkthrough plumbing):
   # - quality.walkthrough_multi_turn NEW enabled (opt-in test proving
   #   claude -p + --resume session-chain works)

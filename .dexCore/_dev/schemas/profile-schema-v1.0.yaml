@@ -1,13 +1,16 @@
-# DexHub Personal Profile Schema v1.1
+# DexHub Personal Profile Schema v1.2
 # Single Source of Truth for profile.yaml structure
 
-schema_version: "1.1"
+schema_version: "1.2"
 created: "2025-11-16"
-updated: "2026-04-19"
+updated: "2026-04-20"
 status: "active"
 # v1.1 (2026-04-19): added company.* block (Q43-Q49 enterprise compliance fields)
 #                    for onboarding v5.0. Backward-compatible — all new fields
 #                    are optional; v1.0 profiles remain valid.
+# v1.2 (2026-04-20): added `consents` array for saved-consent tracking (Phase
+#                    5.1.c Tier 3.1). Additive — v1.0/v1.1 profiles remain valid.
+#                    Feature: meta.saved_consent_tracking in features.yaml.
 
 # CONTRACT DEFINITION
 contract:
@@ -446,6 +449,54 @@ fields:
           max_items: 20
           item_max_length: 200
 
+  # SAVED CONSENTS SECTION (v1.2, added 2026-04-20)
+  # Records which cloud features / connectors the user has explicitly granted
+  # consent for. Connector wizards read this BEFORE asking, to avoid re-asking
+  # when consent was already given under the same data_handling_context.
+  # See .dexCore/_dev/docs/CONSENT-TRACKING.md for the full protocol.
+  consents:
+    type: array
+    required: false
+    description: "Explicit user consents for cloud/connector features, tracked to avoid re-asking."
+    version_added: "v1.2"
+    max_items: 100
+    default: []
+    item_shape:
+      feature_id:
+        type: string
+        required: true
+        description: "Feature ID from features.yaml (e.g. connectors.github_wizard)"
+        example: "connectors.github_wizard"
+      granted_at:
+        type: string
+        format: ISO8601
+        required: true
+        description: "When consent was recorded"
+        example: "2026-04-20T10:15:00Z"
+      granted_by_command:
+        type: string
+        required: false
+        description: "Which DexHub command surfaced the consent ask (for audit)"
+        example: "*github-setup"
+      data_handling_context:
+        type: enum
+        required: true
+        values: ["local_only", "lan_only", "cloud_llm_allowed", "hybrid", "unconfigured"]
+        description: "company.data_handling_policy AT TIME OF GRANT. Consent expires if policy changes."
+        example: "cloud_llm_allowed"
+      expires_at:
+        type: string
+        format: ISO8601
+        required: false
+        description: "Optional expiry. null = no expiry."
+        example: null
+      notes:
+        type: string
+        required: false
+        max_length: 500
+        description: "Free-form audit notes (why granted, what was explained)"
+        example: "Initial setup. User on cloud_llm_allowed policy."
+
 # VALIDATION RULES
 validation:
   on_produce:
@@ -489,6 +540,17 @@ evolution:
       - "All optional — v1.0 profiles remain valid without company.* block"
       - "data_handling_policy is P0 enterprise gate (in SMART v5)"
       - "Other 6 are P0/P1 compliance context (VOLLSTÄNDIG v5 only)"
+
+  v1.2:
+    date: "2026-04-20"
+    changes: "Add `consents` array for saved-consent tracking (Phase 5.1.c Tier 3.1)"
+    breaking_changes: []
+    notes:
+      - "New field: consents (array of consent entries)"
+      - "Each entry: feature_id, granted_at, granted_by_command, data_handling_context, expires_at, notes"
+      - "Purpose: avoid re-asking users who have already consented under the same data_handling_policy"
+      - "Protocol: see .dexCore/_dev/docs/CONSENT-TRACKING.md"
+      - "v1.0/v1.1 profiles remain valid — consents defaults to []"
 
   v2.0_planned:
     date: "TBD"

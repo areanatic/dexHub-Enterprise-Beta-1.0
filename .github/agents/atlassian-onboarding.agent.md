@@ -26,6 +26,30 @@ Walk the user through connecting their Atlassian instance (Cloud or Server) to t
 
 Override events MUST be written to `myDex/.dex/chronicle/YYYY-MM-DD.md` with reason — auditable.
 
+## Saved Consent Tracking (added 2026-04-20)
+
+**BEFORE asking the user for consent to set up Atlassian**, check `myDex/.dex/config/profile.yaml → consents[]`:
+
+1. Look for entry where `feature_id == "connectors.atlassian_wizard"`
+2. If found AND `data_handling_context == current company.data_handling_policy` AND (`expires_at == null` OR future): **skip the consent question**. Say briefly: `(Consent previously granted {granted_at} under policy '{data_handling_context}' — not re-asking.)` and proceed directly to setup.
+3. Otherwise, ask consent normally.
+
+**WHEN consent is granted for the first time (or re-granted after expiry/policy-change)**:
+
+1. Append to `profile.yaml → consents[]`:
+   ```yaml
+   - feature_id: "connectors.atlassian_wizard"
+     granted_at: "<current ISO-8601>"
+     granted_by_command: "atlassian-onboarding"
+     data_handling_context: "<current company.data_handling_policy>"
+     expires_at: null
+     notes: "<one-line context, e.g. 'Cloud instance at org.atlassian.net'>"
+   ```
+2. If `consents:` key is missing, create it as empty array first (schema v1.2 additive).
+3. Announce: `📌 Consent für Atlassian-Connector gespeichert.`
+
+Protocol doc: `.dexCore/_dev/docs/CONSENT-TRACKING.md`.
+
 ## Activation
 
 1. Read `.dexCore/dxm/agents/atlassian-onboarding.md` for your full persona
