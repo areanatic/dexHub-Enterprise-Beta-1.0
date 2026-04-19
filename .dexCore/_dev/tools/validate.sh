@@ -35,7 +35,7 @@ echo -e "${BOLD}========================================${NC}"
 echo ""
 
 # ==================== SECTION 1: Byte Limits ====================
-echo -e "${BOLD}[1/22] Byte Limits${NC}"
+echo -e "${BOLD}[1/23] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
 if [ "$BYTES" -le 30500 ]; then
@@ -45,7 +45,7 @@ else
 fi
 
 # ==================== SECTION 2: Bug Status ====================
-echo -e "\n${BOLD}[2/22] Bug Status${NC}"
+echo -e "\n${BOLD}[2/23] Bug Status${NC}"
 
 OPEN_BUGS=$(grep -c 'status: open\|status: confirmed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
 OPEN_BUGS=$(echo "$OPEN_BUGS" | tr -d '[:space:]')
@@ -71,7 +71,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/22] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/23] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 # GREETING action — check state model references in both
 if grep -q 'GREETING' .claude/CLAUDE.md && \
@@ -121,7 +121,7 @@ else
 fi
 
 # ==================== SECTION 4: File Existence ====================
-echo -e "\n${BOLD}[4/22] Critical File Existence${NC}"
+echo -e "\n${BOLD}[4/23] Critical File Existence${NC}"
 
 FILES=(
   ".dexCore/core/agents/dex-master.md"
@@ -154,7 +154,7 @@ for f in "${FILES[@]}"; do
 done
 
 # ==================== SECTION 5: Feature Validation ====================
-echo -e "\n${BOLD}[5/22] Feature Artifact Validation${NC}"
+echo -e "\n${BOLD}[5/23] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
@@ -230,7 +230,7 @@ else
 fi
 
 # ==================== SECTION 6: Architecture Rules ====================
-echo -e "\n${BOLD}[6/22] Architecture Rules${NC}"
+echo -e "\n${BOLD}[6/23] Architecture Rules${NC}"
 
 # G3: No files in root (except allowed)
 ALLOWED_ROOT="CONTRIBUTING.md|LICENSE|NOTICE|README.md|.gitignore|.gitattributes|myDex|tests"
@@ -256,7 +256,7 @@ else
 fi
 
 # ==================== SECTION 7: Sanity Checks ====================
-echo -e "\n${BOLD}[7/22] Sanity Checks${NC}"
+echo -e "\n${BOLD}[7/23] Sanity Checks${NC}"
 
 # Agent count
 AGENT_FILES=$(find .dexCore/dxm/agents -name "*.md" 2>/dev/null | wc -l)
@@ -274,7 +274,7 @@ else
 fi
 
 # ==================== SECTION 8: Agent File Validation ====================
-echo -e "\n${BOLD}[8/22] Agent File Validation${NC}"
+echo -e "\n${BOLD}[8/23] Agent File Validation${NC}"
 
 # Check all .agent.md files have required frontmatter
 for agent_file in .github/agents/*.agent.md; do
@@ -299,7 +299,7 @@ else
 fi
 
 # ==================== SECTION 9: Skill Validation ====================
-echo -e "\n${BOLD}[9/22] Skill Validation${NC}"
+echo -e "\n${BOLD}[9/23] Skill Validation${NC}"
 
 SKILL_COUNT=$(find .github/skills -name "SKILL.md" 2>/dev/null | wc -l)
 pass "Copilot Skills found: $SKILL_COUNT"
@@ -323,7 +323,7 @@ for skill_dir in .github/skills/*/; do
 done
 
 # ==================== SECTION 10: Manifest Sync ====================
-echo -e "\n${BOLD}[10/22] Manifest Sync${NC}"
+echo -e "\n${BOLD}[10/23] Manifest Sync${NC}"
 
 # Workflow manifest paths should use .dexCore/ not dex/
 BAD_PATHS=$(grep -c '"dex/' .dexCore/_cfg/workflow-manifest.csv 2>/dev/null || echo 0)
@@ -346,7 +346,7 @@ else
 fi
 
 # ==================== SECTION 11: Platform Hygiene ====================
-echo -e "\n${BOLD}[11/22] Platform Hygiene${NC}"
+echo -e "\n${BOLD}[11/23] Platform Hygiene${NC}"
 
 # No Claude Code refs in user-facing files
 CC_REFS=0
@@ -388,7 +388,7 @@ else
 fi
 
 # ==================== SECTION 12: Number Consistency ====================
-echo -e "\n${BOLD}[12/22] Number Consistency${NC}"
+echo -e "\n${BOLD}[12/23] Number Consistency${NC}"
 
 # Count actual values
 ACTUAL_AGENTS=$(tail -n +2 .dexCore/_cfg/agent-manifest.csv | wc -l | tr -d ' ')
@@ -421,7 +421,7 @@ else
 fi
 
 # ==================== SECTION 13: Workflow YAML Validation ====================
-echo -e "\n${BOLD}[13/22] Workflow YAML Validation${NC}"
+echo -e "\n${BOLD}[13/23] Workflow YAML Validation${NC}"
 
 WORKFLOW_PASS=0
 WORKFLOW_FAIL=0
@@ -447,7 +447,7 @@ if [ "$WORKFLOW_FAIL" -gt 0 ]; then
 fi
 
 # ==================== SECTION 14: Agent Persona Consistency ====================
-echo -e "\n${BOLD}[14/22] Agent Persona Consistency${NC}"
+echo -e "\n${BOLD}[14/23] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
@@ -468,7 +468,7 @@ for agent_file in .github/agents/*.agent.md; do
 done
 
 # ==================== SECTION 15: Cross-Reference Integrity ====================
-echo -e "\n${BOLD}[15/22] Cross-Reference Integrity${NC}"
+echo -e "\n${BOLD}[15/23] Cross-Reference Integrity${NC}"
 
 # Check key paths mentioned in copilot-instructions.md
 CRITICAL_PATHS=(
@@ -490,7 +490,7 @@ for ref_path in "${CRITICAL_PATHS[@]}"; do
 done
 
 # ==================== SECTION 16: Onboarding Logic ====================
-echo -e "\n${BOLD}[16/22] Onboarding Logic${NC}"
+echo -e "\n${BOLD}[16/23] Onboarding Logic${NC}"
 
 QUESTIONS_FILE=".dexCore/_cfg/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
@@ -532,7 +532,7 @@ else
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
-echo -e "\n${BOLD}[17/22] Guardrail Pattern Enforcement${NC}"
+echo -e "\n${BOLD}[17/23] Guardrail Pattern Enforcement${NC}"
 
 # Check G3 enforcement in CLAUDE.md
 if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
@@ -574,7 +574,7 @@ else
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
-echo -e "\n${BOLD}[18/22] DexMemory & Chronicle Structure${NC}"
+echo -e "\n${BOLD}[18/23] DexMemory & Chronicle Structure${NC}"
 
 # DexMemory infrastructure
 if [ -d "myDex/.dex/chronicle" ]; then
@@ -641,7 +641,7 @@ else
 fi
 
 # ==================== SECTION 19: SSOT Instruction Drift Detection ====================
-echo -e "\n${BOLD}[19/22] SSOT Instruction Drift Detection${NC}"
+echo -e "\n${BOLD}[19/23] SSOT Instruction Drift Detection${NC}"
 
 if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
   if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
@@ -663,7 +663,7 @@ for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
 done
 
 # ==================== SECTION 20: Files-Manifest Integrity ====================
-echo -e "\n${BOLD}[20/22] Files-Manifest Integrity${NC}"
+echo -e "\n${BOLD}[20/23] Files-Manifest Integrity${NC}"
 
 if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
   MANIFEST_TOTAL=$(tail -n +2 .dexCore/_cfg/files-manifest.csv | wc -l | tr -d ' ')
@@ -731,7 +731,7 @@ else
 fi
 
 # ==================== SECTION 21: Source File Semantic Consistency ====================
-echo -e "\n${BOLD}[21/22] Source File Semantic Consistency (SHARED vs peer files)${NC}"
+echo -e "\n${BOLD}[21/23] Source File Semantic Consistency (SHARED vs peer files)${NC}"
 
 # Detect contradictions between SHARED.md and the platform-specific tails.
 # Catches the class of bug where SHARED.md asserts a new paradigm but a tail
@@ -795,7 +795,7 @@ if [ "$CONSISTENCY_ISSUES" -eq 0 ]; then
 fi
 
 # ==================== SECTION 22: CONTEXT.md Session State Schema (D1 Layer-2) ====================
-echo -e "\n${BOLD}[22/22] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
+echo -e "\n${BOLD}[22/23] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
 
 # CONTEXT.md is gitignored per-user state. Check schema ONLY if file exists.
 # Does not FAIL if absent (fresh users won't have one).
@@ -857,6 +857,164 @@ else
   else
     # Legacy CONTEXT.md without Session block — not an error, but note it
     pass "CONTEXT.md present without Session block (legacy format, will be extended on next agent transition)"
+  fi
+fi
+
+# ==================== SECTION 23: Feature Registry Consistency ====================
+echo -e "\n${BOLD}[23/23] Feature Registry (features.yaml) Consistency${NC}"
+
+FEATURES_FILE=".dexCore/_cfg/features.yaml"
+
+if [ ! -f "$FEATURES_FILE" ]; then
+  fail "features.yaml missing at $FEATURES_FILE"
+else
+  pass "features.yaml present"
+
+  # Pick YAML tool (ruby preferred — stdlib on macOS)
+  FEAT_YAML_TOOL=""
+  if command -v ruby >/dev/null 2>&1 && ruby -ryaml -e '' 2>/dev/null; then
+    FEAT_YAML_TOOL="ruby"
+  elif command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+    FEAT_YAML_TOOL="python3"
+  fi
+
+  if [ -z "$FEAT_YAML_TOOL" ]; then
+    warn "features.yaml checks skipped — no YAML parser (install ruby or pip install pyyaml)"
+  else
+    # Valid YAML
+    if [ "$FEAT_YAML_TOOL" = "ruby" ]; then
+      if ruby -ryaml -e "YAML.load_file('$FEATURES_FILE')" 2>/dev/null; then
+        pass "features.yaml parses as valid YAML"
+      else
+        fail "features.yaml fails YAML parse"
+      fi
+    else
+      if python3 -c "import yaml; yaml.safe_load(open('$FEATURES_FILE'))" 2>/dev/null; then
+        pass "features.yaml parses as valid YAML"
+      else
+        fail "features.yaml fails YAML parse"
+      fi
+    fi
+
+    # Required fields on every feature + unique IDs + test-file existence for enabled/always_on
+    if [ "$FEAT_YAML_TOOL" = "ruby" ]; then
+      REGISTRY_REPORT=$(ruby -ryaml -e "
+        data = YAML.load_file('$FEATURES_FILE') rescue (puts 'PARSE_FAIL'; exit 1)
+        section_keys = ['core','onboarding','agents','knowledge','parser','connectors','llm','workflows','quality','meta','bugs','roadmap']
+        required = ['id','name','status']
+        allowed_status = %w[always_on enabled disabled deferred broken experimental]
+        seen_ids = {}
+        missing_field = []
+        bad_status = []
+        duplicate = []
+        missing_test = []
+        section_keys.each do |s|
+          next unless data[s]
+          data[s].each do |f|
+            required.each { |r| missing_field << \"#{s}:#{f['id']||'<no-id>'} missing #{r}\" unless f[r] }
+            bad_status << \"#{s}:#{f['id']}=#{f['status']}\" unless allowed_status.include?(f['status'])
+            if f['id']
+              if seen_ids[f['id']]
+                duplicate << f['id']
+              else
+                seen_ids[f['id']] = true
+              end
+            end
+            # For enabled/always_on: if tests: non-empty, files must exist (exclude parenthetical note entries)
+            if %w[enabled always_on].include?(f['status']) && f['tests'].is_a?(Array) && !f['tests'].empty?
+              f['tests'].each do |t|
+                # Strip any parenthetical after the path (e.g. 'tests/e2e/01.test.sh (structural 15 + live 4)')
+                t_path = t.to_s.split(/\s+[(]/).first.strip
+                next if t_path.start_with?('self-hosting') || t_path.empty?
+                unless File.exist?(t_path)
+                  missing_test << \"#{s}:#{f['id']} references missing test file: #{t_path}\"
+                end
+              end
+            end
+          end
+        end
+        puts 'MISSING_FIELD_COUNT=' + missing_field.length.to_s
+        puts 'BAD_STATUS_COUNT=' + bad_status.length.to_s
+        puts 'DUPLICATE_COUNT=' + duplicate.length.to_s
+        puts 'MISSING_TEST_COUNT=' + missing_test.length.to_s
+        puts 'TOTAL_FEATURES=' + seen_ids.length.to_s
+        puts 'MISSING_FIELD=' + missing_field.first(3).join('; ')
+        puts 'BAD_STATUS=' + bad_status.first(3).join('; ')
+        puts 'DUPLICATE=' + duplicate.first(3).join('; ')
+        puts 'MISSING_TEST=' + missing_test.first(3).join('; ')
+      " 2>/dev/null)
+    else
+      REGISTRY_REPORT=$(python3 -c "
+import yaml, os
+data = yaml.safe_load(open('$FEATURES_FILE'))
+section_keys = ['core','onboarding','agents','knowledge','parser','connectors','llm','workflows','quality','meta','bugs','roadmap']
+required = ['id','name','status']
+allowed_status = ['always_on','enabled','disabled','deferred','broken','experimental']
+seen_ids = {}
+missing_field = []
+bad_status = []
+duplicate = []
+missing_test = []
+for s in section_keys:
+    if not data.get(s): continue
+    for f in data[s]:
+        for r in required:
+            if r not in f or f[r] is None:
+                missing_field.append(f\"{s}:{f.get('id','<no-id>')} missing {r}\")
+        if f.get('status') not in allowed_status:
+            bad_status.append(f\"{s}:{f.get('id')}={f.get('status')}\")
+        if f.get('id'):
+            if f['id'] in seen_ids:
+                duplicate.append(f['id'])
+            else:
+                seen_ids[f['id']] = True
+        if f.get('status') in ('enabled','always_on') and isinstance(f.get('tests'), list) and f['tests']:
+            for t in f['tests']:
+                t_path = str(t).split(' (')[0].strip()
+                if t_path.startswith('self-hosting') or not t_path: continue
+                if not os.path.exists(t_path):
+                    missing_test.append(f\"{s}:{f['id']} references missing test file: {t_path}\")
+print('MISSING_FIELD_COUNT=' + str(len(missing_field)))
+print('BAD_STATUS_COUNT=' + str(len(bad_status)))
+print('DUPLICATE_COUNT=' + str(len(duplicate)))
+print('MISSING_TEST_COUNT=' + str(len(missing_test)))
+print('TOTAL_FEATURES=' + str(len(seen_ids)))
+print('MISSING_FIELD=' + '; '.join(missing_field[:3]))
+print('BAD_STATUS=' + '; '.join(bad_status[:3]))
+print('DUPLICATE=' + '; '.join(duplicate[:3]))
+print('MISSING_TEST=' + '; '.join(missing_test[:3]))
+" 2>/dev/null)
+    fi
+
+    MF=$(echo "$REGISTRY_REPORT" | grep '^MISSING_FIELD_COUNT=' | cut -d= -f2)
+    BS=$(echo "$REGISTRY_REPORT" | grep '^BAD_STATUS_COUNT=' | cut -d= -f2)
+    DU=$(echo "$REGISTRY_REPORT" | grep '^DUPLICATE_COUNT=' | cut -d= -f2)
+    MT=$(echo "$REGISTRY_REPORT" | grep '^MISSING_TEST_COUNT=' | cut -d= -f2)
+    TF=$(echo "$REGISTRY_REPORT" | grep '^TOTAL_FEATURES=' | cut -d= -f2)
+
+    if [ "${MF:-0}" -eq 0 ]; then
+      pass "features.yaml: all ${TF:-0} features have id/name/status"
+    else
+      fail "features.yaml: $MF features missing required fields: $(echo "$REGISTRY_REPORT" | grep '^MISSING_FIELD=' | cut -d= -f2-)"
+    fi
+
+    if [ "${BS:-0}" -eq 0 ]; then
+      pass "features.yaml: all status values in allowed set"
+    else
+      fail "features.yaml: $BS features have invalid status: $(echo "$REGISTRY_REPORT" | grep '^BAD_STATUS=' | cut -d= -f2-)"
+    fi
+
+    if [ "${DU:-0}" -eq 0 ]; then
+      pass "features.yaml: no duplicate feature IDs"
+    else
+      fail "features.yaml: $DU duplicate IDs: $(echo "$REGISTRY_REPORT" | grep '^DUPLICATE=' | cut -d= -f2-)"
+    fi
+
+    if [ "${MT:-0}" -eq 0 ]; then
+      pass "features.yaml: all test paths on enabled/always_on features exist"
+    else
+      fail "features.yaml: $MT enabled features reference missing test files: $(echo "$REGISTRY_REPORT" | grep '^MISSING_TEST=' | cut -d= -f2-)"
+    fi
   fi
 fi
 

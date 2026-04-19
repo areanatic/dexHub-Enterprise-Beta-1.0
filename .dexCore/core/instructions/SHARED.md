@@ -492,3 +492,8 @@ Phrases like "Lass uns X", "Wir machen Y", "Ab jetzt Z", "Nie wieder X", "X stat
 - **Investigate before fixing** — Understand the history before changing anything
 - **Agent findings are hypotheses** — Always verify with manual grep/read before acting on agent output
 - **Analysis = report only** — Never fix during analysis tasks unless explicitly told to
+
+## Governance Policies
+
+- **Deprecated phrases:** when renaming a core concept, update `validate.sh §21` `DEPRECATED_PHRASES` in the same commit — §21 fails builds on stale wording.
+- **Feature registry:** `.dexCore/_cfg/features.yaml` is the source of truth for DexHub capabilities. Every claim in README or menu must map to a feature with `status` ∈ {`always_on`, `enabled`}. `validate.sh §23` enforces registry health.
