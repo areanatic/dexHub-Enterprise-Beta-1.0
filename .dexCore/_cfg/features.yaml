@@ -1,0 +1,777 @@
+# DexHub Feature-Flag Registry — Source of Truth
+# ================================================
+#
+# Every DexHub capability is declared here as an individual feature with:
+#   - status:               always_on | enabled | disabled | deferred | broken | experimental
+#   - phase:                which release milestone (1.0 | 1.1 | 5.x.x block ID | future)
+#   - enterprise_compliance: ok | local_vlm_required | cloud_with_consent | research_pending | not_applicable
+#   - requires:             external tools/binaries needed (comma-separated)
+#   - depends_on:           other feature IDs this one requires to be enabled
+#   - docs:                 link to design/research doc (myDex/drafts/ or .dexCore/_dev/docs/)
+#   - tests:                list of E2E test files proving this works
+#
+# Status semantics (enforced by validate.sh §23 once added):
+#   always_on     — Core infrastructure, cannot be toggled (e.g. DexMaster IDLE state)
+#   enabled       — Active, user-visible, has E2E test, works end-to-end
+#   disabled      — User-togglable, currently off (opt-in required)
+#   deferred      — Planned for later phase, NOT shipped, honest roadmap label
+#   broken        — Known-not-working, bug documented in .dexCore/_dev/todos/bugs.md
+#   experimental  — Alpha, user opt-in with warning, may change
+#
+# Rule: README.md MUST NOT claim a feature works unless its status is always_on or enabled.
+# Rule: Every enabled feature MUST have at least one test entry.
+# Rule: Changes to this file require validate.sh and bash tests/e2e/run-all.sh green before commit.
+
+schema_version: "1.0"
+registry_version: "0.1.0"
+updated_at: "2026-04-19"
+last_audit: "2026-04-19"
+
+# ─────────────────────────────────────────────────────────────────────────
+# CORE INFRASTRUCTURE — always_on, no toggle
+# ─────────────────────────────────────────────────────────────────────────
+core:
+  - id: core.dexmaster_orchestrator
+    name: "DexMaster Orchestrator (IDLE state model)"
+    description: "Session-start entry point, menu, agent routing"
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/agents/dex-master.md
+    tests:
+      - tests/e2e/01-onboarding-smart.test.sh (live-mode)
+
+  - id: core.ssot_compile_step
+    name: "SSOT Compile Step (SHARED.md → platform tails)"
+    description: "One source of truth compiles into .claude/CLAUDE.md + .github/copilot-instructions.md"
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: [bash, sha256sum]
+    depends_on: []
+    docs: .dexCore/_dev/docs/LAYER-1-CONVENTION.md
+    tests:
+      - .dexCore/_dev/tools/validate.sh (§3, §15-19)
+
+  - id: core.agent_boundary_state_model
+    name: "Agent Boundary State Model (IDLE/AGENT/CODE-MODE)"
+    description: "Explicit state transitions + CONTEXT.md persistence (D1 Layer 1+2)"
+    status: always_on
+    phase: 4.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/docs/adr/ADR-009-agent-boundary-state-model.md
+    tests:
+      - .dexCore/_dev/tools/validate.sh (§22)
+
+  - id: core.validate_sh
+    name: "validate.sh structural quality gate"
+    description: "22 sections of structural invariant checks (file existence, hash integrity, SSOT drift, manifest)"
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: [bash]
+    depends_on: []
+    docs: .dexCore/_dev/tools/validate.sh
+    tests:
+      - self-hosting (runs itself)
+
+  - id: core.post_write_check_hook
+    name: "Post-write-check hook (G3 enforcement)"
+    description: "Blocks writes to project root"
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/tools/post-write-check.sh
+    tests:
+      - tests/e2e/00-fresh-install.test.sh
+
+# ─────────────────────────────────────────────────────────────────────────
+# ONBOARDING — user's first 5 minutes with DexHub
+# ─────────────────────────────────────────────────────────────────────────
+onboarding:
+  - id: onboarding.smart_v4_3
+    name: "SMART onboarding v4.3 (21 questions, 6-7 min)"
+    description: "Current shipped SMART variant — structurally validated, not live-walkthrough-tested"
+    status: enabled
+    phase: 5.1
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: myDex/.dex/config/onboarding-questions.yaml
+    tests:
+      - tests/e2e/01-onboarding-smart.test.sh (structural 15 + live 4)
+    known_issues:
+      - "Full walkthrough end-to-end NOT yet tested with scripted answers → profile.yaml produced"
+
+  - id: onboarding.vollstandig_v4_3
+    name: "VOLLSTÄNDIG onboarding v4.3 (42 questions, 17-22 min)"
+    description: "Full variant — structurally defined, untested at scale"
+    status: enabled
+    phase: 5.1
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: myDex/.dex/config/onboarding-questions.yaml
+    tests: []
+    known_issues:
+      - "Possible schema drift between profile-schema-v1.0.yaml and profile.yaml.example (see drafts/FIX-PLAN-PROFILE-SCHEMA.md)"
+
+  - id: onboarding.minimal_v4_3
+    name: "MINIMAL onboarding (ultra-fast)"
+    status: enabled
+    phase: 5.1
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: myDex/.dex/config/onboarding-questions.yaml
+    tests: []
+
+  - id: onboarding.questions_v5_holistic_review
+    name: "Onboarding Questions Holistic Review v5.0"
+    description: "Remove redundant questions, add gaps (Figma, tools, interfaces, enterprise policies, skill level)"
+    status: deferred
+    phase: 5.1.b
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: myDex/drafts/ (pending — ONBOARDING-QUESTIONS-REVIEW-2026-04-20.md)
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# AGENT SYSTEM — Pack-based, user-togglable
+# ─────────────────────────────────────────────────────────────────────────
+agents:
+  - id: agents.core_pack
+    name: "Core Pack (9 essential agents)"
+    description: "dex-master, mydex-agent, analyst, architect, dev, pm, po, sm, ux-expert"
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: .dexCore/core/agents/
+    tests: []
+
+  - id: agents.dis_pack
+    name: "DIS Pack (Innovation Suite)"
+    description: "brainstorming-coach, creative-problem-solver, design-thinking-coach, innovation-strategist, storyteller"
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/agents/
+    tests: []
+
+  - id: agents.game_pack
+    name: "Game Pack"
+    description: "game-architect, game-designer, game-dev"
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/agents/
+    tests: []
+
+  - id: agents.dhl_pack
+    name: "DHL Pack (enterprise-specific)"
+    description: "dhl-ds-advisor, dhl-ds-reviewer"
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/agents/
+    tests: []
+
+  - id: agents.meta_pack
+    name: "Meta Pack (brownfield analysis)"
+    description: "18 meta-agents: codebase-analyzer, pattern-detector, api-documenter, tech-debt-auditor, etc."
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/meta-agents/
+    tests: []
+
+  - id: agents.onboarding_pack
+    name: "Onboarding Pack (connector-specific)"
+    description: "atlassian-onboarding, github-onboarding, figma-onboarding"
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/agents/
+    tests: []
+
+  - id: agents.user_toggle_menu
+    name: "DexMaster *agents toggle menu"
+    description: "User can enable/disable individual agents and packs via DexMaster menu"
+    status: deferred
+    phase: 5.1.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [agents.core_pack]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# KNOWLEDGE LAYER — 3-tier (Wiki / Tank / Chronicle)
+# ─────────────────────────────────────────────────────────────────────────
+knowledge:
+  - id: knowledge.l1_wiki
+    name: "L1 Wiki (myDex/.dex/wiki/)"
+    description: "Markdown truth-files injected at session start (NexusGram pattern)"
+    status: deferred
+    phase: 5.2.a
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: knowledge.l2_tank_sqlite
+    name: "L2 Tank (native SQLite + Chunker + Semantic Search)"
+    description: "Native implementation, NOT Memory-Keeper-MCP"
+    status: deferred
+    phase: 5.2.b
+    enterprise_compliance: ok
+    requires: [sqlite3]
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: knowledge.l3_chronicle
+    name: "L3 Chronicle + CONTEXT.md"
+    description: "Session diaries + state persistence (already exists)"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.agent_boundary_state_model]
+    docs: .dexCore/_dev/docs/CONTEXT-SCHEMA.md
+    tests:
+      - .dexCore/_dev/tools/validate.sh (§22)
+
+  - id: knowledge.ingest_pipeline
+    name: "Ingest pipeline (inbox → chunks → Tank)"
+    description: "Document parsing → chunking → L2 Tank storage"
+    status: deferred
+    phase: 5.2.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [knowledge.l2_tank_sqlite, parser.router]
+    docs: pending
+    tests: []
+
+  - id: knowledge.query_interface
+    name: "Query interface (retrieval UX)"
+    description: "@knowledge search / RAG surface to agents"
+    status: deferred
+    phase: 5.2.d
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [knowledge.l2_tank_sqlite]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# DOCUMENT PARSER — broken into 7 sub-features, not one block
+# ─────────────────────────────────────────────────────────────────────────
+parser:
+  - id: parser.router
+    name: "Tool-Parser-Router architecture"
+    description: "Dispatches extract requests to right backend based on file-type + user preference"
+    status: deferred
+    phase: 5.3.a
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: myDex/drafts/CONCEPT-PARSER-ARCHITECTURE.md
+    tests: []
+
+  - id: parser.kreuzberg_backend
+    name: "Kreuzberg Integration (91+ formats, MIT)"
+    description: "Primary backend for PDF/Office/etc. Rust core + Python bindings + MCP server"
+    status: deferred
+    phase: 5.3.b
+    enterprise_compliance: ok
+    requires: [pip, kreuzberg]
+    depends_on: [parser.router]
+    docs: myDex/drafts/RESEARCH-KREUZBERG-DEEP-DIVE.md
+    tests: []
+
+  - id: parser.ollama_vlm_backend
+    name: "Ollama VLM (GLM-OCR + RapidOCR)"
+    description: "Local-VLM OCR — Enterprise-Compliance default for DHL"
+    status: deferred
+    phase: 5.3.c
+    enterprise_compliance: local_vlm_required
+    requires: [ollama]
+    depends_on: [parser.router]
+    docs: myDex/drafts/CONCEPT-DOCUMENT-PARSING-HOLISTIC-V2.md
+    tests: []
+
+  - id: parser.pattern_a_vector_text
+    name: "Pattern A Skill (Vector+Text — Figma/designer PDFs)"
+    description: "Cheap Oversize: pdftotext -raw + overview PNG + correlate"
+    status: deferred
+    phase: 5.3.d
+    enterprise_compliance: ok
+    requires: [poppler-utils, sips]
+    depends_on: []
+    docs: .dexCore/_dev/docs/ADDITIONAL-MULTIMODAL-OVERSIZE-PARSING.md
+    tests: []
+
+  - id: parser.pattern_b_raster_6phase
+    name: "Pattern B Skill (Raster 6-Phase Pipeline)"
+    description: "Expensive but necessary: overview → cluster-detect → hi-res crops → per-cluster VLM → synthesis → verify"
+    status: deferred
+    phase: 1.1
+    enterprise_compliance: local_vlm_required
+    requires: [poppler-utils, sips, ollama]
+    depends_on: [parser.pattern_a_vector_text, parser.ollama_vlm_backend]
+    docs:
+      - ~/.claude/projects/.../memory/feedback_raster_oversize_visual_boards.md
+      - ~/.claude/projects/.../memory/project_phase_5_3_parser_oversize_priority_feature.md
+    tests: []
+
+  - id: parser.inbox_auto_parse
+    name: "Inbox Auto-Parse Workflow"
+    description: "Drops in myDex/inbox/ trigger parse → extract → chronicle"
+    status: deferred
+    phase: 5.3.f
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [parser.router]
+    docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
+    tests: []
+
+  - id: parser.guided_setup_wizard
+    name: "Guided Setup Wizard"
+    description: "Chat-based onboarding, backend selection, health-check, install-per-dialog"
+    status: deferred
+    phase: 5.3.g
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [parser.router]
+    docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
+    tests: []
+
+  - id: parser.capabilities_yaml
+    name: "capabilities.yaml (backend state tracking)"
+    description: "Records what's installed, which backends active, user preferences"
+    status: deferred
+    phase: 5.3.h
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: myDex/drafts/CONCEPT-DOCUMENT-PARSING-HOLISTIC-V2.md
+    tests: []
+
+  - id: parser.license_audit_enforcer
+    name: "License Audit (block AGPL/GPL/commercial backends)"
+    description: "PyMuPDF (AGPL), MinerU (GPL), Marker (commercial) BLOCKED in install wizard"
+    status: deferred
+    phase: 5.3.b
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [parser.guided_setup_wizard]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# CONNECTORS — MCP-based integrations
+# ─────────────────────────────────────────────────────────────────────────
+connectors:
+  - id: connectors.atlassian_wizard
+    name: "Atlassian Connector Wizard"
+    description: "Jira + Confluence MCP setup script (Cloud/Server auto-detect)"
+    status: broken
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: [node, mcp-atlassian]
+    depends_on: []
+    docs: .dexCore/core/integrations/atlassian/
+    tests: []
+    known_issues:
+      - "BUG P0: Copilot/VS-Code-MCP config 7-layer bug — hardcoded paths, legacy VS Code format, env-var mismatches (see .dexCore/_dev/todos/bugs.md)"
+
+  - id: connectors.github_wizard
+    name: "GitHub Connector Wizard"
+    description: "GitHub MCP setup"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: [gh]
+    depends_on: []
+    docs: .dexCore/core/integrations/github/
+    tests: []
+
+  - id: connectors.figma_wizard
+    name: "Figma Connector Wizard"
+    description: "Figma MCP setup"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/integrations/figma/
+    tests: []
+
+  - id: connectors.known_config_database
+    name: "Known-URL Configuration Database"
+    description: ".dexCore/core/integrations/known-configs.yaml — wizard lookup table"
+    status: deferred
+    phase: 5.4.a
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: connectors.research_fallback_persistence
+    name: "Research-fallback + save-for-next-user"
+    description: "Unknown connector URL → research → save finding to known-configs.yaml for next user"
+    status: deferred
+    phase: 5.4.c
+    enterprise_compliance: research_pending
+    requires: []
+    depends_on: [connectors.known_config_database]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# LLM INTEGRATION — local + cloud options
+# ─────────────────────────────────────────────────────────────────────────
+llm:
+  - id: llm.ollama_local
+    name: "Ollama Local LLM Integration"
+    description: "OllamaService + Settings UI + Model Management + Streaming Pull + Startup Detection"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: [ollama]
+    depends_on: []
+    docs: app/ollama.js
+    tests: []
+
+  - id: llm.copilot_primary
+    name: "GitHub Copilot (primary LLM platform)"
+    description: "Native agent-mode via .github/agents/ + .github/copilot-instructions.md"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: [vscode, github-copilot]
+    depends_on: [core.ssot_compile_step]
+    docs: .github/copilot-instructions.md
+    tests: []
+    known_issues:
+      - "Live Copilot end-to-end testing still pending (see tests.copilot_smoke_test)"
+
+  - id: llm.claude_code
+    name: "Claude Code integration"
+    description: ".claude/CLAUDE.md generated via SSOT"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: [claude-code]
+    depends_on: [core.ssot_compile_step]
+    docs: .claude/CLAUDE.md
+    tests:
+      - tests/e2e/01-onboarding-smart.test.sh (live-mode)
+
+  - id: llm.github_models_api_fallback
+    name: "GitHub Models API fallback endpoint"
+    description: "app/server.js fallback"
+    status: broken
+    phase: 1.0
+    enterprise_compliance: cloud_with_consent
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/todos/bugs.md
+    tests: []
+    known_issues:
+      - "BUG P1: endpoint deprecated since 2025-10, new github.ai structure required"
+
+# ─────────────────────────────────────────────────────────────────────────
+# WORKFLOW SYSTEM — XML engine + .workflow.yaml files
+# ─────────────────────────────────────────────────────────────────────────
+workflows:
+  - id: workflows.xml_engine
+    name: "Workflow XML engine definition"
+    description: ".dexCore/core/tasks/workflow.xml spec"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/tasks/workflow.xml
+    tests: []
+
+  - id: workflows.runner_backend
+    name: "Workflow Runner Backend"
+    description: "Server-side execution of 41+ workflows"
+    status: broken
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [workflows.xml_engine]
+    docs: .dexCore/_dev/todos/bugs.md
+    tests: []
+    known_issues:
+      - "BUG P1: Workflow-Runner missing — DexHub Server cannot execute 41+ workflows. Root cause: YAML declarations vs missing runtime engine. Blocks Flow Board + agent orchestration."
+
+  - id: workflows.46_workflow_files
+    name: "46 workflow.yaml files present"
+    description: "Definitions shipped, runner missing (see workflows.runner_backend)"
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/core/workflows/
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# QUALITY GATES + TESTING
+# ─────────────────────────────────────────────────────────────────────────
+quality:
+  - id: quality.e2e_harness
+    name: "E2E Test Harness (Phase 5.0 foundation)"
+    description: "tests/e2e/ with assertion-lib.sh, claude-runner.sh, run-all.sh"
+    status: enabled
+    phase: 5.0
+    enterprise_compliance: ok
+    requires: [bash, ruby-or-python3-yaml]
+    depends_on: []
+    docs: tests/e2e/README.md
+    tests:
+      - tests/e2e/run-all.sh
+
+  - id: quality.e2e_live_mode
+    name: "E2E Live Mode (claude-runner actual invocations)"
+    description: "Opt-in via CLAUDE_E2E_LIVE=1, costs API tokens"
+    status: enabled
+    phase: 5.1.a
+    enterprise_compliance: cloud_with_consent
+    requires: [claude-code]
+    depends_on: [quality.e2e_harness]
+    docs: tests/e2e/README.md
+    tests:
+      - tests/e2e/01-onboarding-smart.test.sh (live block)
+
+  - id: quality.validate_sh_§3_strict
+    name: "validate.sh §3 strict phrase assertions (Phase-4 debt)"
+    description: "Tighten §3 after Phase 4 paradigm shift — new phrases as expectation, old loosening reverted"
+    status: deferred
+    phase: 5.1.debt
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: quality.validate_sh_§21_policy
+    name: "§21 DEPRECATED_PHRASES maintenance policy"
+    description: "2-line policy in SHARED.md that §21 must be updated when core concepts rename"
+    status: deferred
+    phase: 5.1.debt
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: quality.validate_sh_§23_features_yaml
+    name: "validate.sh §23 features.yaml consistency check"
+    description: "Enforce README claims match features.yaml status (always_on|enabled only)"
+    status: deferred
+    phase: 5.1.c (this session, follow-up commit)
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [meta.features_yaml]
+    docs: pending
+    tests: []
+
+  - id: quality.copilot_smoke_weekly
+    name: "Live Copilot Smoke Test (recurring, 1h/week)"
+    description: "Open Beta in Copilot, walk through 3 workflows, log bugs, never skip"
+    status: deferred
+    phase: 5.1.copilot-smoke
+    enterprise_compliance: cloud_with_consent
+    requires: [vscode, github-copilot]
+    depends_on: []
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# META — the feature-registry itself + enterprise mode
+# ─────────────────────────────────────────────────────────────────────────
+meta:
+  - id: meta.features_yaml
+    name: "Feature-Flag Registry (this file)"
+    description: ".dexCore/_cfg/features.yaml — source of truth for what DexHub can do"
+    status: enabled
+    phase: 5.1.c
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: MEMORY's MASTER_PLAN_2026_04_19_RESTRUCTURED.md
+    tests: []
+
+  - id: meta.enterprise_compliance_doc
+    name: "Enterprise Compliance Matrix doc"
+    description: ".dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md — per-feature compliance stance"
+    status: deferred
+    phase: 5.1.c (this session)
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [meta.features_yaml]
+    docs: pending
+    tests: []
+
+  - id: meta.enterprise_mode_toggle
+    name: "Enterprise Mode (strict compliance filter)"
+    description: "When enabled: disables cloud-only features, forces local-VLM, requires explicit consent for any cloud call"
+    status: deferred
+    phase: future
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [meta.features_yaml]
+    docs: pending
+    tests: []
+
+  - id: meta.readme_honesty_pass
+    name: "README Honesty Pass"
+    description: "Claims in README align with features.yaml status; deferred/broken explicitly labeled"
+    status: deferred
+    phase: 5.1.c (this session)
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [meta.features_yaml]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# KNOWN BUGS (promoted to feature-level for visibility)
+# ─────────────────────────────────────────────────────────────────────────
+# Bugs ARE features with status: broken. Makes them tracked, counted, unavoidable.
+# When fixed → status transitions to enabled (+ test added).
+bugs:
+  - id: bugs.workflow_runner_missing
+    name: "Workflow Runner Backend Missing"
+    description: "DexHub Server cannot execute 41+ workflows"
+    status: broken
+    priority: P1
+    phase: 6.bugs
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/todos/bugs.md
+    effort_estimate: "2-8h"
+
+  - id: bugs.mcp_config_7_layer_bug
+    name: "Copilot/VS-Code-MCP Atlassian 7-Layer Bug"
+    description: "MCP-Config writes to dead paths: hardcoded paths, legacy VS Code format, env-var mismatches"
+    status: broken
+    priority: P0
+    phase: 6.bugs
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/todos/bugs.md
+    effort_estimate: "4-6h"
+
+  - id: bugs.github_models_api_deprecated
+    name: "GitHub Models API fallback endpoint deprecated"
+    description: "app/server.js uses dead endpoint since 2025-10, github.ai is new structure"
+    status: broken
+    priority: P1
+    phase: 6.bugs
+    enterprise_compliance: cloud_with_consent
+    requires: []
+    depends_on: []
+    docs: .dexCore/_dev/todos/bugs.md
+    effort_estimate: "1-2h"
+
+# ─────────────────────────────────────────────────────────────────────────
+# ROADMAP — Deferred to 1.1+
+# ─────────────────────────────────────────────────────────────────────────
+roadmap:
+  - id: roadmap.cross_project_knowledge
+    name: "Cross-project knowledge aggregation"
+    description: "Knowledge layer spans multiple DexHub projects"
+    status: deferred
+    phase: 2.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [knowledge.l2_tank_sqlite]
+    docs: pending
+    tests: []
+
+  - id: roadmap.auto_project_detection
+    name: "Auto-project detection"
+    description: "2+ related files in inbox → propose creating a project"
+    status: deferred
+    phase: 2.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: roadmap.team_profile_support
+    name: "Team profile support"
+    description: "Shared profile across team members (workflow.xml step 0.5 commented out)"
+    status: deferred
+    phase: 1.3
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: roadmap.marketplace_integrations_skills_workflows
+    name: "Marketplace for Integrations/Skills/Workflows"
+    description: "Community share of connectors, parser backends, workflow templates"
+    status: deferred
+    phase: 2.0
+    enterprise_compliance: research_pending
+    requires: []
+    depends_on: []
+    docs: pending
+    tests: []
+
+  - id: roadmap.audio_transcription
+    name: "Audio Transcription (Parser extension)"
+    description: "Voice notes + Figma video comments → text"
+    status: deferred
+    phase: 1.1
+    enterprise_compliance: local_vlm_required
+    requires: []
+    depends_on: [parser.router]
+    docs: pending
+    tests: []
+
+# ─────────────────────────────────────────────────────────────────────────
+# COUNTS (auto-updated at each registry change)
+# ─────────────────────────────────────────────────────────────────────────
+counts:
+  total: 60
+  by_status:
+    always_on: 6
+    enabled: 14
+    disabled: 0
+    deferred: 34
+    broken: 6
+    experimental: 0

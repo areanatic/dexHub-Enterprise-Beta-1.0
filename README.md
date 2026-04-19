@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/version-EB--1.0-orange" alt="Version">
-  <img src="https://img.shields.io/badge/agents-43-blueviolet" alt="Agents">
+  <img src="https://img.shields.io/badge/agents-46-blueviolet" alt="Agents">
   <img src="https://img.shields.io/badge/workflows-46-blueviolet" alt="Workflows">
   <img src="https://img.shields.io/badge/skills-12-blueviolet" alt="Skills">
-  <img src="https://img.shields.io/badge/100%25-local-green" alt="Local">
+  <img src="https://img.shields.io/badge/data-local-green" alt="Data Local">
 </p>
 
 # DexHub Enterprise Beta 1.0
@@ -17,7 +17,13 @@ An AI development framework built on three ideas:
 
 **Extensions through Git.** Agents, workflows, and skills are plain files in your repo. Fork DexHub, add your own, share via branches and PRs. Teams can exchange proven processes the way open-source projects exchange code — versioned, reviewable, composable. Development knowledge becomes a shared, evolving asset across organizations.
 
-Everything runs locally. No cloud dependency, no accounts, no data leaving your machine.
+### What "local" means here (honest)
+
+- **Your data is local.** Profiles, decisions, chronicles, project files never leave your machine unless you explicitly configure a connector.
+- **Your LLM is your choice.** Run against GitHub Copilot (cloud), Anthropic's CLI (cloud), or Ollama (fully local). DexHub compiles identical instructions for all three.
+- **Connectors are optional.** Jira, GitHub, Figma integrations talk to their respective APIs when configured — always with your explicit setup step, never auto-enabled.
+
+Enterprise deployments: see [Enterprise Compliance Matrix](.dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md) for a per-feature compliance stance.
 
 ---
 
@@ -92,7 +98,22 @@ Codebase Analyzer, Pattern Detector, API Documenter, Data Analyst, Requirements 
 
 ---
 
-## Workflows (45)
+## Feature Matrix
+
+DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 60 features today, classified by status:
+
+| Status | Count | What it means |
+|---|---|---|
+| `always_on` | 6 | Core infrastructure (DexMaster, SSOT compile, validate.sh) |
+| `enabled` | 14 | Shipped and tested — covered by this README |
+| `deferred` | 34 | Planned for 1.1 or later (Knowledge Layer, Parser, Agent Packs) |
+| `broken` | 6 | Known bugs — tracked, not shipping claims (Workflow Runner backend, Atlassian MCP 7-layer bug, GitHub Models API deprecated endpoint) |
+
+**Honest label for Beta 1.0 scope:** What ships today is a DexHub core framework (SSOT compile, agent boundary state model, onboarding variants, guardrails, 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh quality gate). **The Knowledge Layer, Document Parser, native Workflow-Runner backend, and Agent Pack UX are explicitly on the roadmap — see `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining build plan (Phases 5.2–5.4).**
+
+---
+
+## Workflows (46)
 
 Guided step-by-step processes with templates and checklists:
 
@@ -132,13 +153,13 @@ Agents load domain knowledge on demand — 12 knowledge packs:
 
 Setup wizards that guide you through connecting your tools. No hardcoded URLs — the wizard asks for your instance and configures everything.
 
-| Integration | What you get | Setup |
-|-------------|-------------|-------|
-| **Atlassian** (Jira + Confluence) | Search issues, read pages, create content | `@atlassian-onboarding` |
-| **GitHub Enterprise** | Repos, PRs, issues, CI/CD workflows | `@github-onboarding` |
-| **Figma** | Design files, components, tokens | `@figma-onboarding` |
+| Integration | What you get | Setup | Status |
+|-------------|-------------|-------|--------|
+| **Atlassian** (Jira + Confluence) | Search issues, read pages, create content | `@atlassian-onboarding` | ⚠️ Known P0 bug: 7-layer MCP-config issue on Copilot/VS-Code path — fix pending, see [bugs.md](.dexCore/_dev/todos/bugs.md) |
+| **GitHub Enterprise** | Repos, PRs, issues, CI/CD workflows | `@github-onboarding` | ✅ Enabled |
+| **Figma** | Design files, components, tokens | `@figma-onboarding` | ✅ Enabled |
 
-All integrations use MCP (Model Context Protocol) and work with any Atlassian/GitHub/Figma instance.
+All integrations use MCP (Model Context Protocol) and work with any Atlassian/GitHub/Figma instance. All are `cloud_with_consent` per the [Enterprise Compliance Matrix](.dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md) — they call out to the respective service after you've configured the URL + credentials.
 
 ---
 
@@ -165,10 +186,11 @@ myDex/                       Your workspace (local, gitignored)
 
 **Design principles:**
 - **Plain markdown** — agents and workflows are markdown files, portable to any LLM
-- **Zero cloud** — everything runs in your IDE, your data stays on your machine
+- **Data-local** — your files stay on disk; LLM + connectors are your choice
 - **Modular** — add or remove modules (DXM, DIS, DXB) independently
-- **Guardrails** — 7 safety rules enforce output quality and file organization
+- **Guardrails** — 9 safety rules (G1–G9) enforce output quality and file organization
 - **Extensible** — build custom agents with `@dex-builder`, add knowledge packs, create workflows
+- **Feature-flagged** — every capability is declared in [`features.yaml`](.dexCore/_cfg/features.yaml) with explicit status
 
 ---
 
@@ -306,13 +328,22 @@ The framework follows a distributed model: teams build their own agents and work
 
 ## Quality & Validation
 
+DexHub runs two complementary quality gates — one structural, one behavioural:
+
 ```bash
-# 251 automated structural checks (9 guardrails)
+# Structural: 260 invariant checks across 22 sections (file existence, hash integrity,
+# SSOT drift detection, cross-platform source alignment, manifest consistency)
 bash .dexCore/_dev/tools/validate.sh
 
 # Profile schema validation
 python .dexCore/_dev/tools/validate_profile_schema.py myDex/.dex/config/profile.yaml
+
+# Behavioural: E2E test harness (structural 51/51 default, +4 live assertions with --live)
+bash tests/e2e/run-all.sh          # fast, no API cost
+bash tests/e2e/run-all.sh --live   # invokes headless LLM CLI, costs API tokens
 ```
+
+**Gate discipline:** every user-facing feature must have an E2E test entry. "Exists ≠ works" — structural green is not behavioural green. See [tests/e2e/README.md](tests/e2e/README.md).
 
 ---
 
