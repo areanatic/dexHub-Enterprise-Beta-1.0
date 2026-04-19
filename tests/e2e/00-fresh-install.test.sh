@@ -25,15 +25,27 @@ assert_file_exists ".dexCore/core/instructions/claude-specific.md" "Claude tail 
 assert_file_exists ".dexCore/core/instructions/copilot-specific.md" "Copilot tail present"
 assert_file_exists ".dexCore/_dev/tools/build-instructions.sh" "build-instructions.sh present"
 
-# 3. Generated outputs exist (CLAUDE.md + copilot-instructions.md must be committed)
-assert_file_exists ".claude/CLAUDE.md" "Generated CLAUDE.md present"
-assert_file_exists ".github/copilot-instructions.md" "Generated copilot-instructions.md present"
+# 3. Generated outputs exist (.github/copilot-instructions.md is the Beta primary target;
+#    .claude/CLAUDE.md is a removable integration-module artifact per PLATFORM-POLICY.md).
+HAS_CLAUDE_TAIL=1
+[ -f ".claude/CLAUDE.md" ] || HAS_CLAUDE_TAIL=0
 
-# 4. SSOT outputs are in sync (not stale)
-if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
-  pass "SSOT outputs in sync with sources"
+assert_file_exists ".github/copilot-instructions.md" "Generated copilot-instructions.md present (Beta primary target)"
+if [ "$HAS_CLAUDE_TAIL" = "1" ]; then
+  assert_file_exists ".claude/CLAUDE.md" "Generated CLAUDE.md present (Claude Code integration)"
 else
-  fail "SSOT drift detected — run build-instructions.sh"
+  echo -e "  \033[1;33m⊘\033[0m Claude Code integration module absent (enterprise bundle) — CLAUDE.md check skipped"
+fi
+
+# 4. SSOT outputs are in sync (not stale) — only meaningful in dev mode (both tails present)
+if [ "$HAS_CLAUDE_TAIL" = "1" ]; then
+  if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
+    pass "SSOT outputs in sync with sources"
+  else
+    fail "SSOT drift detected — run build-instructions.sh"
+  fi
+else
+  echo -e "  \033[1;33m⊘\033[0m SSOT drift check skipped — enterprise bundle (compiler compares all tails; only Copilot tail present)"
 fi
 
 # 5. DexMaster agent exists and has state model
@@ -82,8 +94,12 @@ assert_file_contains ".gitignore" "chronicle" "chronicle/ is gitignored (privacy
 assert_file_not_contains "README.md" "azamani1|@dhl\\.com|/Users/az" "README has no personal paths"
 assert_file_not_contains ".dexCore/core/instructions/SHARED.md" "/Users/az|azamani1" "SHARED.md has no personal paths"
 
-# 12. Guardrail hook infrastructure
-assert_file_exists ".claude/settings.json" "Claude settings present (PostToolUse hook)"
-assert_file_exists ".claude/skills/dexhub-testing/scripts/post-write-check.sh" "post-write-check hook present"
+# 12. Guardrail hook infrastructure — Claude-Code-specific, skip in enterprise
+if [ "$HAS_CLAUDE_TAIL" = "1" ]; then
+  assert_file_exists ".claude/settings.json" "Claude settings present (PostToolUse hook)"
+  assert_file_exists ".claude/skills/dexhub-testing/scripts/post-write-check.sh" "post-write-check hook present"
+else
+  echo -e "  \033[1;33m⊘\033[0m Claude Code hook checks skipped (enterprise bundle has no .claude/)"
+fi
 
 test_summary

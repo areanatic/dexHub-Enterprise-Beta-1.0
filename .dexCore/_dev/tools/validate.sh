@@ -28,9 +28,23 @@ cd "$PROJECT_ROOT"
 pass() { PASS=$((PASS + 1)); echo -e "  ${GREEN}PASS${NC} $1"; }
 fail() { FAIL=$((FAIL + 1)); echo -e "  ${RED}FAIL${NC} $1"; }
 warn() { WARN=$((WARN + 1)); echo -e "  ${YELLOW}WARN${NC} $1"; }
+skip() { echo -e "  ${YELLOW}SKIP${NC} $1"; }
+
+# ─── Mode detection ───────────────────────────────────────────────
+# Enterprise bundle = stripped of integration modules (no .claude/, no
+# tests/e2e/integrations/). validate.sh auto-detects this and skips
+# Claude-tail-specific checks that would otherwise FAIL cosmetically.
+# See .dexCore/_dev/docs/PLATFORM-POLICY.md.
+HAS_CLAUDE_TAIL=1
+if [ ! -f ".claude/CLAUDE.md" ]; then
+  HAS_CLAUDE_TAIL=0
+fi
 
 echo -e "${BOLD}========================================${NC}"
 echo -e "${BOLD} DexHub EA — Validation Suite${NC}"
+if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+  echo -e "${BOLD} Mode: ENTERPRISE BUNDLE (Claude tail absent)${NC}"
+fi
 echo -e "${BOLD}========================================${NC}"
 echo ""
 
@@ -73,51 +87,81 @@ fi
 # ==================== SECTION 3: Cross-Platform Consistency ====================
 echo -e "\n${BOLD}[3/24] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
-# GREETING action — check state model references in both
-if grep -q 'GREETING' .claude/CLAUDE.md && \
-   grep -q 'GREETING' .github/copilot-instructions.md && \
-   grep -q 'dex-master.md' .claude/CLAUDE.md && \
-   grep -q 'dex-master.md' .github/copilot-instructions.md; then
-  pass "GREETING action: references dex-master.md in both"
-else
-  fail "GREETING action mismatch"
-fi
-
-# AGENT-REQUEST action — check agent loading protocol in both
-if grep -q 'AGENT-REQUEST' .claude/CLAUDE.md && \
-   grep -q 'AGENT-REQUEST' .github/copilot-instructions.md; then
-  CLAUDE_AR=$(grep 'AGENT-REQUEST' .claude/CLAUDE.md | head -1)
-  COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | head -1)
-  if [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
-    pass "AGENT-REQUEST action identical"
+if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+  skip "§3 cross-platform parity: enterprise bundle has only Copilot tail (nothing to parity-check against)"
+  # In enterprise mode, check copilot-instructions.md content for the same concepts
+  if grep -q 'GREETING' .github/copilot-instructions.md && grep -q 'dex-master.md' .github/copilot-instructions.md; then
+    pass "GREETING action: references dex-master.md in copilot-instructions.md"
   else
-    warn "AGENT-REQUEST wording differs (may be platform-specific tail)"
+    fail "GREETING action missing in copilot-instructions.md"
+  fi
+  if grep -q 'AGENT-REQUEST' .github/copilot-instructions.md; then
+    pass "AGENT-REQUEST action present in copilot-instructions.md"
+  else
+    fail "AGENT-REQUEST missing in copilot-instructions.md"
+  fi
+  if [ "$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo 0)" -ge 1 ]; then
+    pass "Agent Resolution rule in copilot-instructions.md"
+  else
+    fail "Agent Resolution missing in copilot-instructions.md"
+  fi
+  if grep -q 'keep scope proportional' .github/copilot-instructions.md; then
+    pass "G4 anti-overplanning in copilot-instructions.md"
+  else
+    fail "G4 anti-overplanning missing in copilot-instructions.md"
+  fi
+  if grep -qi 'Never invent or simplify.*menu' .github/copilot-instructions.md; then
+    pass "NEVER DO: menu integrity in copilot-instructions.md"
+  else
+    fail "NEVER DO menu integrity missing in copilot-instructions.md"
   fi
 else
-  fail "AGENT-REQUEST action mismatch"
-fi
+  # GREETING action — check state model references in both
+  if grep -q 'GREETING' .claude/CLAUDE.md && \
+     grep -q 'GREETING' .github/copilot-instructions.md && \
+     grep -q 'dex-master.md' .claude/CLAUDE.md && \
+     grep -q 'dex-master.md' .github/copilot-instructions.md; then
+    pass "GREETING action: references dex-master.md in both"
+  else
+    fail "GREETING action mismatch"
+  fi
 
-# Agent Resolution rule
-CLAUDE_RES=$(grep -c 'agent-manifest.csv' .claude/CLAUDE.md 2>/dev/null || echo "0")
-COPILOT_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
-if [ "$CLAUDE_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
-  pass "Agent Resolution rule in both files"
-else
-  fail "Agent Resolution missing (CLAUDE=$CLAUDE_RES, COPILOT=$COPILOT_RES)"
-fi
+  # AGENT-REQUEST action — check agent loading protocol in both
+  if grep -q 'AGENT-REQUEST' .claude/CLAUDE.md && \
+     grep -q 'AGENT-REQUEST' .github/copilot-instructions.md; then
+    CLAUDE_AR=$(grep 'AGENT-REQUEST' .claude/CLAUDE.md | head -1)
+    COPILOT_AR=$(grep 'AGENT-REQUEST' .github/copilot-instructions.md | head -1)
+    if [ "$CLAUDE_AR" = "$COPILOT_AR" ]; then
+      pass "AGENT-REQUEST action identical"
+    else
+      warn "AGENT-REQUEST wording differs (may be platform-specific tail)"
+    fi
+  else
+    fail "AGENT-REQUEST action mismatch"
+  fi
 
-# G4 Anti-Overplanning
-if grep -q 'keep scope proportional' .claude/CLAUDE.md && grep -q 'keep scope proportional' .github/copilot-instructions.md; then
-  pass "G4 anti-overplanning in both files"
-else
-  fail "G4 anti-overplanning missing in one file"
-fi
+  # Agent Resolution rule
+  CLAUDE_RES=$(grep -c 'agent-manifest.csv' .claude/CLAUDE.md 2>/dev/null || echo "0")
+  COPILOT_RES=$(grep -c 'agent-manifest.csv' .github/copilot-instructions.md 2>/dev/null || echo "0")
+  if [ "$CLAUDE_RES" -ge 1 ] && [ "$COPILOT_RES" -ge 1 ]; then
+    pass "Agent Resolution rule in both files"
+  else
+    fail "Agent Resolution missing (CLAUDE=$CLAUDE_RES, COPILOT=$COPILOT_RES)"
+  fi
 
-# NEVER DO — menu integrity rule
-if grep -qi 'Never invent or simplify.*menu' .claude/CLAUDE.md && grep -qi 'Never invent or simplify.*menu' .github/copilot-instructions.md; then
-  pass "NEVER DO: menu integrity rule in both"
-else
-  fail "NEVER DO #1 mismatch"
+  # G4 Anti-Overplanning
+  if grep -q 'keep scope proportional' .claude/CLAUDE.md && grep -q 'keep scope proportional' .github/copilot-instructions.md; then
+    pass "G4 anti-overplanning in both files"
+  else
+    fail "G4 anti-overplanning missing in one file"
+  fi
+
+  # NEVER DO — menu integrity rule
+  if grep -qi 'Never invent or simplify.*menu' .claude/CLAUDE.md && grep -qi 'Never invent or simplify.*menu' .github/copilot-instructions.md; then
+    pass "NEVER DO: menu integrity rule in both"
+  else
+    fail "NEVER DO #1 mismatch"
+  fi
 fi
 
 # ==================== SECTION 4: File Existence ====================
@@ -148,6 +192,8 @@ FILES=(
 for f in "${FILES[@]}"; do
   if [ -e "$f" ]; then
     pass "$f"
+  elif [ "$f" = ".claude/CLAUDE.md" ] && [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+    skip "$f (enterprise bundle — Claude tail stripped per PLATFORM-POLICY)"
   else
     fail "$f MISSING"
   fi
@@ -158,10 +204,19 @@ echo -e "\n${BOLD}[5/24] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
-  if grep -q "$g:" .claude/CLAUDE.md && grep -q "$g:" .github/copilot-instructions.md; then
-    pass "Guardrail $g in both instruction files"
+  if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+    # Enterprise: check only the Copilot tail
+    if grep -q "$g:" .github/copilot-instructions.md; then
+      pass "Guardrail $g in copilot-instructions.md"
+    else
+      fail "Guardrail $g missing in copilot-instructions.md"
+    fi
   else
-    fail "Guardrail $g missing"
+    if grep -q "$g:" .claude/CLAUDE.md && grep -q "$g:" .github/copilot-instructions.md; then
+      pass "Guardrail $g in both instruction files"
+    else
+      fail "Guardrail $g missing"
+    fi
   fi
 done
 
@@ -189,7 +244,13 @@ else
 fi
 
 # F-012: DexMemory
-if grep -q 'DexMemory' .claude/CLAUDE.md; then
+if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+  if grep -q 'DexMemory' .github/copilot-instructions.md; then
+    pass "F-012: DexMemory in copilot-instructions.md (enterprise mode)"
+  else
+    fail "F-012: DexMemory missing from copilot-instructions.md"
+  fi
+elif grep -q 'DexMemory' .claude/CLAUDE.md; then
   pass "F-012: DexMemory referenced in CLAUDE.md"
 else
   fail "F-012: DexMemory missing from CLAUDE.md"
@@ -202,11 +263,14 @@ else
 fi
 
 # Intent Detection Protocol
-if grep -q 'GREETING.*AGENT-REQUEST.*TASK-DIRECT' .claude/CLAUDE.md 2>/dev/null || \
-   (grep -q 'GREETING' .claude/CLAUDE.md && grep -q 'TASK-DIRECT' .claude/CLAUDE.md); then
-  pass "Intent Detection Protocol present"
+# In enterprise mode, check copilot-instructions.md; otherwise check both (CLAUDE.md primary)
+INTENT_FILE=".claude/CLAUDE.md"
+[ "$HAS_CLAUDE_TAIL" = "0" ] && INTENT_FILE=".github/copilot-instructions.md"
+if grep -q 'GREETING.*AGENT-REQUEST.*TASK-DIRECT' "$INTENT_FILE" 2>/dev/null || \
+   (grep -q 'GREETING' "$INTENT_FILE" && grep -q 'TASK-DIRECT' "$INTENT_FILE"); then
+  pass "Intent Detection Protocol present (in $INTENT_FILE)"
 else
-  fail "Intent Detection Protocol missing"
+  fail "Intent Detection Protocol missing (in $INTENT_FILE)"
 fi
 
 # Dev-Mode Welcome + Dashboard
@@ -534,43 +598,51 @@ fi
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
 echo -e "\n${BOLD}[17/24] Guardrail Pattern Enforcement${NC}"
 
-# Check G3 enforcement in CLAUDE.md
-if grep -q "Root-Forbidden" .claude/CLAUDE.md && grep -q "Smart Routing" .claude/CLAUDE.md 2>/dev/null; then
-  pass "G3: Root-Forbidden + Smart Routing in CLAUDE.md"
+# Primary tail for guardrail checks: CLAUDE.md if present, else copilot-instructions.md
+GUARD_TAIL=".claude/CLAUDE.md"
+[ "$HAS_CLAUDE_TAIL" = "0" ] && GUARD_TAIL=".github/copilot-instructions.md"
+
+# Check G3 enforcement
+if grep -q "Root-Forbidden" "$GUARD_TAIL" && grep -q "Smart Routing" "$GUARD_TAIL" 2>/dev/null; then
+  pass "G3: Root-Forbidden + Smart Routing in $GUARD_TAIL"
 else
-  fail "G3: Missing Root-Forbidden enforcement in CLAUDE.md"
+  fail "G3: Missing Root-Forbidden enforcement in $GUARD_TAIL"
 fi
 
 # Check G5 consent pattern
-if grep -q "WAIT for explicit" .claude/CLAUDE.md 2>/dev/null; then
-  pass "G5: Consent pattern (WAIT for explicit) in CLAUDE.md"
+if grep -q "WAIT for explicit" "$GUARD_TAIL" 2>/dev/null; then
+  pass "G5: Consent pattern (WAIT for explicit) in $GUARD_TAIL"
 else
-  fail "G5: Consent pattern missing"
+  fail "G5: Consent pattern missing in $GUARD_TAIL"
 fi
 
 # Check G6 no hallucinated paths
-if grep -q "Verify with file system" .claude/CLAUDE.md 2>/dev/null || grep -q "verify.*file system" .claude/CLAUDE.md 2>/dev/null; then
-  pass "G6: No hallucinated paths rule in CLAUDE.md"
+if grep -q "Verify with file system" "$GUARD_TAIL" 2>/dev/null || grep -q "verify.*file system" "$GUARD_TAIL" 2>/dev/null; then
+  pass "G6: No hallucinated paths rule in $GUARD_TAIL"
 else
-  warn "G6: Hallucinated paths rule may be missing"
+  warn "G6: Hallucinated paths rule may be missing in $GUARD_TAIL"
 fi
 
-# Check hook enforcement exists
-if [ -f ".claude/settings.json" ] && grep -q "PostToolUse" .claude/settings.json 2>/dev/null; then
-  pass "Guardrail hook: PostToolUse hook configured"
+# Check hook enforcement — Claude-Code-specific (skills/hooks live in .claude/)
+if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+  skip "Claude Code hook checks (PostToolUse, post-write-check.sh) — enterprise bundle has no .claude/"
 else
-  warn "Guardrail hook: No PostToolUse hook in settings.json"
-fi
-
-if [ -f ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
-  pass "Guardrail hook: post-write-check.sh exists"
-  if [ -x ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
-    pass "Guardrail hook: post-write-check.sh is executable"
+  if [ -f ".claude/settings.json" ] && grep -q "PostToolUse" .claude/settings.json 2>/dev/null; then
+    pass "Guardrail hook: PostToolUse hook configured"
   else
-    fail "Guardrail hook: post-write-check.sh NOT executable"
+    warn "Guardrail hook: No PostToolUse hook in settings.json"
   fi
-else
-  fail "Guardrail hook: post-write-check.sh MISSING"
+
+  if [ -f ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
+    pass "Guardrail hook: post-write-check.sh exists"
+    if [ -x ".claude/skills/dexhub-testing/scripts/post-write-check.sh" ]; then
+      pass "Guardrail hook: post-write-check.sh is executable"
+    else
+      fail "Guardrail hook: post-write-check.sh NOT executable"
+    fi
+  else
+    fail "Guardrail hook: post-write-check.sh MISSING"
+  fi
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
@@ -643,20 +715,26 @@ fi
 # ==================== SECTION 19: SSOT Instruction Drift Detection ====================
 echo -e "\n${BOLD}[19/24] SSOT Instruction Drift Detection${NC}"
 
-if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
-  if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
-    pass "Instruction outputs are in sync with sources (SHARED.md + tails)"
-  else
-    fail "Instructions STALE — run: bash .dexCore/_dev/tools/build-instructions.sh"
-  fi
+if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+  skip "SSOT drift check — enterprise bundle has only Copilot tail; compiler-check compares both tails in dev mode only"
 else
-  warn "build-instructions.sh not found — cannot check SSOT drift"
+  if [ -f ".dexCore/_dev/tools/build-instructions.sh" ]; then
+    if bash .dexCore/_dev/tools/build-instructions.sh check >/dev/null 2>&1; then
+      pass "Instruction outputs are in sync with sources (SHARED.md + tails)"
+    else
+      fail "Instructions STALE — run: bash .dexCore/_dev/tools/build-instructions.sh"
+    fi
+  else
+    warn "build-instructions.sh not found — cannot check SSOT drift"
+  fi
 fi
 
-# Verify generated files exist
+# Verify generated files exist (per-tail)
 for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
   if [ -f "$gen_file" ]; then
     pass "Generated file exists: $gen_file"
+  elif [ "$gen_file" = ".claude/CLAUDE.md" ] && [ "$HAS_CLAUDE_TAIL" = "0" ]; then
+    skip "$gen_file (enterprise bundle — Claude tail stripped per PLATFORM-POLICY)"
   else
     fail "Generated file MISSING: $gen_file"
   fi
@@ -926,6 +1004,12 @@ else
                 # Strip any parenthetical after the path (e.g. 'tests/e2e/01.test.sh (structural 15 + live 4)')
                 t_path = t.to_s.split(/\s+[(]/).first.strip
                 next if t_path.start_with?('self-hosting') || t_path.empty?
+                # Integration-module tests (tests/e2e/integrations/*) are REMOVABLE
+                # per PLATFORM-POLICY.md. build-for-enterprise.sh strips these.
+                # Skip the file-existence check for them — they're allowed absent
+                # in stripped enterprise bundles. Dev-mode catches missing integration
+                # tests via actual test execution (run-all.sh).
+                next if t_path.start_with?('tests/e2e/integrations/')
                 unless File.exist?(t_path)
                   missing_test << \"#{s}:#{f['id']} references missing test file: #{t_path}\"
                 end
@@ -972,6 +1056,9 @@ for s in section_keys:
             for t in f['tests']:
                 t_path = str(t).split(' (')[0].strip()
                 if t_path.startswith('self-hosting') or not t_path: continue
+                # Integration-module tests (tests/e2e/integrations/*) are removable
+                # per PLATFORM-POLICY.md. Skip file-existence check.
+                if t_path.startswith('tests/e2e/integrations/'): continue
                 if not os.path.exists(t_path):
                     missing_test.append(f\"{s}:{f['id']} references missing test file: {t_path}\")
 print('MISSING_FIELD_COUNT=' + str(len(missing_field)))
@@ -1023,11 +1110,19 @@ fi
 # operating in worktree X committing content meant for worktree Y.
 # Anchor file declares this repo's identity; §24 verifies runtime context
 # matches that declaration.
+#
+# Enterprise-build skip (2026-04-20 fix): when running inside a stripped
+# enterprise bundle (no .git directory + anchor stripped by build-for-
+# enterprise.sh), §24 becomes meaningless — we're not in a dev worktree.
+# Detect this and skip cleanly instead of failing.
 echo -e "\n${BOLD}[24/24] Session Anchor (worktree-identity consistency)${NC}"
 
 ANCHOR_FILE=".dexcore-session-anchor"
 
-if [ ! -f "$ANCHOR_FILE" ]; then
+if [ ! -d ".git" ] && [ ! -f "$ANCHOR_FILE" ]; then
+  # Enterprise bundle or extracted tarball — §24 is N/A here
+  warn "Session-anchor check skipped — no .git and no anchor (enterprise bundle or extracted tarball; §24 is a dev-worktree-only guard)"
+elif [ ! -f "$ANCHOR_FILE" ]; then
   fail "Session-anchor missing — expected $ANCHOR_FILE (see 2026-04-19 cross-repo incident)"
 else
   pass "Session-anchor file present"
