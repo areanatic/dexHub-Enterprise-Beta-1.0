@@ -58,10 +58,23 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 
 ## Current tests
 
-| # | Test | Requires | Structural | Live (--live) |
-|---|------|----------|-----------|---------------|
-| 00 | `00-fresh-install.test.sh` | None | 36 assertions | — |
-| 01 | `01-onboarding-smart.test.sh` | Ruby / Python+YAML | 15 assertions | 4 assertions (DexMaster greeting, menu render, *mydex entrypoint) |
+| # | Test | Requires | Structural | Live | Walkthrough (opt-in) |
+|---|------|----------|-----------|------|---------------------|
+| 00 | `00-fresh-install.test.sh` | None | 36 assertions | — | — |
+| 01 | `01-onboarding-smart.test.sh` | Ruby / Python+YAML | 15 assertions | 4 assertions (DexMaster greeting, menu render, *mydex entrypoint) | — |
+| 02 | `02-onboarding-walkthrough.test.sh` | Claude CLI + OPT-IN | — | — | 6 assertions via session-resume (DexMaster → *mydex → "Alex" name). Costs ~2-5 USD. |
+
+### Opt-in walkthrough
+
+```bash
+# Default: skipped (cost protection)
+bash tests/e2e/02-onboarding-walkthrough.test.sh   # → SKIPPED
+
+# Opt-in (real API cost)
+CLAUDE_E2E_LIVE_WALKTHROUGH=1 bash tests/e2e/02-onboarding-walkthrough.test.sh
+```
+
+Opt-in tests use `claude -p --output-format=json` to capture `session_id` + `claude --resume <id>` to chain multi-turn conversations. Implementation: `harness/claude-runner.sh` functions `start_conversation` / `resume_conversation`.
 
 ## Coming next (Phase 5.1+)
 

@@ -62,6 +62,79 @@ claude_prompt_json() {
   env -u CLAUDECODE claude -p "$prompt" --output-format=json 2>/dev/null
 }
 
+# Multi-turn gate: OPT-IN because each walkthrough costs real API tokens.
+# Set CLAUDE_E2E_LIVE_WALKTHROUGH=1 to enable. Each walkthrough may cost
+# a few USD depending on conversation length. DO NOT run in CI default.
+walkthrough_mode_enabled() {
+  [ "${CLAUDE_E2E_LIVE_WALKTHROUGH:-0}" = "1" ]
+}
+
+# Start a new conversation, capture session_id + result text.
+# Usage:
+#   start_conversation "prompt text"
+#   session_id=$LAST_CLAUDE_SESSION_ID
+#   response=$LAST_CLAUDE_RESPONSE
+start_conversation() {
+  local prompt="$1"
+  if ! check_claude_installed; then return 1; fi
+
+  local raw
+  raw=$(env -u CLAUDECODE claude -p "$prompt" --output-format=json 2>/dev/null)
+
+  if [ -z "$raw" ]; then
+    export LAST_CLAUDE_SESSION_ID=""
+    export LAST_CLAUDE_RESPONSE=""
+    return 1
+  fi
+
+  # Extract session_id + result using ruby (stdlib json is always present)
+  local parsed
+  parsed=$(echo "$raw" | ruby -rjson -e '
+    d = JSON.parse(STDIN.read) rescue nil
+    if d && d["session_id"]
+      puts "SID=#{d["session_id"]}"
+      puts "===RESULT==="
+      puts d["result"].to_s
+    else
+      puts "SID="
+      puts "===RESULT==="
+    end
+  ' 2>/dev/null)
+
+  export LAST_CLAUDE_SESSION_ID=$(echo "$parsed" | grep '^SID=' | head -1 | sed 's/^SID=//')
+  export LAST_CLAUDE_RESPONSE=$(echo "$parsed" | awk '/===RESULT===/{flag=1; next} flag')
+}
+
+# Resume an existing session with a new prompt.
+# Usage:
+#   resume_conversation "$LAST_CLAUDE_SESSION_ID" "next user message"
+#   response=$LAST_CLAUDE_RESPONSE
+resume_conversation() {
+  local session_id="$1"
+  local prompt="$2"
+  if ! check_claude_installed; then return 1; fi
+  [ -z "$session_id" ] && return 1
+
+  local raw
+  raw=$(env -u CLAUDECODE claude -p "$prompt" --resume "$session_id" --output-format=json 2>/dev/null)
+
+  local parsed
+  parsed=$(echo "$raw" | ruby -rjson -e '
+    d = JSON.parse(STDIN.read) rescue nil
+    if d
+      puts "SID=#{d["session_id"]}"
+      puts "===RESULT==="
+      puts d["result"].to_s
+    else
+      puts "SID="
+      puts "===RESULT==="
+    end
+  ' 2>/dev/null)
+
+  export LAST_CLAUDE_SESSION_ID=$(echo "$parsed" | grep '^SID=' | head -1 | sed 's/^SID=//')
+  export LAST_CLAUDE_RESPONSE=$(echo "$parsed" | awk '/===RESULT===/{flag=1; next} flag')
+}
+
 # assert_claude_response_contains "prompt" "expected-pattern" [description]
 assert_claude_response_contains() {
   local prompt="$1"
