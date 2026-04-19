@@ -702,14 +702,16 @@ meta:
 
   - id: meta.enterprise_mode_toggle
     name: "Enterprise Mode (strict compliance filter)"
-    description: "When enabled: disables cloud-only features, forces local-VLM, requires explicit consent for any cloud call"
-    status: deferred
-    phase: future
+    description: "Read-only status display wired via DexMaster *enterprise-mode command (Tier 3 partial). Reads profile.company.data_handling_policy and reports which features would be filtered. Active enforcement hooks in list-agents / connector menus are Tier 3 next-step."
+    status: experimental
+    phase: 5.1.c
     enterprise_compliance: ok
     requires: []
-    depends_on: [meta.features_yaml]
-    docs: pending
+    depends_on: [meta.features_yaml, onboarding.data_handling_gate]
+    docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md + dex-master.md prompt id=show-enterprise-mode-status
     tests: []
+    known_issues:
+      - "Status display works; active enforcement (block cloud feature when local_only) still requires menu-prompt integration in each feature-surfacing flow"
 
   - id: meta.readme_honesty_pass
     name: "README Honesty Pass"
@@ -832,12 +834,11 @@ counts:
     always_on: 6
     enabled: 19
     disabled: 0
-    deferred: 34
+    deferred: 33
     broken: 6
-    experimental: 0
-  # Updated 2026-04-19 Phase 5.1.b wiring (Tier 2 commit):
-  # - onboarding.smart_v5 promoted experimental → enabled (wired as default)
-  # - onboarding.vollstandig_v5 promoted experimental → enabled
-  # - onboarding.data_handling_gate promoted experimental → enabled
-  # - onboarding.legacy_path_preserved promoted deferred → enabled (wired *mydex-advanced)
-  # Walkthrough test (Tier 5) remains pending; filter enforcement (Tier 3) pending.
+    experimental: 1
+  # Updated 2026-04-19 Tier 3 (DexMaster awareness):
+  # - meta.enterprise_mode_toggle deferred → experimental (status display wired;
+  #   full enforcement via per-feature menu filters remains Tier 3 next-step)
+  # - DexMaster menu gains *features + *enterprise-mode commands
+  # - Tier 2 earlier: onboarding.smart_v5/vollstandig_v5/data_handling_gate/legacy promoted to enabled

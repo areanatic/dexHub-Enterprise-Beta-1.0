@@ -178,14 +178,16 @@
   <menu>
     <item cmd="*help">❓ Return to main menu (*help)</item>
     <item cmd="*mydex" exec="{project-root}/.dexCore/core/agents/mydex-agent.md">🏠 Your personal workspace (*mydex)</item>
-    <item cmd="*list-agents" action="list all agents from {project-root}/.dexCore/_cfg/agent-manifest.csv">👥 Agent Directory - 41 specialized agents (*list-agents)</item>
+    <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents)</item>
     <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 41 structured workflows (*list-workflows)</item>
+    <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
     <item cmd="*council-mode" workflow="{project-root}/.dexCore/core/workflows/council-mode/workflow.yaml">🏛️  Multi-agent expert collaboration (*council-mode)</item>
     <item cmd="*about" action="#about-dexhub">📖 Learn about the platform (*about)</item>
     <item cmd="*exit">👋 Exit DexHub (*exit)</item>
 
     <!-- Hidden Features - Not shown in menu, but work when invoked -->
     <item cmd="*dev-mode" exec="{project-root}/.dexCore/_dev/agents/dev-mode-master.md" hidden="true">Development Mode - Internal feedback system</item>
+    <item cmd="*enterprise-mode" action="#show-enterprise-mode-status" hidden="true">Enterprise Mode status (*enterprise-mode) - shows compliance filter state</item>
 
     <footer>
 ──────────────────────────────────────
@@ -352,6 +354,42 @@ What would you like to do?
 
       (Display this BEFORE the menu, after the greeting)
     </template>
+
+    <prompt id="list-agents-from-registry">
+      Load .dexCore/_cfg/features.yaml (YAML).
+      Select entries where section == "agents" AND (status == "enabled" OR status == "always_on").
+      If the profile has company.data_handling_policy == "local_only", ALSO filter out any agent with enterprise_compliance != "ok".
+      Render as numbered list grouped by pack (core_pack, dis_pack, game_pack, dhl_pack, meta_pack, onboarding_pack), with one line each:
+        "{n}. {name} — {description} ({status})"
+      At the end, show hint:
+        "*features — full registry with disabled/deferred/broken entries."
+      Also render any deferred/disabled agents with a "🔒 (opt-in)" marker and a note that the user can request activation.
+      If features.yaml is missing: fall back to listing from agent-manifest.csv and warn the user.
+    </prompt>
+
+    <prompt id="show-features-registry">
+      Load .dexCore/_cfg/features.yaml.
+      Render a summary table in {communication_language}:
+        | Section | always_on | enabled | disabled | deferred | broken | experimental |
+      Then offer three drill-downs:
+        1. Show all `enabled` + `always_on` (shipped today)
+        2. Show all `deferred` (roadmap)
+        3. Show all `broken` (known bugs; with priority P0/P1 from features.yaml)
+      Announce .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md as the compliance companion doc.
+      If features.yaml is missing: report error + do NOT fabricate a list.
+    </prompt>
+
+    <prompt id="show-enterprise-mode-status">
+      Load the user's profile (myDex/.dex/config/profile.yaml) and read company.data_handling_policy.
+      Translate to Enterprise Mode status:
+        - local_only → "🔒 Enterprise Mode: STRICT — cloud features blocked"
+        - lan_only → "🛡️ Enterprise Mode: LAN-ONLY — public internet connectors blocked"
+        - cloud_llm_allowed → "☁️  Enterprise Mode: OPEN — cloud features available with per-feature consent"
+        - hybrid → "🔀 Enterprise Mode: HYBRID — per-feature decision on first use"
+        - null or missing → "❓ Enterprise Mode: UNCONFIGURED — run *mydex to answer Q43 (data_handling_policy)"
+      Then display a short list of features that would be FILTERED OUT under the current policy (cross-reference features.yaml enterprise_compliance field).
+      This is a read-only status display. The actual enforcement hook lives in the feature-surfacing prompts (list-agents-from-registry filter, connector menu filter — Tier 3 scope).
+    </prompt>
   </prompts>
 </agent>
 ```
