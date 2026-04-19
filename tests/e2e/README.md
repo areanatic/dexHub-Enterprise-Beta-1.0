@@ -67,6 +67,7 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 | 04 | `04-knowledge-l1-wiki-scaffold.test.sh` | None | ~15 assertions (pattern doc, 3 templates, user wiki README, gitignore, features.yaml claim) | — | — |
 | 05 | `05-consent-tracking.test.sh` | None | ~12 assertions (CONSENT-TRACKING.md, schema v1.2, profile example, DexMaster *consents/*revoke-consent, 3 connector agents reference consent) | — | — |
 | 06 | `06-onboarding-existing-profile.test.sh` | Claude CLI for live | 8 structural (mydex-agent has Check-Existing-Profile step + 4 choices + overwrite confirm-gate) | — | Live (opt-in): fixture + 4 turns, asserts profile-hash UNCHANGED post-cancel. Costs ~3-5 USD. |
+| 07 | `07-onboarding-overwrite-reject-confirm.test.sh` | Claude CLI for live | 5 structural (mydex-agent confirm-gate wording + [j/n] pattern + confirmed-branch + rejected-branch) | — | Live (opt-in): fixture + 5 turns, picks "Neu beginnen" → "n", asserts SHA-256 UNCHANGED both pre-confirm AND post-reject. Costs ~3-5 USD. |
 
 ### Opt-in walkthroughs
 

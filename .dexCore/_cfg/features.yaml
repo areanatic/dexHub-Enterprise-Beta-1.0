@@ -697,6 +697,22 @@ quality:
     known_issues:
       - "First iteration proves plumbing only. Full 5-answer walk + profile.yaml-produced assertion is quality.walkthrough_smart_v5_full (Tier 5.2)."
 
+  - id: quality.walkthrough_overwrite_reject_confirm
+    name: "Overwrite Confirm-Gate Reject Path (Tier 5.5.3)"
+    description: "Companion to walkthrough_existing_profile_edge. Goes ONE level deeper: user picks '2 Neu beginnen' → confirm-gate fires ('Sicher? Aktuelles Profil wird überschrieben. [j/n]') → user answers 'n' → profile MUST survive unchanged. Structural: mydex-agent.md has confirm-gate wording + branch logic. Live (opt-in): 5 turns + SHA-256 equality check pre-confirm AND post-reject. Catches a class of safety bug test 06 cannot: confirm-gate bypassed before user answers."
+    status: enabled
+    phase: 5.1.c-tier5.5
+    enterprise_compliance: cloud_with_consent
+    requires: [claude-code]
+    depends_on: [quality.walkthrough_existing_profile_edge, quality.walkthrough_multi_turn]
+    docs: tests/e2e/07-onboarding-overwrite-reject-confirm.test.sh + tests/e2e/README.md
+    tests:
+      - tests/e2e/07-onboarding-overwrite-reject-confirm.test.sh
+    known_issues:
+      - "Reject path covered; actual confirmed-overwrite path (choice 2 → 'j' → full walkthrough) is Tier 5.5.3b — higher cost (~10 USD) because it chains a fresh walkthrough."
+      - "Confirm-gate wording match uses tolerant regex (sicher|wirklich|überschreiben|confirm|sure|[j/n]|[y/n]). Exact phrasing from mydex-agent is the PRIMARY match; others accept LLM paraphrasing."
+      - "Safety-critical assertion is SHA-256 equality — tolerant on phrasing, strict on file-content outcome."
+
   - id: quality.walkthrough_existing_profile_edge
     name: "Existing-Profile Edge Case — cancel path (Tier 5.5 first slice)"
     description: "Proves walkthrough does NOT silently overwrite an existing profile.yaml. Structural: mydex-agent.md contains Check-Existing-Profile step with 4 choices + confirmation-gate on overwrite. Live (opt-in): install fixture profile, run *mydex + *onboarding, verify agent recognizes existing profile, offers 4 choices, respects 'cancel' choice (4) without modifying the file. SHA-256 comparison post-walk is the critical safety assertion."
@@ -905,18 +921,22 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 66
+  total: 67
   by_status:
     always_on: 6
-    enabled: 27
+    enabled: 28
     disabled: 0
     deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 late-2 (Tier 5.5.3):
+  # - quality.walkthrough_overwrite_reject_confirm NEW enabled (confirm-gate reject-path,
+  #   5 structural + opt-in live; complementary to existing_profile_edge test 06)
+  # Net this turn: total 66→67, enabled 27→28.
   # Updated 2026-04-20 late (Tier 5.5 first slice):
   # - quality.walkthrough_existing_profile_edge NEW enabled (existing-profile cancel-path,
   #   structural 8/8 + opt-in live gate; protects against silent-overwrite regression)
-  # Net this turn: total 65→66, enabled 26→27.
+  # Net prior turn: total 65→66, enabled 26→27.
   # Updated 2026-04-20 (Tier 5.2 + Phase 5.2.a + Tier 3.1):
   # - quality.walkthrough_smart_v5_full NEW enabled (full 5-answer walkthrough test)
   # - knowledge.l1_wiki deferred → enabled (scaffold shipped — pattern + templates + user README)
