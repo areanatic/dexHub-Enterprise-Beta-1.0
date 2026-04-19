@@ -1,6 +1,6 @@
 # L1 Wiki Session-Start Injection
 
-> **Status (2026-04-20):** Scaffold shipped. Script works standalone. Wiring into actual session-start (Claude Code / Copilot / agent boot) is a follow-up.
+> **Status (2026-04-20):** Scaffold shipped. Script works standalone. Wiring into actual session-start is a follow-up — **GitHub Copilot is the primary target; Claude Code is an optional integration module (see `PLATFORM-POLICY.md`)**.
 > **Feature:** `knowledge.l1_wiki_injection` in `.dexCore/_cfg/features.yaml`
 > **Activates:** `knowledge.l1_wiki` scaffold (commit `019af7c`) from authoring-surface to runtime-loadable
 
@@ -34,19 +34,21 @@ Actual hookup to Claude Code / Copilot / Ollama session-start is platform-specif
                    │
                    ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  Downstream consumers (PLATFORM-SPECIFIC, DEFERRED):        │
+│  Downstream consumers (ORDERED BY BETA PRIORITY):           │
 │                                                             │
-│  Claude Code:  append output to CONTEXT.md at session       │
-│                start, so agents reading CONTEXT.md pick it  │
-│                up. Or: wire into SSOT compile step so       │
-│                .claude/CLAUDE.md gets the block.            │
-│                                                             │
-│  Copilot:      append to .github/copilot-instructions.md    │
-│                via SSOT compile step (wiki content becomes  │
-│                part of every Copilot session).              │
+│  Copilot:      [PRIMARY BETA TARGET] append to              │
+│                .github/copilot-instructions.md via SSOT     │
+│                compile step (wiki content becomes part of   │
+│                every Copilot session). Beta ships HERE.     │
 │                                                             │
 │  Manual:       agents can invoke load-wiki.sh on request    │
-│                (works today; just no auto-inject yet).      │
+│                (works today; platform-agnostic).            │
+│                                                             │
+│  Claude Code:  [OPTIONAL INTEGRATION MODULE, REMOVABLE]     │
+│                append output to CONTEXT.md at session       │
+│                start. Lives in .claude/ and is stripped     │
+│                for enterprise builds per PLATFORM-POLICY.   │
+│                Nice-to-have for dev, not Beta promise.      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -114,10 +116,14 @@ The script filters `status: archived` out — only `active` (or missing status f
 - **Not wired to session start yet** — the pipeline exists; the hookup is platform-specific and remains a scaffold deliverable.
 - **Order is filesystem-dependent** — files are enumerated in alphabetical order. Users wanting specific order should prefix with numbers (`01-foo.md`, `02-bar.md`).
 
-## Phase milestones
+## Phase milestones (ORDERED BY BETA PRIORITY — Copilot first)
 
 - ✅ **5.2.a** (2026-04-20 morning, commit `019af7c`) — authoring scaffold: pattern doc, templates, user README
-- ✅ **5.2.d-scaffold** (2026-04-20 late, this commit) — load-wiki.sh + design doc + test 10 structural verification
-- ⬜ **5.2.d-wire-claude-code** — append load-wiki.sh output to CONTEXT.md at Claude Code session start (integration point: SSOT compile step OR a `.claude/hooks/SessionStart` hook)
-- ⬜ **5.2.d-wire-copilot** — bake wiki content into `.github/copilot-instructions.md` via SSOT compile (so GitHub Copilot users see it)
+- ✅ **5.2.d-scaffold** (2026-04-20 late, commit `bac8bd0`) — load-wiki.sh + design doc + test 10 structural verification (platform-agnostic)
+- ⬜ **5.2.d-wire-copilot** (NEXT, PRIMARY) — bake wiki content into `.github/copilot-instructions.md` via SSOT compile step. This is the Beta-target integration. Ships as core Beta feature.
 - ⬜ **5.2.b** — L2 Tank (SQLite + chunker + semantic search) for anything too big for L1
+- ⬜ **5.2.d-wire-claude-code** (OPTIONAL INTEGRATION MODULE) — append load-wiki.sh output to CONTEXT.md at Claude Code session start. Lives in `.claude/hooks/SessionStart` or similar. Stripped from enterprise builds per `PLATFORM-POLICY.md`.
+
+## Enterprise Build Constraint
+
+This feature ships to enterprise via the Copilot wire-up. The Claude Code wire-up is a dev convenience that rides in the areanatic repo and is removed by `build-for-enterprise.sh` before any enterprise push. See `ENTERPRISE-BUILD.md`.
