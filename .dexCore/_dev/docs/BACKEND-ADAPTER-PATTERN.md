@@ -139,6 +139,23 @@ Opt-in live test (gated behind `CLAUDE_E2E_LIVE_<BACKEND>=1` env var) asserts re
 
 Match `tests/e2e/23-parser-kreuzberg-backend.test.sh` as the template.
 
+### Test-environment-awareness (lesson from 2026-04-21)
+
+Adapter behavior branches on backend-installed-ness. Your dev machine may have the backend installed (→ `status=ready` or `partial`); CI doesn't (→ `status=not_installed`). **Structural tests must accept ALL valid status paths**, not just the one your local state happens to hit.
+
+Concrete lesson: `tests/e2e/24-parser-ollama-vlm-backend.test.sh` first shipped with a fallback grep pattern `"daemon not reachable|not installed"` that matched `status=partial` on my dev machine (Ollama installed) but NOT `status=not_installed` on CI (Ollama missing — adapter emits `"Install Ollama (https://ollama.com), then: ollama pull …"` which is literal `"Install Ollama"`, not `"not installed"`). Fixed in `63893bd` by widening the regex to accept all three informative variants.
+
+**Before shipping a new adapter test**, run it BOTH ways locally:
+```
+# Dev machine (backend installed)
+bash tests/e2e/NN-*.test.sh
+
+# Simulated CI (backend not on PATH)
+env PATH="/usr/bin:/bin" bash tests/e2e/NN-*.test.sh
+```
+
+If either run fails, the test is making assumptions about environment state that the other run disproves. Fix by accepting all legitimate adapter states, not by narrowing to one.
+
 ---
 
 ## Sub-features to register
