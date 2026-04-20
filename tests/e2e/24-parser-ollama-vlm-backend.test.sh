@@ -103,12 +103,40 @@ if echo "$DETECT_JSON" | ruby -rjson -e '
   failures = []
   failures << "setup_hint missing/empty" if d["setup_hint"].to_s.strip.empty?
   failures << "compliance missing/empty" if d["compliance"].to_s.strip.empty?
-  failures << "backend must be \"ollama_vlm\", got #{d["backend"].inspect}" unless d["backend"] == "ollama_vlm"
+  failures << "backend must be ollama_vlm, got #{d["backend"].inspect}" unless d["backend"] == "ollama_vlm"
   abort failures.join("; ") unless failures.empty?
 ' 2>/dev/null; then
   pass "--detect: structural invariants hold across all status values (setup_hint, compliance, backend)"
 else
-  fail "--detect: invariant field missing — vocab alone doesn't prove behavior"
+  fail "--detect: invariant field missing — vocab alone proves nothing"
+fi
+
+# hint_type field (2026-04-22 session-7 Option E) — machine-readable
+# setup_hint category. Must be present and in the defined vocabulary.
+# ollama_vlm has the most interesting hint_type transitions:
+#   status=ready         → hint_type=ok
+#   status=not_installed → hint_type=install_backend
+#   status=partial (daemon down)  → hint_type=daemon_unreachable
+#   status=partial (no VLM model) → hint_type=missing_dependency
+if echo "$DETECT_JSON" | ruby -rjson -e '
+  d = JSON.parse(STDIN.read)
+  vocab = %w[ok install_backend daemon_unreachable missing_dependency policy_blocked probe_error]
+  ht = d["hint_type"]
+  abort "hint_type missing" if ht.nil? || ht.to_s.empty?
+  abort "hint_type #{ht.inspect} not in vocab #{vocab}" unless vocab.include?(ht)
+  if d["status"] == "ready" && ht != "ok"
+    abort "status=ready but hint_type=#{ht.inspect} (should be ok)"
+  end
+  if d["status"] == "not_installed" && ht != "install_backend"
+    abort "status=not_installed but hint_type=#{ht.inspect} (should be install_backend)"
+  end
+  if d["status"] == "partial" && !%w[daemon_unreachable missing_dependency].include?(ht)
+    abort "status=partial but hint_type=#{ht.inspect} (should be daemon_unreachable or missing_dependency)"
+  end
+' 2>/dev/null; then
+  pass "--detect: hint_type present + in vocabulary + consistent with status (partial disambiguated)"
+else
+  fail "--detect: hint_type field missing, invalid, or inconsistent with status"
 fi
 
 # Endpoint field should match OLLAMA_HOST or default

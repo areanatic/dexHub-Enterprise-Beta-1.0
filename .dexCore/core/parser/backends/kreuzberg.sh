@@ -78,10 +78,11 @@ done
 # Cheap: `command -v` + a single `--version` call. No file operations,
 # no network, no side effects.
 probe_kreuzberg() {
-  local bin status version install_hint
+  local bin status version install_hint hint_type
   bin=$(command -v kreuzberg 2>/dev/null || echo "")
   if [ -z "$bin" ]; then
     status="not_installed"
+    hint_type="install_backend"
     version=""
     install_hint="brew install kreuzberg-dev/tap/kreuzberg  (macOS) · cargo install kreuzberg-cli  (any) · docker pull ghcr.io/kreuzberg-dev/kreuzberg"
   else
@@ -94,9 +95,11 @@ probe_kreuzberg() {
     fi
     if [ -z "$version" ]; then
       status="probe_failed"
+      hint_type="probe_error"
       install_hint="Binary at $bin responded to neither --version nor -V. Reinstall or use a different tool."
     else
       status="ready"
+      hint_type="ok"
       install_hint="Ready — invoke via 'bash kreuzberg.sh --extract PATH'."
     fi
   fi
@@ -119,11 +122,12 @@ probe_kreuzberg() {
       "version"      => ARGV[1],
       "status"       => ARGV[2],
       "setup_hint"   => ARGV[3],
+      "hint_type"    => ARGV[4],
       "supported"    => ["pdf", "docx", "xlsx", "pptx", "odt", "rtf",
                           "html", "epub", "md", "txt", "csv"],
       "compliance"   => "ok"
     })
-  ' "${bin:-}" "${version:-}" "$status" "$install_hint"
+  ' "${bin:-}" "${version:-}" "$status" "$install_hint" "$hint_type"
 }
 
 # ─── Extract ────────────────────────────────────────────────────────

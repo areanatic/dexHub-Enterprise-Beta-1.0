@@ -62,12 +62,38 @@ Exactly one of:
   "version": "<version string or empty>",
   "status": "<one of the vocabulary above>",
   "setup_hint": "<concrete next step>",
+  "hint_type": "<machine-readable category of setup_hint>",
   "supported": ["<format1>", "<format2>"],
   "compliance": "ok" | "local_vlm_required" | "cloud_only"
 }
 ```
 
 Extensions are allowed as siblings (e.g. VLM adapters may add `model` or `endpoint`). Do not rename the core fields.
+
+### `hint_type` vocabulary (introduced 2026-04-22 session-7 Option E)
+
+Structured categorization of `setup_hint` content. Lets downstream tools
+(UI wrappers, tests, capabilities-probe) branch on the ROOT CAUSE of a
+non-ready state without regex-parsing the free-text `setup_hint`. Tests
+in particular can assert on `hint_type` with zero brittleness.
+
+| `hint_type` | When adapter emits it | Action the user takes |
+|---|---|---|
+| `ok` | status=ready — adapter is operational | none |
+| `install_backend` | tool not on PATH | install the binary (brew/cargo/pip/apt) |
+| `daemon_unreachable` | binary found but supporting service offline | start the service (ollama serve, dockerd) |
+| `missing_dependency` | binary+service OK but a sub-resource absent | pull a model / install a plugin / upgrade |
+| `policy_blocked` | enterprise compliance gate refused this backend | switch data_handling_policy or pick a different adapter |
+| `probe_error` | the adapter's own probe failed unexpectedly | adapter bug — file an issue |
+
+Every `status` value maps 1:1 to at most one `hint_type` for a given
+adapter run, but different statuses can share a `hint_type` (e.g. both
+`not_installed` and the `not_installed`-equivalent leg of `partial` emit
+`install_backend`). The status answers "what state is this?"; `hint_type`
+answers "what kind of fix?".
+
+Adapters that invent new hint_type values MUST add them here first +
+update dependent tests.
 
 ### `--extract PATH` output
 

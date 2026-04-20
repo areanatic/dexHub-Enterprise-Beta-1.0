@@ -117,6 +117,33 @@ else
   fail "--detect: invariant field missing — status-vocabulary alone is not enough"
 fi
 
+# hint_type field (introduced 2026-04-22 session-7 Option E) — structured
+# categorization of setup_hint. Must be present and in the defined vocabulary.
+# status→hint_type mapping for this adapter:
+#   ready → ok | not_installed → install_backend | probe_failed → probe_error
+if echo "$DETECT_JSON" | ruby -rjson -e '
+  d = JSON.parse(STDIN.read)
+  vocab = %w[ok install_backend daemon_unreachable missing_dependency policy_blocked probe_error]
+  ht = d["hint_type"]
+  abort "hint_type missing" if ht.nil? || ht.to_s.empty?
+  abort "hint_type #{ht.inspect} not in vocab #{vocab}" unless vocab.include?(ht)
+  # For kreuzberg specifically: daemon_unreachable is not a valid mapping
+  # (kreuzberg is a one-shot CLI, no daemon). Would indicate a bug.
+  abort "kreuzberg should never emit daemon_unreachable" if ht == "daemon_unreachable"
+  # Consistency: status=ready must map to hint_type=ok
+  if d["status"] == "ready" && ht != "ok"
+    abort "status=ready but hint_type=#{ht.inspect} (should be ok)"
+  end
+  # Consistency: status=not_installed must map to install_backend
+  if d["status"] == "not_installed" && ht != "install_backend"
+    abort "status=not_installed but hint_type=#{ht.inspect} (should be install_backend)"
+  end
+' 2>/dev/null; then
+  pass "--detect: hint_type present + in vocabulary + consistent with status"
+else
+  fail "--detect: hint_type field missing, invalid, or inconsistent with status"
+fi
+
 # On a CI box where kreuzberg is not installed (usual case), we expect
 # status=not_installed + a concrete install hint.
 if [ "$STATUS" = "not_installed" ]; then

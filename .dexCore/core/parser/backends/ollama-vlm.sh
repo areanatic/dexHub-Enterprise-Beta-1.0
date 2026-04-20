@@ -134,11 +134,12 @@ discover_vision_model() {
 }
 
 probe_ollama_vlm() {
-  local bin="" ollama_version="" daemon_running="false" model="" status install_hint
+  local bin="" ollama_version="" daemon_running="false" model="" status install_hint hint_type
   bin=$(command -v ollama 2>/dev/null || echo "")
 
   if [ -z "$bin" ]; then
     status="not_installed"
+    hint_type="install_backend"
     # Honor --model override here too: if the user told us which model
     # they want, the install hint names THEIR choice, not a generic
     # default. Without this, `--model starcoder-vision` on a fresh box
@@ -157,9 +158,14 @@ probe_ollama_vlm() {
       model=$(discover_vision_model)
       if [ -n "$model" ]; then
         status="ready"
+        hint_type="ok"
         install_hint="Ready with model '$model'. Use --extract PATH or --model NAME to pick another."
       else
+        # Daemon reachable but no vision model pulled — the user needs
+        # to pull a model, not install a daemon. hint_type discriminates
+        # this case from the other `partial` cause below.
         status="partial"
+        hint_type="missing_dependency"
         if [ -n "$MODEL_OVERRIDE" ]; then
           install_hint="Override model '$MODEL_OVERRIDE' not pulled. Try: ollama pull $MODEL_OVERRIDE"
         else
@@ -167,7 +173,10 @@ probe_ollama_vlm() {
         fi
       fi
     else
+      # Binary found but daemon not reachable. Distinct actionable
+      # hint_type from the no-model-pulled case above.
       status="partial"
+      hint_type="daemon_unreachable"
       install_hint="ollama installed but daemon not reachable at $OLLAMA_ENDPOINT. Try: ollama serve  (or open the Ollama.app)"
     fi
   fi
@@ -194,10 +203,11 @@ probe_ollama_vlm() {
       "model"          => ARGV[4],
       "status"         => ARGV[5],
       "setup_hint"     => ARGV[6],
+      "hint_type"      => ARGV[7],
       "supported"      => ["png", "jpg", "jpeg", "gif", "webp", "bmp", "tiff"],
       "compliance"     => "local_vlm_required"
     })
-  ' "${bin:-}" "${ollama_version:-}" "$OLLAMA_ENDPOINT" "$daemon_running" "${model:-}" "$status" "$install_hint"
+  ' "${bin:-}" "${ollama_version:-}" "$OLLAMA_ENDPOINT" "$daemon_running" "${model:-}" "$status" "$install_hint" "$hint_type"
 }
 
 # ─── Extract ────────────────────────────────────────────────────────
