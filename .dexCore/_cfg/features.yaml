@@ -422,19 +422,22 @@ knowledge:
       - "Embeddings column remains empty after ingest — 5.2.b-embed slice fills it."
 
   - id: knowledge.l2_tank_query
-    name: "L2 Tank — query script (l2-query.sh)"
-    description: "SCAFFOLD STUB. Emits [L2 STUB] signal. Real implementation (FTS5 + embedding cosine hybrid) ships in phase 5.2.b-query. Future contract: markdown-formatted top-N chunks with source path + relevance score, optimized for LLM readability."
-    status: experimental
-    phase: 5.2.b-scaffold
+    name: "L2 Tank — query script (l2-query.sh) — FTS5 KEYWORD SEARCH"
+    description: "Real FTS5 keyword search shipped Phase 5.2.b-query (2026-04-20). BM25 ranking, markdown/JSON output formats, --top N limit, --source-type filter (wiki/chronicle/ingest), graceful empty-tank + no-match + missing-tank cases (all exit 0 with notices). Content newline preservation via sqlite3 .mode json. Cosine-similarity hybrid ranking (semantic) is a future slice — requires embeddings (see knowledge.l2_tank_embed, deferred)."
+    status: enabled
+    phase: 5.2.b-query
     enterprise_compliance: ok
-    requires: [bash, sqlite3]
+    requires: [bash, sqlite3, ruby]
     depends_on: [knowledge.l2_tank_init]
     docs: .dexCore/_dev/docs/L2-TANK.md
     tests:
       - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+      - tests/e2e/14-knowledge-l2-tank-query.test.sh
     primary_target: github_copilot
     known_issues:
-      - "Stub only — no real query. [L2 STUB] signal emitted."
+      - "Keyword-only today. No semantic (cosine-similarity) ranking yet — awaits knowledge.l2_tank_embed to populate the embeddings table."
+      - "FTS5 rank is BM25 (lower = better). Output shows raw rank values; no normalization (0..1 scale) yet — intentional, lets power-users see actual BM25 scores."
+      - "Multi-word queries without explicit FTS5 operators are treated as phrase queries (wrapped in double-quotes). For OR / AND / NEAR, users can pass FTS5 syntax directly (double-quote-escape is handled)."
 
   - id: knowledge.l2_tank_wire_copilot
     name: "L2 Tank → Copilot injection (deferred)"
@@ -1082,11 +1085,17 @@ counts:
   total: 78
   by_status:
     always_on: 6
-    enabled: 37
+    enabled: 38
     disabled: 0
     deferred: 34
     broken: 0
-    experimental: 1
+    experimental: 0
+  # Updated 2026-04-20 late-8 (Phase 5.2.b-query: FTS5 search shipped):
+  # - knowledge.l2_tank_query: experimental (STUB) → enabled (REAL FTS5)
+  # Net: enabled 37→38, experimental 1→0.
+  # L2 Tank now functionally: author → ingest → search (keyword-only).
+  # Next: 5.2.b-wire-copilot (bake seed-query results into copilot-instructions.md),
+  #       5.2.b-embed (Ollama backend → cosine-sim hybrid ranking).
   # Updated 2026-04-20 late-7 (Phase 5.2.b-ingest: REAL chunker shipped):
   # - knowledge.l2_tank_ingest: experimental (STUB) → enabled (REAL CHUNKER)
   # Net: enabled 36→37, experimental 2→1.
