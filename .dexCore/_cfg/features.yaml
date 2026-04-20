@@ -674,15 +674,23 @@ parser:
     tests: []
 
   - id: parser.inbox_auto_parse
-    name: "Inbox Auto-Parse Workflow"
-    description: "Drops in myDex/inbox/ trigger parse → extract → chronicle"
-    status: deferred
+    name: "Inbox Auto-Parse Orchestrator (inbox-auto-parse.sh + *inbox menu)"
+    description: "Shipped Phase 5.3.f first slice (2026-04-21). `.dexCore/core/parser/inbox-auto-parse.sh` iterates all pending files in the configured inbox (precedence: --inbox flag > $DEXHUB_INBOX env > config.yaml inbox_folder > default myDex/inbox/), routes each through parse-route.sh, invokes the right backend adapter (kreuzberg / ollama_vlm / native), pipes extracted text into l2-ingest.sh for L2 Tank ingestion, then ARCHIVES the original to `<inbox>/.processed/<timestamp>-<name>` (never silently deletes). Per-file JSON records surface success/failure + extract bytes + archive path. Dual-env tested (BACKEND-ADAPTER-PATTERN.md §142-157). DexMaster `*inbox` menu item wraps the script for conversational UX. Flags: --dry-run / --no-archive / --one-file / --inbox / --format json|text. This slice makes the Parser arc END-TO-END USABLE — drop a file, run the script, it's in the Tank."
+    status: enabled
     phase: 5.3.f
     enterprise_compliance: ok
-    requires: []
-    depends_on: [parser.router]
+    requires: [bash, ruby, sqlite3]
+    depends_on: [parser.router, parser.capabilities_yaml, knowledge.l2_tank_ingest]
     docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
-    tests: []
+    tests:
+      - tests/e2e/26-parser-inbox-auto-parse.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "One-shot mode only — no file-system watcher. User must run the script (or DexMaster *inbox) manually. Continuous watching (fswatch on macOS / inotify on Linux) is a deferred enhancement."
+      - "Desktop-shortcut creation (user request 2026-04-21) — create a Finder alias / Linux .desktop / Windows .lnk pointing at the inbox — is NOT in this slice. Scaffolded as a follow-up: users can manually `ln -s $(pwd)/myDex/inbox ~/Desktop/DexHub-Inbox` today."
+      - "Binary files whose backend is not installed return status=routed_but_backend_unavailable. They're NOT archived (stay in inbox for retry after the user installs the backend). This is intentional — don't penalize users for a deferred install."
+      - "Kreuzberg/ollama_vlm adapter failures during extract surface as status=extract_failed with the backend's exit code in the error field. l2-ingest failures surface as status=ingest_failed with stderr excerpt."
+      - "For very large inboxes (100s of files), the for-loop processes sequentially. Future --parallel N flag could speed this up. Not a blocker for Beta 1.0 scale."
 
   - id: parser.guided_setup_wizard
     name: "Parser capabilities probe (parser.guided_setup_wizard) — probe-and-write layer"

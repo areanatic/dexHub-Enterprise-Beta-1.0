@@ -192,6 +192,7 @@
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
     <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
     <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
+    <item cmd="*inbox" action="#inbox-auto-parse">📥 Process Inbox (*inbox) - route + extract + ingest all files in myDex/inbox/</item>
     <item cmd="*enable-pack" action="#enable-pack" hidden="true">📦 Enable an agent pack (*enable-pack &lt;pack_id&gt;)</item>
     <item cmd="*disable-pack" action="#disable-pack" hidden="true">📦 Disable an agent pack (*disable-pack &lt;pack_id&gt;) — mandatory packs refuse</item>
     <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
@@ -398,6 +399,34 @@ What would you like to do?
       Fallback behavior:
         - If agent-manifest.csv is missing: report error + do NOT fabricate a list.
         - If pack manifest for an enabled pack is missing: skip that pack + warn once.
+    </prompt>
+
+    <prompt id="inbox-auto-parse">
+      Use Bash tool: `bash {project-root}/.dexCore/core/parser/inbox-auto-parse.sh --format text`.
+      The script processes every pending file in the configured inbox
+      (resolved in this precedence: --inbox flag, $DEXHUB_INBOX env,
+      config.yaml inbox_folder, default myDex/inbox/) — routes each
+      through the parser, extracts text with the appropriate backend,
+      ingests into the L2 Knowledge Tank, and archives the original to
+      inbox/.processed/&lt;timestamp&gt;-&lt;name&gt;.
+
+      Render the script's text output as-is to the user (it already
+      includes a summary table with per-file status icons). Add a
+      short summary in {communication_language} at the end:
+        - "✅ N files processed + ingested. Archived to myDex/inbox/.processed/."
+        - "❌ M files failed — see per-file errors above. Run `bash {project-root}/.dexCore/core/parser/parse-route.sh &lt;file&gt;` for diagnostics."
+        - "⏸️  K files routed but waiting on backend install — see `*parser-setup` for install hints."
+
+      If the user wants to process just one file: "bash .dexCore/core/parser/inbox-auto-parse.sh --one-file PATH".
+      If the user wants a different inbox location: "bash .dexCore/core/parser/inbox-auto-parse.sh --inbox /path/to/folder"
+      or set $DEXHUB_INBOX. The `inbox_folder` field in .dexCore/_cfg/config.yaml is the persistent default.
+
+      Desktop-shortcut creation (e.g., a Finder alias on ~/Desktop pointing at the inbox) is a planned follow-up slice —
+      not implemented in this first slice. Users can create the shortcut manually today:
+        ln -s "$(pwd)/myDex/inbox" ~/Desktop/DexHub-Inbox
+
+      If the bash call fails (ruby missing, l2-ingest broken, etc.), report the error clearly + suggest
+      `bash {project-root}/.dexCore/_dev/tools/validate.sh` for diagnostics.
     </prompt>
 
     <prompt id="parser-setup">
