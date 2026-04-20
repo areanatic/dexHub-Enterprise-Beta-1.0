@@ -700,7 +700,7 @@ parser:
       - "Binary files whose backend is not installed return status=routed_but_backend_unavailable. They're NOT archived (stay in inbox for retry after the user installs the backend). This is intentional — don't penalize users for a deferred install."
       - "Kreuzberg/ollama_vlm adapter failures during extract surface as status=extract_failed with the backend's exit code in the error field. l2-ingest failures surface as status=ingest_failed with stderr excerpt."
       - "For very large inboxes (100s of files), the for-loop processes sequentially. Future --parallel N flag could speed this up. Not a blocker for Beta 1.0 scale."
-      - "Cosmetic: l2-query shows the source path as the ext_tmp basename (dexhub-inbox-ext-XXXXXX.md) rather than the original filename. The archived copy in .processed/ has the real name. Plumbing the original basename through l2-ingest is a low-priority polish follow-up."
+      - "Fixed 2026-04-21 session-7: l2-query now shows the archive path (myDex/inbox/.processed/<ts>-<name>) as source_path, not the ephemeral tmp file. Done via new l2-ingest --source-display flag that overrides source_path for DB storage. The timestamp + basename used for --source-display is reused for the actual archive mv, so DB reference matches on-disk file."
 
   - id: parser.inbox_shortcut_setup
     name: "Inbox Desktop-Shortcut Setup (inbox-setup.sh + *inbox-setup menu)"

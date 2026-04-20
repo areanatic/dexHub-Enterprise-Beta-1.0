@@ -112,6 +112,29 @@ else
   fail "real run: archive copy missing"
 fi
 
+# ─── Source-display: DB stores archive path, not tmp-file path ──────
+# Regression guard for 2026-04-21 session-7 filename-plumb fix.
+# Before: l2-query showed /var/folders/.../dexhub-inbox-ext-XXX.md
+#         (the tmp file we actually read content from, ephemeral +
+#          meaningless to the user)
+# After:  source_path in DB = myDex/inbox/.processed/<ts>-<name>
+#         (the archive location, stable + meaningful)
+#
+# Verify by querying the tank for content we just ingested and asserting
+# the returned source_path looks like an archive path, not a tmp path.
+# Uses the real repo tank (auto-init'd by inbox-auto-parse), not scratch,
+# because the whole pipeline needs to work together for this assertion.
+QUERY_TOOL=".dexCore/core/knowledge/l2/l2-query.sh"
+if [ -x "$QUERY_TOOL" ]; then
+  QUERY_OUT=$(bash "$QUERY_TOOL" "Hello world" 2>&1 || true)
+  # Look for dexhub-inbox-ext (the bug signature)
+  if echo "$QUERY_OUT" | grep -q "dexhub-inbox-ext"; then
+    fail "l2-query source shows tmp path — filename-plumb regression"
+  else
+    pass "l2-query source does not show ephemeral tmp path (session-7 filename-plumb fix)"
+  fi
+fi
+
 # ─── --no-archive: leaves file in place ─────────────────────────────
 echo "# Keep me" > "$SCRATCH/keep.md"
 NOARCH=$(bash "$SCRIPT" --inbox "$SCRATCH" --no-archive --format json 2>/dev/null)

@@ -287,8 +287,28 @@ dispatch_file() {
     return
   fi
 
+  # Compute the archive path BEFORE ingest so we can pass it as
+  # --source-display to l2-ingest. This way the Tank stores the
+  # archive path (where the original file will live post-processing)
+  # instead of the ephemeral tmp file we actually read content from.
+  # Consequence for queries: l2-query shows a meaningful source name
+  # (e.g. "myDex/inbox/.processed/20260421T192312Z-report.pdf") rather
+  # than "/var/folders/.../dexhub-inbox-ext-XXXXXX.md". --no-archive
+  # mode falls back to the original inbox path as display.
+  local display_path
+  local ts_for_display bn_for_display
+  ts_for_display=$(date -u +"%Y%m%dT%H%M%SZ")
+  bn_for_display=$(basename "$file")
+  if [ "$NO_ARCHIVE" = "0" ]; then
+    # Relative-to-repo-root path (most useful + stable for queries)
+    display_path="myDex/inbox/.processed/${ts_for_display}-${bn_for_display}"
+  else
+    # --no-archive keeps the file in inbox/, use that location as display
+    display_path="myDex/inbox/${bn_for_display}"
+  fi
+
   local ingest_out ingest_exit
-  ingest_out=$("$L2_INGEST" --source "$extract_tmp" 2>&1)
+  ingest_out=$("$L2_INGEST" --source "$extract_tmp" --source-display "$display_path" 2>&1)
   ingest_exit=$?
   rm -f "$extract_tmp"
 
@@ -306,10 +326,11 @@ dispatch_file() {
 
   local archive_path=""
   if [ "$NO_ARCHIVE" = "0" ]; then
-    local ts bn
-    ts=$(date -u +"%Y%m%dT%H%M%SZ")
-    bn=$(basename "$file")
-    archive_path="$ARCHIVE_DIR/${ts}-${bn}"
+    # Reuse the timestamp + basename from display_path computation above
+    # so the DB-stored source_path MATCHES the actual on-disk archive
+    # path. Without this, a slow machine could tick into the next second
+    # between the two date calls and the DB reference would drift.
+    archive_path="$ARCHIVE_DIR/${ts_for_display}-${bn_for_display}"
     mv "$file" "$archive_path" 2>/dev/null || archive_path=""
   fi
 

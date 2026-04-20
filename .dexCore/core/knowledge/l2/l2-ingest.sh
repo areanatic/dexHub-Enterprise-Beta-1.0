@@ -45,15 +45,23 @@ SOURCE_DIR=""
 GLOB="*.md"
 DRY_RUN=0
 MAX_CHUNK_SIZE=2048
+# --source-display PATH: override the source_path stored in DB with a
+# logical path (e.g., original filename / archive path) while still
+# reading content from the actual --source file on disk. Use case: the
+# inbox orchestrator extracts PDFs into temp files, but queries should
+# surface the original inbox filename as the source — not the tmp path.
+# Valid only with a single --source (validation below).
+SOURCE_DISPLAY=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --db)         DB="$2"; shift 2 ;;
-    --source)     SOURCES+=("$2"); shift 2 ;;
-    --source-dir) SOURCE_DIR="$2"; shift 2 ;;
-    --glob)       GLOB="$2"; shift 2 ;;
-    --dry-run)    DRY_RUN=1; shift ;;
-    --max-chunk)  MAX_CHUNK_SIZE="$2"; shift 2 ;;
+    --db)              DB="$2"; shift 2 ;;
+    --source)          SOURCES+=("$2"); shift 2 ;;
+    --source-dir)      SOURCE_DIR="$2"; shift 2 ;;
+    --source-display)  SOURCE_DISPLAY="$2"; shift 2 ;;
+    --glob)            GLOB="$2"; shift 2 ;;
+    --dry-run)         DRY_RUN=1; shift ;;
+    --max-chunk)       MAX_CHUNK_SIZE="$2"; shift 2 ;;
     --help|-h)
       sed -n '2,35p' "${BASH_SOURCE[0]}"
       exit 0
@@ -84,6 +92,18 @@ fi
 
 if [ "${#SOURCES[@]}" -eq 0 ]; then
   echo "ERROR: no sources given (use --source FILE or --source-dir DIR)" >&2
+  exit 1
+fi
+
+# --source-display is 1:1 with a single source. Batch use needs per-file
+# displays which we don't yet support (inbox-auto-parse calls us once per
+# file anyway, so this is fine). Enforce here to avoid silent mis-attribution.
+if [ -n "$SOURCE_DISPLAY" ] && [ "${#SOURCES[@]}" -gt 1 ]; then
+  echo "ERROR: --source-display requires exactly one --source (got ${#SOURCES[@]})" >&2
+  exit 1
+fi
+if [ -n "$SOURCE_DISPLAY" ] && [ -n "$SOURCE_DIR" ]; then
+  echo "ERROR: --source-display is incompatible with --source-dir" >&2
   exit 1
 fi
 
@@ -157,7 +177,16 @@ ingest_file() {
   fi
 
   abs_file="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
-  rel_path="$(relpath "$abs_file")"
+  # rel_path is what the DB stores as source_path. Default: file's own
+  # location relative to repo. Override via --source-display PATH when
+  # the caller knows a more meaningful logical source (e.g. inbox
+  # orchestrator passes the original filename / archive path instead
+  # of the ephemeral tmp file we actually read content from).
+  if [ -n "${SOURCE_DISPLAY:-}" ]; then
+    rel_path="$SOURCE_DISPLAY"
+  else
+    rel_path="$(relpath "$abs_file")"
+  fi
   src_type="$(infer_source_type "$rel_path")"
   src_hash="$(shasum -a 256 "$file" | cut -d' ' -f1)"
 
