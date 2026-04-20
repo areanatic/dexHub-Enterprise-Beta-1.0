@@ -216,8 +216,16 @@ extract_file() {
   [ -z "$file" ] && { echo "ERROR: --extract requires a file path" >&2; exit 1; }
   [ ! -f "$file" ] && { echo "ERROR: file not found: $file" >&2; exit 3; }
 
-  local probe probe_status probe_model
+  # Force JSON for the internal probe regardless of outer --format.
+  # Without this, --extract --format text (used by inbox-auto-parse.sh)
+  # would make probe_ollama_vlm emit human text, ruby JSON.parse would
+  # choke, and probe_status would be empty → adapter mis-reports as
+  # not-ready even when a model is happily pulled. Found 2026-04-22
+  # session-7 during pattern_a_vector_text development.
+  local probe probe_status probe_model saved_format="$FORMAT"
+  FORMAT=json
   probe=$(probe_ollama_vlm 2>/dev/null)
+  FORMAT="$saved_format"
   probe_status=$(echo "$probe" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"] rescue "probe_failed"' 2>/dev/null)
   probe_model=$(echo "$probe" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["model"] rescue ""' 2>/dev/null)
 

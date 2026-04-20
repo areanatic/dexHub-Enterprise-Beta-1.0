@@ -42,6 +42,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 PARSE_ROUTE="$SCRIPT_DIR/parse-route.sh"
 KREUZBERG="$SCRIPT_DIR/backends/kreuzberg.sh"
 OLLAMA_VLM="$SCRIPT_DIR/backends/ollama-vlm.sh"
+PATTERN_A="$SCRIPT_DIR/backends/pattern-a-vector-text.sh"
 L2_INGEST="$REPO_ROOT/.dexCore/core/knowledge/l2/l2-ingest.sh"
 L2_INIT="$REPO_ROOT/.dexCore/core/knowledge/l2/l2-init.sh"
 L2_TANK_DB="$REPO_ROOT/myDex/.dex/l2/tank.sqlite"
@@ -231,6 +232,14 @@ dispatch_file() {
     kreuzberg)
       if [ -x "$KREUZBERG" ]; then
         "$KREUZBERG" --extract "$file" --format text > "$extract_tmp" 2>/dev/null
+        extract_exit=$?
+      else
+        extract_exit=127
+      fi
+      ;;
+    pattern_a_vector_text)
+      if [ -x "$PATTERN_A" ]; then
+        "$PATTERN_A" --extract "$file" --format text > "$extract_tmp" 2>/dev/null
         extract_exit=$?
       else
         extract_exit=127

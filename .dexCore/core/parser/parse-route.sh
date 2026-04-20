@@ -203,18 +203,30 @@ else
         BACKEND="kreuzberg"
         STATUS="ready"
         REASON="PDF + kreuzberg installed (native PDF extraction, 91+ formats)"
+      elif [ "$(cap_backend_installed pattern_a_vector_text)" = "true" ]; then
+        # Pattern A — poppler pdftotext adapter. PDF-only, faster than
+        # kreuzberg, ships the full hint_type contract. Preferred over
+        # the legacy `native` branch below because it is a first-class
+        # adapter (install-prompted by capabilities-probe, structurally
+        # tested, pattern-compliant).
+        BACKEND="pattern_a_vector_text"
+        STATUS="ready"
+        REASON="PDF + pattern_a_vector_text (poppler pdftotext) installed — fast layout-preserving extraction"
       else
-        # Fallback — can we do a best-effort text extract with system pdftotext?
+        # Legacy fallback — pdftotext on PATH but capabilities-probe
+        # never ran. Same binary as pattern_a but without the adapter
+        # contract. Kept for backwards compatibility with users who
+        # skipped onboarding; remove in 1.1 once everyone's migrated.
         if command -v pdftotext >/dev/null 2>&1; then
           BACKEND="native"
           STATUS="ready"
-          REASON="kreuzberg not installed — falling back to system pdftotext"
-          HINT="For richer PDF extraction: install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg)"
+          REASON="kreuzberg + pattern_a both absent from capabilities.yaml — falling back to system pdftotext"
+          HINT="For richer PDF extraction: install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg). Or run 'bash .dexCore/core/parser/capabilities-probe.sh' to register your already-installed pdftotext as pattern_a."
         else
           BACKEND="none"
           STATUS="backend_missing"
-          REASON="PDF requires a backend (kreuzberg or system pdftotext)"
-          HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) or poppler-utils (ships pdftotext)."
+          REASON="PDF requires a backend (kreuzberg or poppler pdftotext)"
+          HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) or poppler (ships pdftotext)."
         fi
       fi
       ;;

@@ -137,10 +137,16 @@ extract_file() {
   [ ! -f "$file" ] && { echo "ERROR: file not found: $file" >&2; exit 3; }
 
   # Must be ready (or --require bypasses only the not-installed exit).
-  # We call the same probe + check status.
-  local probe_status probe_bin
+  # Force JSON locally for the internal probe: the probe function honors
+  # the outer $FORMAT, so a caller using --extract --format text (like
+  # inbox-auto-parse.sh) would otherwise get text output that ruby
+  # JSON.parse chokes on → probe_status empty → false "not ready" path.
+  # Found 2026-04-22 session-7 while adding pattern_a_vector_text.
+  local probe_status probe_bin saved_format="$FORMAT"
+  FORMAT=json
   probe_status=$(probe_kreuzberg | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"] rescue "probe_failed"' 2>/dev/null)
   probe_bin=$(probe_kreuzberg | ruby -rjson -e 'puts JSON.parse(STDIN.read)["binary"] rescue ""' 2>/dev/null)
+  FORMAT="$saved_format"
 
   if [ "$probe_status" != "ready" ]; then
     # Graceful — emit a JSON result with status=not_installed, or fail

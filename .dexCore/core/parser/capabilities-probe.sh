@@ -59,6 +59,7 @@ ONLY_BACKEND=""
 KNOWN_BACKENDS=(
   "kreuzberg:kreuzberg.sh"
   "ollama_vlm:ollama-vlm.sh"
+  "pattern_a_vector_text:pattern-a-vector-text.sh"
 )
 
 while [ $# -gt 0 ]; do

@@ -650,15 +650,23 @@ parser:
       - "Auto-probe shipped 2026-04-21 (parser.guided_setup_wizard + parse-route.sh wiring). Router now auto-invokes capabilities-probe.sh when capabilities.yaml is missing — first-run users with Ollama + a VLM model pulled get ollama_vlm routing without hand-editing any YAML. --no-auto-probe opts out for deterministic tests."
 
   - id: parser.pattern_a_vector_text
-    name: "Pattern A Skill (Vector+Text — Figma/designer PDFs)"
-    description: "Cheap Oversize: pdftotext -raw + overview PNG + correlate"
-    status: deferred
+    name: "Pattern A — Vector+Text PDF extraction (pdftotext adapter)"
+    description: "Shipped 2026-04-22 session-7 (Option C first slice). .dexCore/core/parser/backends/pattern-a-vector-text.sh wraps poppler's pdftotext CLI for fast, layout-preserving text extraction from PDFs that have a text layer (Figma exports, design mockups, PDFs generated from word processors). Role distinct from kreuzberg: kreuzberg handles the full 91+ format catalog with richer layout analysis; pattern_a is PDF-only, faster, smaller-footprint, and ships as the recommended fallback when kreuzberg isn't installed. Emits the full BACKEND-ADAPTER-PATTERN contract (status + setup_hint + hint_type + compliance=ok) and live-verified on developer machine against a generated PDF. Optional sips-based overview PNG (for future Pattern B integration) is deferred — this first slice is text-only."
+    status: enabled
     phase: 5.3.d
     enterprise_compliance: ok
-    requires: [poppler-utils, sips]
+    requires: [poppler-utils]
     depends_on: []
-    docs: .dexCore/_dev/docs/ADDITIONAL-MULTIMODAL-OVERSIZE-PARSING.md
-    tests: []
+    docs:
+      - .dexCore/_dev/docs/ADDITIONAL-MULTIMODAL-OVERSIZE-PARSING.md
+      - .dexCore/_dev/docs/BACKEND-ADAPTER-PATTERN.md
+    tests:
+      - tests/e2e/28-parser-pattern-a-backend.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Optional sips-based overview PNG is NOT shipped in this first slice — pattern_a produces text-only extraction today. Overview PNG correlation is scope for pattern_b_raster_6phase (1.1 roadmap) where it is architecturally load-bearing."
+      - "Only 'pdf' is in the supported[] list. If a user tries --extract on a non-PDF, pdftotext emits an error to stderr which we surface as status=extract_failed. Router should not route non-PDF to this adapter; callers that bypass the router get honest failure, not silent garbage."
+      - "Routing precedence: router prefers kreuzberg when installed (richer output), else pattern_a (fast PDF), else legacy native pdftotext fallback. The legacy fallback duplicates pattern_a's core capability — kept for backwards compatibility with users who skipped capabilities-probe. Candidate for removal in 1.1 once everyone's onboarded to capabilities.yaml."
 
   - id: parser.pattern_b_raster_6phase
     name: "Pattern B Skill (Raster 6-Phase Pipeline)"
@@ -1279,11 +1287,15 @@ counts:
   total: 84
   by_status:
     always_on: 7
-    enabled: 57
+    enabled: 58
     disabled: 0
-    deferred: 20
+    deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 7 (Option C ship — parser.pattern_a_vector_text).
+  # Net since previous session-7 update: 1 flip deferred → enabled
+  # (parser.pattern_a_vector_text, 5.3.d first slice with full hint_type contract).
+  # Total unchanged at 84; one deferred graduated.
   # Updated 2026-04-22 session 7 (Option B ship — parser.inbox_shortcut_setup).
   # Net since earlier session-7 update: +1 new enabled feature
   # (parser.inbox_shortcut_setup — Desktop shortcut creator, 5.3.h first slice).

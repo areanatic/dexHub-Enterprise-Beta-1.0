@@ -105,8 +105,8 @@ DexHub tracks every capability as an individually toggleable feature in [`.dexCo
 | Status | Count | What it means |
 |---|---|---|
 | `always_on` | 7 | Core infrastructure (DexMaster, SSOT compile, validate.sh, D1 state model, consent tracking) |
-| `enabled` | 57 | Shipped and tested — covered by this README |
-| `deferred` | 20 | Planned for 1.1 or later (Parser Pattern B raster pipeline, native Workflow-Runner backend, watcher mode for inbox) |
+| `enabled` | 58 | Shipped and tested — covered by this README |
+| `deferred` | 19 | Planned for 1.1 or later (Parser Pattern B raster pipeline, native Workflow-Runner backend, watcher mode for inbox) |
 | `experimental` | 0 | No features currently in experimental status |
 | `broken` | 0 | No known-broken shipping features. 3 P0/P1 "bugs" inherited from Playground tracking were reclassified 2026-04-19: 2 were Playground-only (app/server.js never ported to Beta), 1 was fixed (Atlassian MCP install.sh v2.0 interactive wizard). |
 
