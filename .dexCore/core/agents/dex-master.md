@@ -194,6 +194,7 @@
     <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
     <item cmd="*inbox" action="#inbox-auto-parse">📥 Process Inbox (*inbox) - route + extract + ingest all files in myDex/inbox/</item>
     <item cmd="*inbox-setup" action="#inbox-setup">🔗 Inbox Desktop Shortcut (*inbox-setup) - create (or remove) a Desktop shortcut pointing at myDex/inbox/</item>
+    <item cmd="*inbox-watch" action="#inbox-watch">👁️  Inbox Watcher (*inbox-watch) - continuously auto-process files as they arrive in myDex/inbox/</item>
     <item cmd="*enable-pack" action="#enable-pack" hidden="true">📦 Enable an agent pack (*enable-pack &lt;pack_id&gt;)</item>
     <item cmd="*disable-pack" action="#disable-pack" hidden="true">📦 Disable an agent pack (*disable-pack &lt;pack_id&gt;) — mandatory packs refuse</item>
     <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
@@ -451,6 +452,32 @@ What would you like to do?
 
       Safety contract: the script ONLY touches ~/Desktop/&lt;name&gt;. No repo writes.
       On macOS, uses a symlink (no TCC / Automation permission prompt).
+    </prompt>
+
+    <prompt id="inbox-watch">
+      Use Bash tool: `bash {project-root}/.dexCore/core/parser/inbox-watch.sh --once --format text`.
+      That runs a single pass (equivalent to *inbox) and exits — safe default
+      for the conversational flow. If the user explicitly asks for continuous
+      watching, invoke with `--start` and warn them it blocks until Ctrl-C
+      (not a daemon — nohup/tmux/systemd for background).
+
+      Render the script output as-is. In {communication_language}, add:
+        - If method=poll:   "✅ Watching every 10s. Drop files — they'll auto-ingest."
+        - If method=fswatch/inotify: "✅ Real-time watch via <method>. Zero CPU when idle."
+        - On missing PowerShell / inotify: quote the hint verbatim.
+
+      Useful overrides:
+        --once              single pass (default in this handler)
+        --start             continuous foreground watch
+        --interval N        poll interval seconds (poll method only)
+        --method fswatch    force fswatch (needs: brew install fswatch)
+        --method inotify    force inotifywait (needs: apt install inotify-tools)
+        --method poll       force polling (always works)
+        --inbox PATH        override inbox folder for this session
+
+      Safety contract: the watcher only ever invokes inbox-auto-parse.sh;
+      it never processes files outside the configured inbox. Same safety
+      envelope as *inbox.
     </prompt>
 
     <prompt id="parser-setup">

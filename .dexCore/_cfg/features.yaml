@@ -720,6 +720,25 @@ parser:
       - "macOS shortcut is a symlink, not a Finder Alias. Symlinks render with the curved-arrow badge and open the inbox folder when double-clicked. True Finder Aliases require osascript + Automation permission (TCC prompt) — not worth the friction for Beta 1.0."
       - "Live-verify gated behind CLAUDE_E2E_LIVE_INBOX_SETUP=1 (never touches real ~/Desktop; uses scratch dir via XDG_DESKTOP_DIR + HOME redirect)."
 
+  - id: parser.inbox_watcher
+    name: "Inbox Watcher (inbox-watch.sh + *inbox-watch menu)"
+    description: "Shipped Phase 5.3.i first slice (2026-04-21 session-7). .dexCore/core/parser/inbox-watch.sh continuously monitors the inbox + auto-processes files as they arrive. Wraps inbox-auto-parse.sh (does not duplicate its logic). Three detection methods auto-selected: fswatch (macOS/BSD, real-time kernel events) > inotifywait (Linux, real-time) > poll (universal fallback, find-based, 10s default). --once for single-pass / cron use, --dry-run for planning, --method override for explicit selection, --interval for poll tuning. Not a daemon — runs in foreground; users who want background use nohup/tmux/screen/systemd-user-service. De-duplication handled by inbox-auto-parse (processing an already-archived file = harmless no-op). Respects the same inbox-resolution precedence as inbox-auto-parse + inbox-setup."
+    status: enabled
+    phase: 5.3.i
+    enterprise_compliance: ok
+    requires: [bash, ruby]
+    optional_deps: [fswatch, inotify-tools]
+    depends_on: [parser.inbox_auto_parse]
+    docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
+    tests:
+      - tests/e2e/29-parser-inbox-watch.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Not daemonized. Foreground process — Ctrl-C stops. Users backgrounding via nohup/tmux/screen/systemd-user. Native systemd/launchd integration is deferred to 1.1 (scope: parser.inbox_watcher_daemon)."
+      - "Windows watch method not yet scaffolded. Current poll-fallback works on Windows bash (Git Bash / MSYS2 / WSL), but a native FileSystemWatcher PowerShell integration would be nicer. Scope: 1.1 (parser.inbox_watcher_windows_native)."
+      - "Poll method's 10s default interval is a tradeoff between latency + CPU. Users who drop files rarely can set --interval 60 (still low CPU); users wanting sub-second latency should install fswatch or inotifywait."
+      - "No lock file — running two inbox-watch processes against the same inbox is untested. inbox-auto-parse's archive mv is atomic (mv on POSIX is atomic within a filesystem) so race conditions would produce at-most-once processing, not double-processing, but no formal guarantee."
+
   - id: parser.guided_setup_wizard
     name: "Parser capabilities probe (parser.guided_setup_wizard) — probe-and-write layer"
     description: "Shipped Phase 5.3.g first slice (2026-04-21). .dexCore/core/parser/capabilities-probe.sh iterates every registered backend adapter (kreuzberg, ollama_vlm today), calls each --detect, and merges the results into myDex/.dex/config/capabilities.yaml. Closes the known_issue on both kreuzberg + ollama_vlm backends about 'router does not yet auto-probe'. User-owned fields (notes, preferences) are preserved across re-probes; script-owned fields (installed, version, compliance, last_probe, probe_status) are overwritten per-probe. Never clobbers user-edited YAML that's outside the probe-owned keys. Atomic write via mktemp + mv. Idempotent — re-runs are safe. Conversational wrapper (*parser-setup DexMaster menu entry invoking this script + offering install commands when backends missing) is a follow-up slice."
