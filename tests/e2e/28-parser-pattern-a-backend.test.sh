@@ -117,6 +117,19 @@ case "$EXTRACT_EXIT" in
 esac
 rm -f "$TMP_MD"
 
+# ─── FORMAT=json regression guard (2026-04-22 session-7 post-review) ─
+# The bug that prompted the fix was DISCOVERED here during pattern_a
+# development: extract_file() captured probe_status via ruby JSON.parse,
+# but probe honored outer $FORMAT. Text-mode extract → empty probe_status
+# → false "not ready" branch. This test exercises the text-mode path
+# that inbox-auto-parse.sh always uses.
+TEXT_OUT=$(bash "$ADAPTER" --extract README.md --format text 2>&1 || true)
+if echo "$TEXT_OUT" | grep -q "status= —"; then
+  fail "--extract --format text emits empty probe_status (FORMAT=json regression)"
+else
+  pass "--extract --format text: FORMAT=json save/restore holds (no empty-status signature)"
+fi
+
 # ─── --extract on missing file → exit 3 ─────────────────────────────
 bash "$ADAPTER" --extract "/tmp/does-not-exist-pa-${RANDOM}${RANDOM}.pdf" >/dev/null 2>&1
 MISS_EXIT=$?

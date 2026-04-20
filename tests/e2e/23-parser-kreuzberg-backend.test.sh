@@ -117,6 +117,21 @@ else
   fail "--detect: invariant field missing — status-vocabulary alone is not enough"
 fi
 
+# FORMAT=json regression guard (2026-04-22 session-7 post-review).
+# Bug: extract_file() captured probe_status via `probe | ruby -rjson`,
+# but the probe honors outer $FORMAT. Calling --extract --format text
+# would make probe emit text → ruby JSON.parse choke → empty probe_status
+# → false "not ready" branch fires even when backend is healthy. The fix
+# (local saved_format="$FORMAT"; FORMAT=json; ...; FORMAT="$saved_format")
+# prevents this. This assertion exercises the text-mode path that was
+# previously only integration-tested via inbox-auto-parse.sh.
+TEXT_OUT=$(bash "$ADAPTER" --extract README.md --format text 2>&1 || true)
+if echo "$TEXT_OUT" | grep -q "status= —"; then
+  fail "--extract --format text emits empty probe_status (FORMAT=json regression)"
+else
+  pass "--extract --format text: FORMAT=json save/restore holds (no empty-status signature)"
+fi
+
 # hint_type field (introduced 2026-04-22 session-7 Option E) — structured
 # categorization of setup_hint. Must be present and in the defined vocabulary.
 # status→hint_type mapping for this adapter:

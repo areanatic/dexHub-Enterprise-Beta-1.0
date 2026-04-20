@@ -610,6 +610,7 @@ parser:
       - "Policy gate today reads profile.company.data_handling_policy but only ollama_vlm backend is 'local_vlm_required' — block-path for cloud backends lights up when real cloud backends (future: cloud OCR) ship."
       - "System-pdftotext fallback assumes poppler-utils present. If not installed, PDFs without kreuzberg → status=backend_missing."
       - "Large-PDF path (≥oversize) returns status=deferred with backend=defer — the pattern_b raster pipeline that actually handles this is 1.1 roadmap."
+      - "capabilities.yaml↔PATH inconsistency (2026-04-22 session-7 final-review low-severity finding): if a user hand-edits capabilities.yaml claiming a backend as installed=true while the actual binary is missing from PATH, parse-route trusts the YAML + reports status=ready, but the adapter's own probe self-corrects to not_installed. Graceful fallback works (inbox-auto-parse surfaces extract_failed with adapter error), but diagnostics can be confusing. Fix path: parse-route could re-validate via the adapter's --detect instead of trusting YAML — deferred because it costs an extra shell-out per route call and the current design (capabilities-probe maintains YAML truth) is correct when users don't hand-edit. Low priority."
 
   - id: parser.kreuzberg_backend
     name: "Kreuzberg backend adapter (parser.kreuzberg_backend) — shell wrapper"
@@ -667,6 +668,7 @@ parser:
       - "Optional sips-based overview PNG is NOT shipped in this first slice — pattern_a produces text-only extraction today. Overview PNG correlation is scope for pattern_b_raster_6phase (1.1 roadmap) where it is architecturally load-bearing."
       - "Only 'pdf' is in the supported[] list. If a user tries --extract on a non-PDF, pdftotext emits an error to stderr which we surface as status=extract_failed. Router should not route non-PDF to this adapter; callers that bypass the router get honest failure, not silent garbage."
       - "Routing precedence: router prefers kreuzberg when installed (richer output), else pattern_a (fast PDF), else legacy native pdftotext fallback. The legacy fallback duplicates pattern_a's core capability — kept for backwards compatibility with users who skipped capabilities-probe. Candidate for removal in 1.1 once everyone's onboarded to capabilities.yaml."
+      - "Silent stderr drops on success (2026-04-22 session-7 final-review low-severity finding): when pdftotext exits 0 but writes warnings to stderr (font-decode issues, encoding substitutions), the adapter discards them. Corrupted-text PDFs produce replacement characters that slip through as valid content. Acceptable for the target use case (clean vector PDFs / Figma exports); would matter more for scanned-document PDFs which should go through ollama_vlm anyway. Fix path: surface stderr summary as a 'warnings' field in the success JSON — deferred until real-world data shows it's needed."
 
   - id: parser.pattern_b_raster_6phase
     name: "Pattern B Skill (Raster 6-Phase Pipeline)"

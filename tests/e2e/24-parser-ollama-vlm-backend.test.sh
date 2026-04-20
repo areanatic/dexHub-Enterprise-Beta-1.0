@@ -111,6 +111,17 @@ else
   fail "--detect: invariant field missing — vocab alone proves nothing"
 fi
 
+# FORMAT=json regression guard (2026-04-22 session-7 post-review).
+# Same fix pattern as kreuzberg.sh / pattern-a-vector-text.sh: extract_file
+# saves + restores outer FORMAT around internal probe call so text-mode
+# callers (inbox-auto-parse.sh) don't get empty probe_status.
+TEXT_OUT=$(bash "$ADAPTER" --extract README.md --format text 2>&1 || true)
+if echo "$TEXT_OUT" | grep -q "status= —"; then
+  fail "--extract --format text emits empty probe_status (FORMAT=json regression)"
+else
+  pass "--extract --format text: FORMAT=json save/restore holds (no empty-status signature)"
+fi
+
 # hint_type field (2026-04-22 session-7 Option E) — machine-readable
 # setup_hint category. Must be present and in the defined vocabulary.
 # ollama_vlm has the most interesting hint_type transitions:
