@@ -139,7 +139,16 @@ probe_ollama_vlm() {
 
   if [ -z "$bin" ]; then
     status="not_installed"
-    install_hint="Install Ollama (https://ollama.com), then: ollama pull llama3.2-vision  (or llava — any VLM listed at https://ollama.com/search?c=vision)"
+    # Honor --model override here too: if the user told us which model
+    # they want, the install hint names THEIR choice, not a generic
+    # default. Without this, `--model starcoder-vision` on a fresh box
+    # silently says "pull llama3.2-vision" — user's intent disappears.
+    # (Caught by 2026-04-21 critical review.)
+    if [ -n "$MODEL_OVERRIDE" ]; then
+      install_hint="Install Ollama (https://ollama.com), then: ollama pull $MODEL_OVERRIDE"
+    else
+      install_hint="Install Ollama (https://ollama.com), then: ollama pull llama3.2-vision  (or llava — any VLM listed at https://ollama.com/search?c=vision)"
+    fi
   else
     ollama_version=$("$bin" --version 2>&1 | head -1 | tr -d '\r' || echo "")
 

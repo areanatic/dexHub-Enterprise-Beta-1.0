@@ -151,17 +151,38 @@ else
   fail "--model override: unexpected status '$OV_STATUS'"
 fi
 if echo "$OV_HINT" | grep -q "nonexistent-model-zzz"; then
-  pass "--model override: hint mentions the requested model"
+  pass "--model override: hint mentions the requested model (in daemon-running state)"
 else
   # Fallback: if Ollama isn't installed (CI case) OR the daemon isn't
-  # reachable, the probe short-circuits BEFORE the model check and the
-  # hint naturally points at the prerequisite. All three variants are
-  # informative, so accept any of them.
-  if echo "$OV_HINT" | grep -qiE "daemon not reachable|not installed|install ollama|install the ollama|ollama pull"; then
-    pass "--model override: install / daemon-not-reachable hint surfaced (model check short-circuited)"
+  # reachable, the probe short-circuits BEFORE the model-already-pulled
+  # check. But the hint MUST STILL name the requested model (this was
+  # the 2026-04-21 review finding — adapter used to hardcode
+  # llama3.2-vision in the not-installed path, losing the user's choice).
+  if echo "$OV_HINT" | grep -qiE "daemon not reachable|ollama pull nonexistent-model-zzz"; then
+    pass "--model override: daemon-not-reachable hint OR install hint preserves the requested model"
   else
-    fail "--model override: hint unhelpful: '$OV_HINT'"
+    fail "--model override: hint lost user's model name" "got: '$OV_HINT'"
   fi
+fi
+
+# Dedicated regression guard: simulate CI (no ollama on PATH) and
+# assert that --model override is propagated to the install hint.
+# This catches the adapter-logic gap that slipped through the 2026-04-21
+# regex-widening fix (the adapter used to hardcode llama3.2-vision in
+# the not-installed path). Use env PATH to hide ollama from the probe.
+NO_OLLAMA_HINT=$(env PATH="/usr/bin:/bin" bash "$ADAPTER" --detect --model "quokka-vision-7b" 2>/dev/null | \
+  ruby -rjson -e 'puts JSON.parse(STDIN.read)["setup_hint"] rescue ""' 2>/dev/null)
+NO_OLLAMA_STATUS=$(env PATH="/usr/bin:/bin" bash "$ADAPTER" --detect --model "quokka-vision-7b" 2>/dev/null | \
+  ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"] rescue ""' 2>/dev/null)
+if [ "$NO_OLLAMA_STATUS" = "not_installed" ]; then
+  pass "--model + no-ollama-simulation: status=not_installed (probe short-circuits)"
+else
+  fail "--model + no-ollama-simulation: expected not_installed, got '$NO_OLLAMA_STATUS'"
+fi
+if echo "$NO_OLLAMA_HINT" | grep -q "quokka-vision-7b"; then
+  pass "--model override survives not-installed branch (hint names requested model)"
+else
+  fail "--model override lost in not-installed branch" "got hint: '$NO_OLLAMA_HINT'"
 fi
 
 # ─── --extract graceful on not-ready ────────────────────────────────
