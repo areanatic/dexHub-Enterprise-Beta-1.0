@@ -623,15 +623,23 @@ parser:
       - "Router integration (parse-route.sh) today decides 'backend=kreuzberg' if capabilities.yaml declares installed=true; it does NOT yet auto-probe via the adapter's --detect. That unification is a natural follow-up slice — most valuable once guided_setup_wizard (5.3.g) automates capabilities.yaml maintenance."
 
   - id: parser.ollama_vlm_backend
-    name: "Ollama VLM (GLM-OCR + RapidOCR)"
-    description: "Local-VLM OCR — Enterprise-Compliance default for DHL"
-    status: deferred
+    name: "Ollama VLM Backend adapter (parser.ollama_vlm_backend) — image → text via local vision model"
+    description: "Shipped Phase 5.3.c first slice (2026-04-21). Shell adapter at .dexCore/core/parser/backends/ollama-vlm.sh following BACKEND-ADAPTER-PATTERN.md. Takes an image, returns extracted text (descriptions + OCR) via a local Ollama VLM — auto-discovers from a priority list (llama3.2-vision, llava-llama3, llava, bakllava, moondream, minicpm-v, llava-phi3) or honors --model override. Respects OLLAMA_HOST env + --endpoint flag for LAN deployments. compliance: local_vlm_required — design invariant: cloud-VLM fallbacks are a DIFFERENT backend, never silently substituted; caller (router/orchestrator) gates policy. Status vocabulary adds 'partial' (Ollama installed but daemon unreachable OR no VLM pulled) alongside the standard {ready, not_installed, probe_failed, blocked}. Extract uses POST /api/generate with base64 image in images[]; 5-minute curl timeout; returns standard adapter JSON + VLM-specific siblings (model_used, eval_count, total_ms)."
+    status: enabled
     phase: 5.3.c
     enterprise_compliance: local_vlm_required
-    requires: [ollama]
+    requires: [bash, ruby, curl]
+    optional_deps: [ollama, "vision-model (llama3.2-vision / llava / moondream / …)"]
     depends_on: [parser.router]
-    docs: myDex/drafts/CONCEPT-DOCUMENT-PARSING-HOLISTIC-V2.md
-    tests: []
+    docs: .dexCore/_dev/docs/BACKEND-ADAPTER-PATTERN.md
+    tests:
+      - tests/e2e/24-parser-ollama-vlm-backend.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "User must pull a VLM model — we never automate `ollama pull` (4-8 GB download, user decision). Without model, --detect reports status=partial with a concrete hint."
+      - "Auto-discovery priority list is hardcoded. Models released after the list was written won't auto-pick; use --model to select newer ones. Future: read from .dexCore/_cfg/vision-models.yaml if the list churns."
+      - "Live behavioral coverage via CLAUDE_E2E_LIVE_VLM=1 in test 24 requires a VLM actually pulled on the target machine. Default CI runs structural-only. VLM inference on a 1x1 image is ~5-30s depending on model + hardware."
+      - "Router (parse-route.sh) decides 'backend=ollama_vlm' when capabilities.yaml declares installed=true; it does NOT yet auto-probe via this adapter's --detect. Same future-unification slice as the kreuzberg adapter (tied to guided_setup_wizard 5.3.g)."
 
   - id: parser.pattern_a_vector_text
     name: "Pattern A Skill (Vector+Text — Figma/designer PDFs)"
