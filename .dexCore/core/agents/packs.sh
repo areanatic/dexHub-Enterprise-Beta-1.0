@@ -71,6 +71,24 @@ pack_field() {
 }
 
 # ─── Discover manifests ─────────────────────────────────────────────
+# discover_packs_into <array_name> — fills a bash array NUL-safely so
+# manifest paths with spaces/newlines/unicode round-trip correctly. The
+# earlier pattern `for m in $(discover_packs)` word-split on $IFS and
+# broke the moment anyone put a space in a path.
+discover_packs_into() {
+  local _arr_name="$1"
+  local _f
+  # shellcheck disable=SC2086  # intentional: we evaluate the name
+  eval "$_arr_name=()"
+  while IFS= read -r -d '' _f; do
+    eval "$_arr_name+=(\"\$_f\")"
+  done < <(find "$MANIFESTS_DIR" -maxdepth 1 -type f -name "*.yaml" -print0 2>/dev/null | sort -z)
+}
+
+# Backwards-compat helper: for callers that legitimately want a newline-
+# joined string (only used in find_manifest's id-match loop, where we
+# then re-split safely). Kept for clarity — real iteration goes via
+# discover_packs_into.
 discover_packs() {
   find "$MANIFESTS_DIR" -maxdepth 1 -type f -name "*.yaml" 2>/dev/null | sort
 }
@@ -133,7 +151,10 @@ effective_state() {
 # ─── Manifest → pack_id map ─────────────────────────────────────────
 find_manifest() {
   local pack="$1"
-  for m in $(discover_packs); do
+  local _manifests=()
+  discover_packs_into _manifests
+  local m
+  for m in "${_manifests[@]}"; do
     local id
     id=$(pack_field "$m" "pack_id")
     if [ "$id" = "$pack" ]; then
@@ -145,17 +166,18 @@ find_manifest() {
 
 # ─── Subcommands ────────────────────────────────────────────────────
 cmd_list() {
-  local manifests
-  manifests=$(discover_packs)
-  if [ -z "$manifests" ]; then
+  local _manifests=()
+  discover_packs_into _manifests
+  if [ "${#_manifests[@]}" -eq 0 ]; then
     echo "No pack manifests found at $MANIFESTS_DIR"
     return
   fi
 
+  local m
   if [ "$FORMAT" = "json" ]; then
     local first=1
     echo "["
-    for m in $manifests; do
+    for m in "${_manifests[@]}"; do
       local pid name desc mand default state
       pid=$(pack_field "$m" "pack_id")
       name=$(pack_field "$m" "name")
@@ -180,7 +202,7 @@ cmd_list() {
   # Text format — aligned columns
   printf "%-22s %-14s %-10s %s\n" "PACK" "STATE" "MANDATORY" "NAME"
   printf "%-22s %-14s %-10s %s\n" "----" "-----" "---------" "----"
-  for m in $manifests; do
+  for m in "${_manifests[@]}"; do
     local pid name mand state
     pid=$(pack_field "$m" "pack_id")
     name=$(pack_field "$m" "name")

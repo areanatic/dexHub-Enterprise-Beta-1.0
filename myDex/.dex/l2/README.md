@@ -66,7 +66,7 @@ bash .dexCore/core/knowledge/l2/l2-detect-backend.sh
 # Expected: Status: READY, Semantic search: AVAILABLE
 
 # 4. Generate embeddings for already-ingested chunks
-#    (Phase 5.2.b-embed — ships in an upcoming slice. Today this is a no-op stub.)
+#    Live-verified 2026-04-21 — embedding generation is fully working.
 bash .dexCore/core/knowledge/l2/l2-embed.sh
 ```
 
@@ -95,7 +95,7 @@ sqlite3 myDex/.dex/l2/tank.sqlite "UPDATE meta SET value='ollama/all-minilm' WHE
 The backend router respects `profile.company.data_handling_policy` (set via onboarding Q43):
 
 - `local_only` / `lan_only` → only Ollama-backed models run. Cloud embedding backends are blocked.
-- `cloud_llm_allowed` / `hybrid` → cloud backends (OpenAI, Anthropic embeddings) opt-in with consent — implementation ships in 5.2.b-enterprise-audit.
+- `cloud_llm_allowed` / `hybrid` → cloud backends (OpenAI, Anthropic embeddings) opt-in with consent. Policy enforcement is live (shipped 2026-04-20, see `knowledge.l2_tank_enterprise_compliance`); the cloud backend implementations themselves are future slices — blocks fire before any network call, so nothing leaks.
 
 Default backend is local. Enterprise users never get cloud embeddings unless they explicitly opt in.
 

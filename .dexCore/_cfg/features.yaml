@@ -1003,6 +1003,45 @@ quality:
 # ─────────────────────────────────────────────────────────────────────────
 # META — the feature-registry itself + enterprise mode
 # ─────────────────────────────────────────────────────────────────────────
+skills:
+  - id: skills.copilot_skill_library
+    name: "Copilot Skill Library (.github/skills/) — 12 lazy-loaded knowledge capsules"
+    description: "Registry entry for the 12 Copilot skills at .github/skills/ — closes the README badge ↔ feature-registry parity gap surfaced in the 2026-04-21 consistency review. Each skill is a SKILL.md + companion assets, lazy-loaded by Copilot when the user's query matches the skill's domain. Skills ship in-repo (not a separate install). Enterprise-bound bundle preserves the full set via build-for-enterprise.sh (no stripping)."
+    status: always_on
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: [core.dexmaster_orchestrator]
+    docs: .github/skills/
+    tests: []
+    primary_target: github_copilot
+    skills_inventory:
+      - dexhub-about
+      - dexhub-architecture
+      - dexhub-chronicle
+      - dexhub-core
+      - dexhub-devmode
+      - dexhub-guardrails
+      - dexhub-integrations
+      - dexhub-platform-awareness
+      - dhl-accessibility
+      - dhl-brand-foundations
+      - dhl-layout-patterns
+      - dhl-ui-components
+
+  - id: skills.claude_code_testing_skill
+    name: "Claude Code integration skill (.claude/skills/dexhub-testing)"
+    description: "Claude-Code-specific skill for running the DexHub test suite — part of the removable Claude Code integration module. Stripped by build-for-enterprise.sh alongside the rest of .claude/."
+    status: enabled
+    phase: 1.0
+    enterprise_compliance: ok
+    requires: []
+    depends_on: []
+    docs: .claude/skills/
+    tests: []
+    integration_module: claude-code
+    primary_target: github_copilot
+
 meta:
   - id: meta.features_yaml
     name: "Feature-Flag Registry (this file)"

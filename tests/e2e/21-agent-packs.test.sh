@@ -172,6 +172,31 @@ else
   fail "unknown pack handling weird"
 fi
 
+# ─── Space-safe manifest discovery (hardening 2026-04-21) ───────────
+# Regression guard: packs.sh used to iterate `for m in $(discover_packs)`
+# which word-split on $IFS. A manifest path containing a space split into
+# two entries and the iteration broke. Now uses NUL-delimited find + bash
+# array, which survives spaces / newlines / unicode / quotes in the path.
+SPACE_DIR=$(mktemp -d -t "dex pack space-XXXXXX")
+cp .dexCore/core/agents/packs/core_pack.yaml "$SPACE_DIR/core_pack.yaml"
+cp .dexCore/core/agents/packs/meta_pack.yaml "$SPACE_DIR/meta_pack.yaml"
+SPACE_OUT=$(bash .dexCore/core/agents/packs.sh --manifests "$SPACE_DIR" list 2>&1)
+# Must see both packs in output — if word-splitting ate the path, neither
+# would be parsed.
+if echo "$SPACE_OUT" | grep -qE "^core_pack" && echo "$SPACE_OUT" | grep -qE "^meta_pack"; then
+  pass "Space in manifest path: list still enumerates all packs"
+else
+  fail "Space-path regression: not all packs enumerated from path with space"
+fi
+# status subcommand also survives
+SPACE_STATUS=$(bash .dexCore/core/agents/packs.sh --manifests "$SPACE_DIR" status meta_pack 2>&1)
+if echo "$SPACE_STATUS" | grep -q "^Pack:[[:space:]]*meta_pack"; then
+  pass "Space in manifest path: find_manifest() resolves meta_pack"
+else
+  fail "Space-path regression: find_manifest() broke on space"
+fi
+rm -rf "$SPACE_DIR"
+
 # ─── Manifest-referenced agent files exist ──────────────────────────
 # core_pack references agents that SHOULD exist
 for f in dex-master.md mydex-agent.md mydex-project-manager.md; do

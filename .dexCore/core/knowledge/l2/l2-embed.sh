@@ -263,6 +263,11 @@ STREAM_FILE=$(mktemp -t dexhub-l2-embed-stream-XXXXXX)
 SQL_FILE=$(mktemp -t dexhub-l2-embed-sql-XXXXXX)
 COUNTS_FILE=$(mktemp -t dexhub-l2-embed-counts-XXXXXX)
 
+# EXIT trap — cleans up temp files on early exit (Ctrl+C, bash error,
+# Ollama crash mid-batch). Without this, interrupted runs leak MBs of
+# intermediate vector JSON per pending chunk into /tmp/.
+trap 'rm -f "$STREAM_FILE" "$SQL_FILE" "$COUNTS_FILE" 2>/dev/null || true' EXIT INT TERM
+
 printf "%s" "$CHUNKS_JSON" | ruby -rjson -ropen3 -e '
   chunks = JSON.parse(STDIN.read)
   endpoint = ARGV[0]
