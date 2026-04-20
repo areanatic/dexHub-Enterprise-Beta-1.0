@@ -298,7 +298,12 @@ fi
 # are legal in filenames), and the escape-layer should produce the
 # doubled-apostrophe form. Simulate by exercising --dry-run (which
 # never calls PS) and verifying the script accepts the name.
-APOS_JSON=$(bash "$SCRIPT" --dry-run --inbox "$SCRATCH_INBOX" --name "Arash's Inbox" --format json 2>/dev/null)
+# Uses an explicit scratch Desktop via XDG_DESKTOP_DIR so CI runners
+# without $HOME/Desktop don't exit 3 before the name-validation path.
+APOS_SCRATCH=$(mktemp -d -t dex-apos-XXXXXX)
+mkdir -p "$APOS_SCRATCH/Desktop" "$APOS_SCRATCH/inbox"
+APOS_JSON=$(XDG_DESKTOP_DIR="$APOS_SCRATCH/Desktop" HOME="$APOS_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$APOS_SCRATCH/inbox" --name "Arash's Inbox" --format json 2>/dev/null)
 APOS_EXIT=$?
 APOS_NAME=$(echo "$APOS_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_name"]' 2>/dev/null)
 if [ "$APOS_EXIT" = "0" ] && [ "$APOS_NAME" = "Arash's Inbox" ]; then
@@ -306,6 +311,7 @@ if [ "$APOS_EXIT" = "0" ] && [ "$APOS_NAME" = "Arash's Inbox" ]; then
 else
   fail "apostrophe name rejected or mangled: exit=$APOS_EXIT name='$APOS_NAME'"
 fi
+rm -rf "$APOS_SCRATCH"
 
 # ─── Cosmetic: known_issue on parser.inbox_auto_parse is retired ────
 # Session-7 closes the "Desktop-shortcut creation is NOT in this slice" note.

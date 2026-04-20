@@ -223,15 +223,28 @@ resolve_desktop_dir() {
   fi
   local user_dirs="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
   if [ -f "$user_dirs" ]; then
+    # Extract via ruby rather than sed with complex bash-escaped quotes.
+    # BSD sed (macOS) + GNU sed (Linux) interpret the triple-escaped
+    # `["'"'"']?` pattern differently — CI (ubuntu) was returning empty
+    # on a pattern that worked on macOS. Ruby's regex is portable and
+    # handles quoted/unquoted + internal-space values uniformly.
+    # Handles:
+    #   XDG_DESKTOP_DIR="$HOME/Schreibtisch"   (default quoted form)
+    #   XDG_DESKTOP_DIR=/custom/path           (unquoted absolute)
+    #   XDG_DESKTOP_DIR='single-quoted'        (alt quote)
+    #   # XDG_DESKTOP_DIR=...                  (commented — skipped)
     local parsed
-    # Extract the XDG_DESKTOP_DIR value. Handles:
-    #   XDG_DESKTOP_DIR="$HOME/Schreibtisch"  (default quoted form)
-    #   XDG_DESKTOP_DIR=/custom/path          (unquoted absolute)
-    #   # XDG_DESKTOP_DIR=...                 (commented — skip)
-    parsed=$(grep -E '^[[:space:]]*XDG_DESKTOP_DIR=' "$user_dirs" 2>/dev/null \
-             | grep -vE '^[[:space:]]*#' \
-             | head -1 \
-             | sed -E 's/^[[:space:]]*XDG_DESKTOP_DIR=["'"'"']?([^"'"'"']*)["'"'"']?[[:space:]]*$/\1/')
+    parsed=$(ruby -e '
+      val = nil
+      File.foreach(ARGV[0]) do |line|
+        next if line =~ /^\s*#/
+        m = line.match(/^\s*XDG_DESKTOP_DIR=(?:"([^"]*)"|'"'"'([^'"'"']*)'"'"'|(\S+))/)
+        next unless m
+        val = m[1] || m[2] || m[3]
+        break
+      end
+      puts val if val
+    ' "$user_dirs" 2>/dev/null)
     if [ -n "$parsed" ]; then
       # Substitute $HOME literally (xdg-user-dirs convention).
       parsed="${parsed//\$HOME/$HOME}"
