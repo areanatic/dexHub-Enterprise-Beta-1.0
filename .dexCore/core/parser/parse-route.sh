@@ -61,12 +61,22 @@ FILE=""
 # already learned from the 2026-04-08 RZP screenshot incident.
 OVERSIZE_BYTES=$((100 * 1024 * 1024))   # 100 MB
 
+# Auto-probe: when capabilities.yaml is missing, call the adapter probe
+# (capabilities-probe.sh --dry-run --format json) once and use the
+# in-memory result for backend-installed lookups. Keeps first-run users
+# from needing to remember the setup step. --no-auto-probe opts out for
+# deterministic test runs that want pure-capabilities.yaml behavior.
+AUTO_PROBE_ENABLED=1
+PROBE_JSON=""
+AUTO_PROBE_USED="false"
+
 while [ $# -gt 0 ]; do
   case "$1" in
-    --format)       FORMAT="$2"; shift 2 ;;
-    --capabilities) CAPS="$2"; shift 2 ;;
-    --profile)      PROFILE="$2"; shift 2 ;;
-    --oversize)     OVERSIZE_BYTES="$2"; shift 2 ;;
+    --format)          FORMAT="$2"; shift 2 ;;
+    --capabilities)    CAPS="$2"; shift 2 ;;
+    --profile)         PROFILE="$2"; shift 2 ;;
+    --oversize)        OVERSIZE_BYTES="$2"; shift 2 ;;
+    --no-auto-probe)   AUTO_PROBE_ENABLED=0; shift ;;
     --help|-h)
       sed -n '2,52p' "${BASH_SOURCE[0]}"
       exit 0
@@ -101,14 +111,48 @@ EXISTS=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) r
 # Default so bash arithmetic doesn't blow up on malformed SIZE
 [ -z "$SIZE" ] || ! [[ "$SIZE" =~ ^[0-9]+$ ]] && SIZE=0
 
+# ─── Auto-probe (when capabilities.yaml missing) ────────────────────
+# Closes the known_issue flagged on both kreuzberg + ollama_vlm
+# adapters: the router used to return backend_missing whenever the
+# user hadn't hand-edited capabilities.yaml. Now: if the file is
+# missing AND auto-probe is enabled (default), we call the probe
+# script once in --dry-run mode and keep the JSON in memory. No file
+# writes. If the user wants pure capabilities.yaml behavior (e.g. for
+# a deterministic test), pass --no-auto-probe.
+if [ "$AUTO_PROBE_ENABLED" = "1" ] && [ ! -f "$CAPS" ]; then
+  PROBE_SCRIPT="$SCRIPT_DIR/capabilities-probe.sh"
+  if [ -x "$PROBE_SCRIPT" ]; then
+    PROBE_JSON=$("$PROBE_SCRIPT" --dry-run --format json 2>/dev/null || echo "")
+    if [ -n "$PROBE_JSON" ] && printf "%s" "$PROBE_JSON" | ruby -rjson -e 'JSON.parse(STDIN.read)' >/dev/null 2>&1; then
+      AUTO_PROBE_USED="true"
+    else
+      PROBE_JSON=""  # malformed — fall through to file-based (which is missing)
+    fi
+  fi
+fi
+
 # ─── Read capabilities.yaml (which backends are installed) ──────────
-# Grep-based extraction — handles the simple key-value layout in our
-# template. Users who hand-craft weird YAML get defaults (= backend
-# missing) and should re-run the guided_setup_wizard when that ships.
+# Two sources, checked in order: (1) in-memory probe JSON if auto-probe
+# fired; (2) capabilities.yaml on disk. Grep-based YAML extraction
+# handles the simple template layout. Users who hand-craft weird YAML
+# get defaults (= backend missing) and should re-run capabilities-probe.sh.
 cap_backend_installed() {
   local name="$1"
+
+  # Source #1: in-memory probe JSON (only populated when auto-probe fired)
+  if [ -n "$PROBE_JSON" ]; then
+    local probe_status
+    probe_status=$(printf "%s" "$PROBE_JSON" | ruby -rjson -e '
+      arr = JSON.parse(STDIN.read) rescue []
+      r = arr.find { |x| x["backend"] == ARGV[0] }
+      puts (r && r["status"] == "ready") ? "true" : "false"
+    ' "$name" 2>/dev/null)
+    echo "${probe_status:-false}"
+    return
+  fi
+
+  # Source #2: capabilities.yaml on disk
   [ ! -f "$CAPS" ] && { echo "false"; return; }
-  # Find the "$name:" block and look for "installed: true" in the next 4 lines.
   if awk -v target="$name:" '
     $0 ~ "^    "target {in_block=1; next}
     in_block && /^    [a-z]+:/ {in_block=0}
@@ -224,17 +268,20 @@ if [ "$FORMAT" = "text" ]; then
   exit 0
 fi
 
-# JSON (default)
+# JSON (default). auto_probe_used surfaces whether the router had to
+# invoke capabilities-probe.sh because capabilities.yaml was missing —
+# useful for debugging first-run / fresh-install routing decisions.
 ruby -rjson -e '
   out = {
-    "file"       => ARGV[0],
-    "type"       => ARGV[1],
-    "size_bytes" => ARGV[2].to_i,
-    "backend"    => ARGV[3],
-    "reason"     => ARGV[4],
-    "status"     => ARGV[5],
-    "policy"     => ARGV[6],
-    "hint"       => ARGV[7]
+    "file"             => ARGV[0],
+    "type"             => ARGV[1],
+    "size_bytes"       => ARGV[2].to_i,
+    "backend"          => ARGV[3],
+    "reason"           => ARGV[4],
+    "status"           => ARGV[5],
+    "policy"           => ARGV[6],
+    "hint"             => ARGV[7],
+    "auto_probe_used"  => ARGV[8] == "true"
   }
   puts JSON.pretty_generate(out)
-' "$FILE" "$TYPE" "$SIZE" "$BACKEND" "$REASON" "$STATUS" "$POLICY" "$HINT"
+' "$FILE" "$TYPE" "$SIZE" "$BACKEND" "$REASON" "$STATUS" "$POLICY" "$HINT" "$AUTO_PROBE_USED"

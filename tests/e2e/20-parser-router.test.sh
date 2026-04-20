@@ -267,4 +267,47 @@ else
   fail "features.yaml: parser.capabilities_yaml NOT registered"
 fi
 
+# ─── Auto-probe (5.3.g follow-up wiring, 2026-04-21) ────────────────
+# Router now invokes capabilities-probe.sh when capabilities.yaml is
+# missing, so first-run users don't need to hand-edit the file before
+# the router can discover backends. --no-auto-probe opts out.
+
+# A router output MUST include the auto_probe_used field
+AUTO_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$SCRATCH/missing-caps.yaml" "$SCRATCH/a.txt" 2>/dev/null)
+if echo "$AUTO_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); exit(d.key?("auto_probe_used") ? 0 : 1)' 2>/dev/null; then
+  pass "JSON: auto_probe_used field present"
+else
+  fail "JSON: auto_probe_used field missing"
+fi
+
+# When capabilities.yaml is missing AND auto-probe is enabled (default):
+# auto_probe_used must be true. The routing DECISION will depend on
+# what backends this machine has (ollama installed? kreuzberg installed?).
+# We only assert the probe fired; not the backend choice.
+AUTO_USED=$(echo "$AUTO_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
+if [ "$AUTO_USED" = "true" ]; then
+  pass "missing capabilities.yaml + auto-probe enabled → auto_probe_used=true"
+else
+  fail "missing caps + auto-probe enabled: auto_probe_used=$AUTO_USED (expected true)"
+fi
+
+# --no-auto-probe → auto_probe_used=false (opt-out works)
+NOAP_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$SCRATCH/missing-caps.yaml" --no-auto-probe "$SCRATCH/a.txt" 2>/dev/null)
+NOAP_USED=$(echo "$NOAP_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
+if [ "$NOAP_USED" = "false" ]; then
+  pass "--no-auto-probe: auto_probe_used=false (opt-out respected)"
+else
+  fail "--no-auto-probe: auto_probe_used=$NOAP_USED (expected false)"
+fi
+
+# When capabilities.yaml EXISTS (no need to probe):
+# auto_probe_used must be false regardless of default
+WITH_CAPS_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$CUSTOM_CAPS" "$SCRATCH/a.txt" 2>/dev/null)
+WITH_CAPS_USED=$(echo "$WITH_CAPS_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
+if [ "$WITH_CAPS_USED" = "false" ]; then
+  pass "existing capabilities.yaml → auto_probe_used=false (no unnecessary probe)"
+else
+  fail "existing caps: auto_probe_used=$WITH_CAPS_USED (expected false)"
+fi
+
 test_summary
