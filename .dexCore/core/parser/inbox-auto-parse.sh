@@ -43,6 +43,8 @@ PARSE_ROUTE="$SCRIPT_DIR/parse-route.sh"
 KREUZBERG="$SCRIPT_DIR/backends/kreuzberg.sh"
 OLLAMA_VLM="$SCRIPT_DIR/backends/ollama-vlm.sh"
 L2_INGEST="$REPO_ROOT/.dexCore/core/knowledge/l2/l2-ingest.sh"
+L2_INIT="$REPO_ROOT/.dexCore/core/knowledge/l2/l2-init.sh"
+L2_TANK_DB="$REPO_ROOT/myDex/.dex/l2/tank.sqlite"
 CONFIG_YAML="$REPO_ROOT/.dexCore/_cfg/config.yaml"
 
 DRY_RUN=0
@@ -129,6 +131,15 @@ fi
 
 ARCHIVE_DIR="$INBOX/.processed"
 [ "$NO_ARCHIVE" = "0" ] && [ "$DRY_RUN" = "0" ] && mkdir -p "$ARCHIVE_DIR"
+
+# Auto-init the L2 Tank if it's missing. Without this, first-run users
+# (and clean CI runners) hit an l2-ingest "DB not initialized" error and
+# see ingest_failed across the whole batch. l2-init.sh is idempotent —
+# safe to call even when the DB already exists. (2026-04-21 CI finding:
+# local env had a tank from earlier tests; CI didn't.)
+if [ "$DRY_RUN" = "0" ] && [ ! -f "$L2_TANK_DB" ] && [ -x "$L2_INIT" ]; then
+  "$L2_INIT" >/dev/null 2>&1 || true
+fi
 
 # ─── Collect pending files ──────────────────────────────────────────
 PENDING=()
