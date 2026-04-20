@@ -860,9 +860,9 @@ quality:
 
   - id: quality.validate_sh_§23_features_yaml
     name: "validate.sh §23 features.yaml consistency check"
-    description: "Enforce README claims match features.yaml status (always_on|enabled only)"
-    status: deferred
-    phase: 5.1.c (this session, follow-up commit)
+    description: "Shipped (2026-04-19 in Tier-1 cleanup). §23 in validate.sh loads features.yaml and enforces: (a) every feature row has a valid status field ∈ {always_on|enabled|disabled|deferred|broken|experimental}, (b) README/menu-level claims reference only always_on|enabled entries (no claim-to-deferred leakage), (c) all referenced test files exist on disk. Runs on every validate.sh invocation — part of the 270-check gate. Parallel to §24 session-anchor + §21 deprecated-phrases."
+    status: enabled
+    phase: 5.1.c
     enterprise_compliance: ok
     requires: []
     depends_on: [meta.features_yaml]
@@ -987,9 +987,9 @@ meta:
 
   - id: meta.enterprise_compliance_doc
     name: "Enterprise Compliance Matrix doc"
-    description: ".dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md — per-feature compliance stance"
-    status: deferred
-    phase: 5.1.c (this session)
+    description: "Shipped 2026-04-19. `.dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md` (11KB) — per-feature compliance stance covering data-handling policies (local_only / lan_only / cloud_llm_allowed / hybrid), backend routing rules for the Knowledge Layer, connector consent flow, and enterprise-bound artifact stripping via build-for-enterprise.sh. Cross-referenced from README + PLATFORM-POLICY.md."
+    status: enabled
+    phase: 5.1.c
     enterprise_compliance: ok
     requires: []
     depends_on: [meta.features_yaml]
@@ -1011,9 +1011,9 @@ meta:
 
   - id: meta.readme_honesty_pass
     name: "README Honesty Pass"
-    description: "Claims in README align with features.yaml status; deferred/broken explicitly labeled"
-    status: deferred
-    phase: 5.1.c (this session)
+    description: "Shipped 2026-04-19. README badges reflect real counts (agents=46, workflows=46, skills=12 — verified against features.yaml). 'Data-local' replaces the old '100% local' badge that conflated data-locality with LLM-locality. Feature Matrix section links to features.yaml. Known-broken items (P0 Atlassian MCP) explicitly labeled. §23 enforces claim-vs-status consistency on every validate.sh run."
+    status: enabled
+    phase: 5.1.c
     enterprise_compliance: ok
     requires: []
     depends_on: [meta.features_yaml]
