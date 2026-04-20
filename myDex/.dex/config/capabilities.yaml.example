@@ -1,0 +1,52 @@
+# DexHub Parser — capabilities.yaml (TEMPLATE)
+# ==========================================================
+# Declares which parser backends this user has installed + their
+# compliance stance. Read by parser.router (`.dexCore/core/parser/
+# parse-route.sh`) to decide which backend (if any) to route files to.
+#
+# This template ships in-repo. Copy to myDex/.dex/config/capabilities.yaml
+# (gitignored) and edit as you install backends. Future: the guided
+# setup wizard (parser.guided_setup_wizard, Phase 5.3.g) will create +
+# maintain this file automatically.
+#
+# Backend statuses are user-owned: the router reads, never writes.
+
+schema_version: "1"
+
+parser:
+  # Each backend has: installed (bool), version (str|null),
+  # compliance (one of: ok | local_vlm_required | cloud_only), notes
+  backends:
+
+    # Kreuzberg — 91+ format native parser, Rust. Handles PDF + Office
+    # (docx, xlsx, pptx, odt, …). MIT license. Ships Phase 5.3.b.
+    kreuzberg:
+      installed: false
+      version: null
+      compliance: ok
+      notes: "Install: brew install kreuzberg (planned). Local, no cloud."
+
+    # Ollama VLM — vision + OCR via a local Ollama vision model. Used
+    # for images, screenshots, mixed-layout PDFs (pattern_a path).
+    # Ships Phase 5.3.c. Local only (compliance=local_vlm_required).
+    ollama_vlm:
+      installed: false
+      version: null
+      compliance: local_vlm_required
+      notes: "Install: ollama pull llava  (or another vision model)."
+
+    # Pattern A — vector PDF text extraction (cheap, fast, native).
+    # For Figma-exported PDFs and text-heavy vector documents.
+    # Ships Phase 5.3.d.
+    pattern_a_vector_text:
+      installed: false
+      version: null
+      compliance: ok
+      notes: "Part of kreuzberg integration — enables Figma PDF path."
+
+  # User preferences override the router's default backend choice.
+  # Null = use router's default; set to a backend name to pin.
+  preferences:
+    default_pdf_backend: null       # "kreuzberg" | "native" | null
+    default_image_backend: null     # "ollama_vlm" | null
+    prefer_native_fallback: true    # if chosen backend missing, try native

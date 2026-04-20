@@ -569,15 +569,23 @@ knowledge:
 # ─────────────────────────────────────────────────────────────────────────
 parser:
   - id: parser.router
-    name: "Tool-Parser-Router architecture"
-    description: "Dispatches extract requests to right backend based on file-type + user preference"
-    status: deferred
+    name: "Tool-Parser-Router (parse-route.sh + detect-mime.sh)"
+    description: "Shipped Phase 5.3.a (2026-04-21). Decides which parser backend handles a given file, based on extension-detected type + file size + capabilities.yaml (which backends installed) + profile.company.data_handling_policy (policy gate). Mirrors the proven L2 Tank backend-routing pattern: detect → graceful status → honest hint. Always exits 0 — 'nothing to route' is an answer, not an error. Min-viable decision tree covers text/code/data/email (→ native, always works), pdf (→ kreuzberg if installed, else system pdftotext fallback, else backend_missing), office (→ kreuzberg, or backend_missing), image (→ ollama_vlm, or backend_missing), archive (→ unsupported), unknown (→ unsupported). Large PDFs (≥100MB by default, overridable via --oversize) defer to the pattern_b raster 6-phase pipeline scheduled for roadmap 1.1. Does NOT invoke backends — that's inbox_auto_parse (5.3.f) and individual backend scripts. Does NOT install or probe backends — capabilities.yaml is user-owned (guided_setup_wizard 5.3.g will maintain it). Stable JSON output shape: {file, type, size_bytes, backend, reason, status, policy, hint}."
+    status: enabled
     phase: 5.3.a
     enterprise_compliance: ok
-    requires: []
-    depends_on: []
+    requires: [bash, ruby]
+    depends_on: [parser.capabilities_yaml]
     docs: myDex/drafts/CONCEPT-PARSER-ARCHITECTURE.md
-    tests: []
+    tests:
+      - tests/e2e/20-parser-router.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Extension-first classification — magic-byte sniffing deferred to 5.3.b+ if real-world usage reveals brittleness. Files without an extension or with mismatched extensions may misroute."
+      - "capabilities.yaml uses a minimal grep+awk parser (handles the template layout; hand-crafted multi-level anchors may fall through to defaults = backend missing). Guided wizard (5.3.g) will own schema compliance."
+      - "Policy gate today reads profile.company.data_handling_policy but only ollama_vlm backend is 'local_vlm_required' — block-path for cloud backends lights up when real cloud backends (future: cloud OCR) ship."
+      - "System-pdftotext fallback assumes poppler-utils present. If not installed, PDFs without kreuzberg → status=backend_missing."
+      - "Large-PDF path (≥oversize) returns status=deferred with backend=defer — the pattern_b raster pipeline that actually handles this is 1.1 roadmap."
 
   - id: parser.kreuzberg_backend
     name: "Kreuzberg Integration (91+ formats, MIT)"
@@ -648,15 +656,20 @@ parser:
     tests: []
 
   - id: parser.capabilities_yaml
-    name: "capabilities.yaml (backend state tracking)"
-    description: "Records what's installed, which backends active, user preferences"
-    status: deferred
-    phase: 5.3.h
+    name: "capabilities.yaml (backend state tracking) — template shipped"
+    description: "Shipped Phase 5.3.a (2026-04-21) as part of parser.router. myDex/.dex/config/capabilities.yaml.example is the tracked in-repo template. Users copy to capabilities.yaml (gitignored — user-owned) and edit as backends get installed. Schema v1 covers parser.backends.{kreuzberg,ollama_vlm,pattern_a_vector_text} with {installed, version, compliance, notes} per backend plus parser.preferences for override knobs. Router reads this file read-only via parse-route.sh --capabilities PATH (default: myDex/.dex/config/capabilities.yaml). Automated maintenance (probe installed backends, write status) ships with parser.guided_setup_wizard (Phase 5.3.g) — today the template + manual edit is the contract."
+    status: enabled
+    phase: 5.3.a
     enterprise_compliance: ok
     requires: []
     depends_on: []
     docs: myDex/drafts/CONCEPT-DOCUMENT-PARSING-HOLISTIC-V2.md
-    tests: []
+    tests:
+      - tests/e2e/20-parser-router.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Manual YAML edits today. guided_setup_wizard (5.3.g) will probe + write automatically; until then users follow the template comments."
+      - "Schema v1 only covers parser backends. Future v2 may add other subsystems (e.g. voice backends, connector cache) under top-level keys."
 
   - id: parser.license_audit_enforcer
     name: "License Audit (block AGPL/GPL/commercial backends)"
