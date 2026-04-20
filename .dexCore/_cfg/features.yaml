@@ -487,6 +487,25 @@ knowledge:
       - "vector_json stored as TEXT (JSON array of floats) — inspectable but ~6-8× more bytes than BLOB float32. Schema v2 migration when a tank crosses ~100k chunks."
       - "Opt-in live test coverage via CLAUDE_E2E_LIVE_EMBED=1 in tests/e2e/17-*. Default CI runs structural-only (always green)."
 
+  - id: knowledge.l2_tank_hybrid_query
+    name: "L2 Tank — hybrid query (BM25 + semantic cosine)"
+    description: "Shipped Phase 5.2.b-hybrid-query (2026-04-20). Extends l2-query.sh with three explicit modes — --keyword-only, --hybrid, --semantic-only — plus an 'auto' default that routes to hybrid when embeddings + Ollama backend are both ready, else falls back to keyword-only. --alpha N (0..1) tunes the blend weight on the keyword side (default 0.5). Hybrid math is done in Ruby at query time: query is embedded via Ollama's /api/embeddings, candidate chunks are fetched from FTS5 top-K keyword matches plus all embedded chunks (capped at 500), and each is scored as α·keyword_norm + (1-α)·cosine_sim_shifted. BM25 is negative in FTS5 so it's flipped + range-normalized to 0..1; cosine is shifted from [-1,1] to [0,1]. JSON output gains a 'mode' field + per-result keyword_score + semantic_score + hybrid_score breakdown. Markdown output shows both scores inline when hybrid is active: (rank: 0.81, kw: 0.55, sem: 1.07). Mode banner in non-quiet output reports the effective mode. --quiet suppresses the banner so copilot-wire drift-check remains clean."
+    status: enabled
+    phase: 5.2.b-hybrid-query
+    enterprise_compliance: backend_gated
+    requires: [bash, sqlite3, ruby, curl]
+    optional_deps: [ollama, "nomic-embed-text-model"]
+    depends_on: [knowledge.l2_tank_query, knowledge.l2_tank_embed, knowledge.l2_tank_backend_routing]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/18-l2-tank-hybrid-query.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Candidate universe capped at 500 embedded chunks per query — sufficient for Beta 1.0 scale. Larger tanks need approximate-nearest-neighbor (HNSW/FAISS); out of scope until 100k+ chunks become common."
+      - "Sequential curl-per-query-embed (single call). Throughput bottleneck is Ollama, not our code. At 768 dim + ~500 chunks, post-embed scoring is <50ms in Ruby."
+      - "--alpha edge cases (0.0 = pure semantic, 1.0 = pure keyword) work but --semantic-only is a cleaner way to get the former (no FTS5 query issued). Users should prefer the explicit flag."
+      - "Opt-in live test coverage via CLAUDE_E2E_LIVE_EMBED=1 in tests/e2e/18-*. Default CI runs structural-only (always green)."
+
   - id: knowledge.l2_tank_backend_routing
     name: "L2 Tank — backend detection + graceful degradation"
     description: "Shipped Phase 5.2.b-embed-detect (2026-04-20). Two helper scripts (l2-detect-backend.sh + l2-status.sh) plus a user-facing mode banner in l2-query.sh make the keyword-vs-hybrid routing visible and honest. Detection reports one of { ready | partial | none | blocked | deferred } without side effects — probes Ollama daemon + model-pulled state cheaply, reads profile.company.data_handling_policy for compliance, and emits text OR JSON. l2-status.sh is a dashboard combining tank state (chunks, embedding coverage, last ingest) with backend status into a single command. The banner in l2-query.sh is suppressed by --quiet (keeps copilot-wire drift-check clean) and otherwise tells the user which mode they're getting plus the concrete next step to enable semantic. Keyword-only works regardless — L2 never blocks on a missing Ollama install."

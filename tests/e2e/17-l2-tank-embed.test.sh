@@ -153,10 +153,10 @@ else
 fi
 
 # ─── features.yaml + L2-TANK.md references ──────────────────────────
-if grep -q "l2_tank_embed" .dexCore/_cfg/features.yaml; then
-  pass "features.yaml: knowledge.l2_tank_embed registered"
+if grep -qE "^\s+- id: knowledge\.l2_tank_embed\b" .dexCore/_cfg/features.yaml; then
+  pass "features.yaml: knowledge.l2_tank_embed registered as a feature entry"
 else
-  fail "features.yaml: knowledge.l2_tank_embed NOT registered"
+  fail "features.yaml: knowledge.l2_tank_embed NOT registered (as '- id:' entry)"
 fi
 
 # ─── UX hint in l2-ingest.sh ────────────────────────────────────────

@@ -192,10 +192,10 @@ STATUS THIS COMMIT: **STUB**. Emits `[L2 STUB] query not yet implemented — FTS
 - ✅ **5.2.b-wire-copilot** (2026-04-20) — build-instructions.sh bakes L2 seed-query results into copilot-instructions.md
 - ✅ **5.2.b-embed-detect** (2026-04-20) — `l2-detect-backend.sh` + `l2-status.sh` + mode banner in query. Graceful-degradation cornerstone.
 - ✅ **5.2.b-embed** (2026-04-20) — `l2-embed.sh` generates embeddings via Ollama `/api/embeddings`. Default model: `nomic-embed-text` (137 MB / 768 dim). Idempotent; `--all` refresh; `--dry-run`; `--require-backend` for scripts. Graceful exit 0 when backend not ready.
-- ⬜ **5.2.b-hybrid-query** — Adds BM25 + cosine-similarity hybrid ranking to `l2-query.sh`. `--keyword-only` / `--hybrid` / `--semantic-only` flags, tunable `--alpha`. Consumes embeddings table populated by 5.2.b-embed.
+- ✅ **5.2.b-hybrid-query** (2026-04-20) — BM25 + cosine hybrid ranking in `l2-query.sh`. `--keyword-only` / `--hybrid` / `--semantic-only` / `--alpha` flags. Auto-mode routes based on embeddings + backend readiness. JSON adds a `mode` field + per-result score breakdown.
 - ⬜ **5.2.b-enterprise-audit** — enterprise_compliance per backend; `data_handling_policy=local_only` blocks cloud backends.
 
-Total realistic effort: 1-1.5 weeks across ~4-6 sessions. 7 of 9 slices shipped (2026-04-20).
+8 of 9 slices shipped (2026-04-20). Only enterprise-audit remaining for the 5.2.b arc.
 
 ## Routing & Graceful Degradation
 
