@@ -274,110 +274,17 @@ SQL
 )
   [ -z "$SEM_CANDIDATES" ] && SEM_CANDIDATES="[]"
 
+  # Invoke the external ruby helper. We used to inline the script via
+  # `ruby - <<HEREDOC` + piped stdin; that pattern silently ate the piped
+  # data because the HEREDOC occupied stdin and `-` told ruby to read
+  # the script from stdin too. Moving the script into l2-hybrid-rank.rb
+  # lets stdin carry the candidate JSON blobs cleanly. (Bug caught in
+  # first live run 2026-04-21.)
+  HYBRID_SCRIPT="$SCRIPT_DIR/l2-hybrid-rank.rb"
   RAW_JSON=$(printf '%s\x0c%s' "$KW_CANDIDATES" "$SEM_CANDIDATES" | \
-    L2_QUERY_TEXT="$QUERY" ruby -rjson -ropen3 - "$EFFECTIVE_MODE" "$ALPHA" "$TOP" "http://localhost:11434" "${BACKEND#*/}" <<'HYBRID_RUBY'
-mode = ARGV[0]
-alpha = ARGV[1].to_f
-top = ARGV[2].to_i
-endpoint = ARGV[3]
-model = ARGV[4]
-
-payload = STDIN.read
-kw_json, sem_json = payload.split("\x0c", 2)
-kw_arr  = (kw_json  && !kw_json.empty?)  ? JSON.parse(kw_json)  : []
-sem_arr = (sem_json && !sem_json.empty?) ? JSON.parse(sem_json) : []
-
-query_text = ENV["L2_QUERY_TEXT"] || ""
-body = JSON.generate({"model" => model, "prompt" => query_text})
-out, _, status = Open3.capture3("curl", "-sS", "--max-time", "60", "-X", "POST",
-  endpoint + "/api/embeddings",
-  "-H", "Content-Type: application/json",
-  "-d", body)
-unless status.success? && !out.empty?
-  STDERR.puts "ERROR: query embedding failed (http)"
-  puts "[]"
-  exit 2
-end
-qresp = JSON.parse(out)
-qvec = qresp["embedding"]
-unless qvec.is_a?(Array) && qvec.length > 0
-  STDERR.puts "ERROR: query embedding empty"
-  puts "[]"
-  exit 2
-end
-qnorm = Math.sqrt(qvec.reduce(0.0) { |s, x| s + x * x })
-
-by_id = {}
-kw_arr.each do |row|
-  by_id[row["id"]] = { row: row, kw_rank: row["kw_rank"].to_f, embedding: nil }
-end
-sem_arr.each do |row|
-  id = row["id"]
-  if by_id[id]
-    by_id[id][:embedding] = row["embedding"]
-  else
-    by_id[id] = { row: row, kw_rank: nil, embedding: row["embedding"] }
-  end
-end
-
-kw_ranks = by_id.values.map { |v| v[:kw_rank] }.compact
-kw_max = kw_ranks.empty? ? nil : kw_ranks.min
-kw_min = kw_ranks.empty? ? nil : kw_ranks.max
-kw_range = (kw_max && kw_min) ? (kw_min - kw_max) : 0
-
-results = []
-by_id.each do |id, v|
-  sem_score = 0.0
-  if v[:embedding] && !v[:embedding].to_s.empty?
-    chunk_vec = JSON.parse(v[:embedding]) rescue nil
-    if chunk_vec.is_a?(Array) && chunk_vec.length == qvec.length
-      dot = 0.0
-      cnorm = 0.0
-      chunk_vec.each_with_index do |x, i|
-        dot += x * qvec[i]
-        cnorm += x * x
-      end
-      cnorm = Math.sqrt(cnorm)
-      cos = (qnorm > 0 && cnorm > 0) ? (dot / (qnorm * cnorm)) : 0.0
-      sem_score = (cos + 1.0) / 2.0
-    end
-  end
-
-  kw_score = 0.0
-  if v[:kw_rank] && kw_range > 0
-    kw_score = (kw_min - v[:kw_rank]) / kw_range
-  elsif v[:kw_rank]
-    kw_score = 1.0
-  end
-
-  hybrid = 0.0
-  case mode
-  when "hybrid"
-    hybrid = alpha * kw_score + (1.0 - alpha) * sem_score
-  when "semantic-only"
-    hybrid = sem_score
-  end
-
-  next if mode == "semantic-only" && (v[:embedding].nil? || v[:embedding].to_s.empty?)
-  next if mode == "hybrid" && v[:kw_rank].nil? && sem_score == 0.0
-
-  results << {
-    "id" => id,
-    "title" => v[:row]["title"],
-    "source_path" => v[:row]["source_path"],
-    "source_type" => v[:row]["source_type"],
-    "content" => v[:row]["content"],
-    "rank" => hybrid,
-    "keyword_score" => kw_score.round(4),
-    "semantic_score" => sem_score.round(4),
-    "hybrid_score" => hybrid.round(4)
-  }
-end
-
-results.sort_by! { |r| -r["rank"] }
-puts JSON.generate(results[0...top])
-HYBRID_RUBY
-)
+    L2_QUERY_TEXT="$QUERY" ruby "$HYBRID_SCRIPT" \
+      "$EFFECTIVE_MODE" "$ALPHA" "$TOP" "http://localhost:11434" "${BACKEND#*/}" \
+      2>/dev/null)
   [ -z "$RAW_JSON" ] && RAW_JSON="[]"
 fi
 

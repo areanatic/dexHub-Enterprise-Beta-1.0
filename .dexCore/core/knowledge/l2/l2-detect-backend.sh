@@ -43,15 +43,21 @@ DEFAULT_BACKEND="ollama/nomic-embed-text"
 
 # Optional DB to read meta.default_embedding_backend from
 DB=""
+# Ollama endpoint — default is the canonical local daemon address.
+# Overridable so tests and users with non-default Ollama installs can probe
+# the right host. Also lets us simulate "no backend" in structural tests by
+# pointing at an unreachable URL.
+OLLAMA_ENDPOINT="http://localhost:11434"
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --format)  FORMAT="$2"; shift 2 ;;
-    --quiet)   QUIET=1; shift ;;
-    --db)      DB="$2"; shift 2 ;;
-    --backend) DEFAULT_BACKEND="$2"; shift 2 ;;
+    --format)   FORMAT="$2"; shift 2 ;;
+    --quiet)    QUIET=1; shift ;;
+    --db)       DB="$2"; shift 2 ;;
+    --backend)  DEFAULT_BACKEND="$2"; shift 2 ;;
+    --endpoint) OLLAMA_ENDPOINT="$2"; shift 2 ;;
     --help|-h)
-      sed -n '2,30p' "${BASH_SOURCE[0]}"
+      sed -n '2,34p' "${BASH_SOURCE[0]}"
       exit 0
       ;;
     *)
@@ -76,7 +82,7 @@ MODEL="${BACKEND#*/}"
 # ─── Check Ollama availability ──────────────────────────────────────
 OLLAMA_INSTALLED="false"
 OLLAMA_RUNNING="false"
-OLLAMA_ENDPOINT="http://localhost:11434"
+# OLLAMA_ENDPOINT set at the top from --endpoint argv or default
 MODEL_PULLED="false"
 
 if command -v ollama >/dev/null 2>&1; then

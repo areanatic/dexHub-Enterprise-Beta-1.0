@@ -80,7 +80,11 @@ if ! sqlite3 "$DB" "SELECT value FROM meta WHERE key='schema_version'" >/dev/nul
 fi
 
 # ─── Backend detection (reuse helper) ───────────────────────────────
-DETECT_JSON=$("$SCRIPT_DIR/l2-detect-backend.sh" --db "$DB" --format json 2>/dev/null || echo "{}")
+# Propagate --endpoint so users (and tests) that point at a non-default
+# Ollama host get consistent detect-vs-embed answers — otherwise detect
+# says "ready" (probing localhost:11434) while embed fails to reach the
+# user-specified host.
+DETECT_JSON=$("$SCRIPT_DIR/l2-detect-backend.sh" --db "$DB" --format json --endpoint "$OLLAMA_ENDPOINT" 2>/dev/null || echo "{}")
 BACKEND=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["backend"] || "ollama/nomic-embed-text"' 2>/dev/null)
 PROVIDER=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["provider"] || "ollama"' 2>/dev/null)
 MODEL=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["model"] || "nomic-embed-text"' 2>/dev/null)
@@ -252,6 +256,13 @@ DIMENSIONS=0
 # embedding call INSIDE ruby to avoid the shell-escape nightmare.
 # Two-stage: ruby emits the OK|dims|vector output per chunk, bash collects.
 
+# mktemp produces paths whose lifetime we control — avoids the PID mismatch
+# trap that bit us on first live run (ruby's Process.pid ≠ bash's $$ when the
+# filename is interpolated inside the ruby -e block).
+STREAM_FILE=$(mktemp -t dexhub-l2-embed-stream-XXXXXX)
+SQL_FILE=$(mktemp -t dexhub-l2-embed-sql-XXXXXX)
+COUNTS_FILE=$(mktemp -t dexhub-l2-embed-counts-XXXXXX)
+
 printf "%s" "$CHUNKS_JSON" | ruby -rjson -ropen3 -e '
   chunks = JSON.parse(STDIN.read)
   endpoint = ARGV[0]
@@ -284,13 +295,17 @@ printf "%s" "$CHUNKS_JSON" | ruby -rjson -ropen3 -e '
       STDOUT.write "ERR\t#{id}\thttp-failed\0"
     end
   end
-' "$OLLAMA_ENDPOINT" "$MODEL" > /tmp/l2-embed-stream.$$ 2>/dev/null
+' "$OLLAMA_ENDPOINT" "$MODEL" > "$STREAM_FILE" 2>/dev/null
 
-# Now process the stream and INSERT into DB. Ruby again for NUL-safe SQL gen.
+# Process the stream → build SQL + per-chunk counts. Ruby again for NUL-safe
+# SQL generation. Output path for SQL is passed as ARGV[3] so we don't get
+# bitten by ruby's Process.pid vs bash's $$ mismatch (our first live run's
+# bug).
 ruby -rjson -e '
   db = ARGV[0]
   backend = ARGV[1]
   stream_file = ARGV[2]
+  sql_file = ARGV[3]
   data = File.binread(stream_file)
   ok = 0
   fail_count = 0
@@ -315,20 +330,20 @@ ruby -rjson -e '
   end
   sql_statements << "COMMIT;"
 
-  File.write("/tmp/l2-embed-sql.#{Process.pid}", sql_statements.join("\n"))
+  File.write(sql_file, sql_statements.join("\n"))
   STDOUT.puts "#{ok}\t#{fail_count}\t#{dims_first}"
-' "$DB" "$BACKEND" "/tmp/l2-embed-stream.$$" > /tmp/l2-embed-counts.$$ 2>/dev/null
+' "$DB" "$BACKEND" "$STREAM_FILE" "$SQL_FILE" > "$COUNTS_FILE" 2>/dev/null
 
 # Apply the SQL
-if [ -f "/tmp/l2-embed-sql.$$" ]; then
-  sqlite3 "$DB" < "/tmp/l2-embed-sql.$$" 2>/dev/null
+if [ -s "$SQL_FILE" ]; then
+  sqlite3 "$DB" < "$SQL_FILE" 2>/dev/null
 fi
 
-if [ -f "/tmp/l2-embed-counts.$$" ]; then
-  read -r OK_COUNT FAIL_COUNT DIMENSIONS < "/tmp/l2-embed-counts.$$"
+if [ -s "$COUNTS_FILE" ]; then
+  read -r OK_COUNT FAIL_COUNT DIMENSIONS < "$COUNTS_FILE"
 fi
 
-rm -f "/tmp/l2-embed-stream.$$" "/tmp/l2-embed-sql.$$" "/tmp/l2-embed-counts.$$"
+rm -f "$STREAM_FILE" "$SQL_FILE" "$COUNTS_FILE"
 
 # ─── Finalize audit row ─────────────────────────────────────────────
 if [ -n "${RUN_ID:-}" ]; then
