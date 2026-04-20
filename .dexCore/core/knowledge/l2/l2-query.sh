@@ -179,10 +179,36 @@ if [ "$FORMAT" = "json" ]; then
   exit 0
 fi
 
+# Compute the mode banner shown to users (skipped in --quiet for build-bake).
+# KEYWORD-ONLY today. HYBRID banner + logic lands in the next slice
+# (5.2.b-hybrid-query). We still emit a forward-looking hint so users know
+# semantic ranking is optional and how to enable it.
+compute_mode_banner() {
+  local emb_count
+  emb_count=$(sqlite3 "$DB" "SELECT COUNT(*) FROM embeddings" 2>/dev/null || echo 0)
+  if [ "$emb_count" -gt 0 ]; then
+    # Will become a real HYBRID banner in slice 3
+    echo "Mode: KEYWORD-ONLY (BM25 via FTS5) — hybrid ranking ships in 5.2.b-hybrid-query"
+  else
+    local detect_out hint
+    detect_out=$("$SCRIPT_DIR/l2-detect-backend.sh" --format json --db "$DB" 2>/dev/null || echo "")
+    hint=$(printf "%s" "$detect_out" | grep -oE '"setup_hint":[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"setup_hint":[[:space:]]*"//; s/"$//')
+    if [ -n "$hint" ]; then
+      echo "Mode: KEYWORD-ONLY (BM25 via FTS5)  ·  enable semantic: $hint"
+    else
+      echo "Mode: KEYWORD-ONLY (BM25 via FTS5)"
+    fi
+  fi
+}
+
 # Markdown output
 if [ "$QUIET" = "0" ]; then
   echo "# L2 TANK — results for \"$QUERY\""
   echo ""
+  if [ -x "$SCRIPT_DIR/l2-detect-backend.sh" ]; then
+    echo "  $(compute_mode_banner)"
+    echo ""
+  fi
   if [ "$RESULT_COUNT" = "0" ]; then
     echo "No matches in $TOTAL_CHUNKS indexed chunks."
     echo ""

@@ -468,6 +468,22 @@ knowledge:
     tests: []
     primary_target: github_copilot
 
+  - id: knowledge.l2_tank_backend_routing
+    name: "L2 Tank — backend detection + graceful degradation"
+    description: "Shipped Phase 5.2.b-embed-detect (2026-04-20). Two helper scripts (l2-detect-backend.sh + l2-status.sh) plus a user-facing mode banner in l2-query.sh make the keyword-vs-hybrid routing visible and honest. Detection reports one of { ready | partial | none | blocked | deferred } without side effects — probes Ollama daemon + model-pulled state cheaply, reads profile.company.data_handling_policy for compliance, and emits text OR JSON. l2-status.sh is a dashboard combining tank state (chunks, embedding coverage, last ingest) with backend status into a single command. The banner in l2-query.sh is suppressed by --quiet (keeps copilot-wire drift-check clean) and otherwise tells the user which mode they're getting plus the concrete next step to enable semantic. Keyword-only works regardless — L2 never blocks on a missing Ollama install."
+    status: enabled
+    phase: 5.2.b-embed-detect
+    enterprise_compliance: ok
+    requires: [bash, sqlite3, ruby, curl]
+    depends_on: [knowledge.l2_tank_init, knowledge.l2_tank_query]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/16-l2-tank-backend-detect.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Detection probes Ollama at http://localhost:11434 — hardcoded for Beta 1.0. Custom endpoints require script edit (future: OLLAMA_HOST env var)."
+      - "YAML policy parser is grep-based (handles flat `company.data_handling_policy:` lines). Nested anchors or block-style indentation edge cases may miss — covered by Beta 1.0's profile.yaml.example structure."
+
   - id: knowledge.l3_chronicle
     name: "L3 Chronicle + CONTEXT.md"
     description: "Session diaries + state persistence (already exists)"
