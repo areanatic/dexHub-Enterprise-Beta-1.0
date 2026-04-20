@@ -716,7 +716,7 @@ parser:
     primary_target: github_copilot
     known_issues:
       - "Windows .lnk support deferred to 1.1 roadmap. Manual workaround in the setup script's error message: Right-click the myDex/inbox folder in Explorer → Send To → Desktop (create shortcut)."
-      - "Linux Desktop detection uses XDG_DESKTOP_DIR env override if set, else falls back to $HOME/Desktop. Full xdg-user-dirs.dirs parsing (Linux users with localized 'Schreibtisch' etc.) is 1.1 scope."
+      - "Linux Desktop resolution priority (shipped 2026-04-21 session-7 Option 3): XDG_DESKTOP_DIR env var > $XDG_CONFIG_HOME/user-dirs.dirs file parse > $HOME/Desktop default. Handles localized desktop environments (Schreibtisch/Bureau/桌面/デスクトップ) via the user-dirs.dirs layer. Comment lines in user-dirs.dirs are skipped. Previously only env var + hard-coded default — Linux users with localized file managers got 'desktop_missing' false-negative."
       - "macOS shortcut is a symlink, not a Finder Alias. Symlinks render with the curved-arrow badge and open the inbox folder when double-clicked. True Finder Aliases require osascript + Automation permission (TCC prompt) — not worth the friction for Beta 1.0."
       - "Live-verify gated behind CLAUDE_E2E_LIVE_INBOX_SETUP=1 (never touches real ~/Desktop; uses scratch dir via XDG_DESKTOP_DIR + HOME redirect)."
 

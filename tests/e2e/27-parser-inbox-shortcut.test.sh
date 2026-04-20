@@ -170,6 +170,67 @@ else
   fail "dex-master.md: inbox-setup prompt doesn't reference the script"
 fi
 
+# ─── XDG_DESKTOP_DIR full xdg-user-dirs.dirs resolution (session-7) ─
+# Priority: env var > user-dirs.dirs file > $HOME/Desktop default.
+# Localized Linux (Schreibtisch / Bureau / 桌面) now works via file parse.
+XDG_SCRATCH=$(mktemp -d -t dex-xdg-XXXXXX)
+mkdir -p "$XDG_SCRATCH/.config" "$XDG_SCRATCH/Schreibtisch" "$XDG_SCRATCH/inbox"
+
+# Case 1: env var takes priority
+mkdir -p "$XDG_SCRATCH/custom"
+XDG_ENV_JSON=$(XDG_DESKTOP_DIR="$XDG_SCRATCH/custom" HOME="$XDG_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
+XDG_ENV_PATH=$(echo "$XDG_ENV_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
+if echo "$XDG_ENV_PATH" | grep -q "/custom/"; then
+  pass "XDG_DESKTOP_DIR env var takes priority over user-dirs.dirs"
+else
+  fail "XDG env priority failed: got '$XDG_ENV_PATH'"
+fi
+
+# Case 2: user-dirs.dirs with German locale (\$HOME/Schreibtisch)
+cat > "$XDG_SCRATCH/.config/user-dirs.dirs" <<'UDIRS'
+# Localized Linux Desktop folder
+XDG_DESKTOP_DIR="$HOME/Schreibtisch"
+XDG_DOWNLOAD_DIR="$HOME/Downloads"
+UDIRS
+# unset XDG_DESKTOP_DIR so file-based path is used
+LOC_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
+LOC_PATH=$(echo "$LOC_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
+if echo "$LOC_PATH" | grep -q "/Schreibtisch/"; then
+  pass "xdg-user-dirs.dirs file: localized Desktop (Schreibtisch) resolved"
+else
+  fail "xdg-user-dirs resolution failed: got '$LOC_PATH'"
+fi
+
+# Case 3: commented-out line must be ignored (edge-case hardening)
+cat > "$XDG_SCRATCH/.config/user-dirs.dirs" <<'UDIRS'
+# XDG_DESKTOP_DIR="$HOME/ShouldBeIgnored"
+XDG_DESKTOP_DIR="$HOME/Schreibtisch"
+UDIRS
+IGN_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
+IGN_PATH=$(echo "$IGN_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
+if echo "$IGN_PATH" | grep -q "/Schreibtisch/" && ! echo "$IGN_PATH" | grep -q "ShouldBeIgnored"; then
+  pass "xdg-user-dirs.dirs: commented lines are skipped"
+else
+  fail "xdg-user-dirs comment handling: got '$IGN_PATH'"
+fi
+
+# Case 4: no env, no user-dirs.dirs → default $HOME/Desktop
+mkdir -p "$XDG_SCRATCH/Desktop"
+rm -f "$XDG_SCRATCH/.config/user-dirs.dirs"
+DEF_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
+DEF_PATH=$(echo "$DEF_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
+if echo "$DEF_PATH" | grep -qE "/Desktop/"; then
+  pass "no env + no user-dirs.dirs → defaults to \$HOME/Desktop"
+else
+  fail "XDG fallback-default failed: got '$DEF_PATH'"
+fi
+
+rm -rf "$XDG_SCRATCH"
+
 # ─── Cosmetic: known_issue on parser.inbox_auto_parse is retired ────
 # Session-7 closes the "Desktop-shortcut creation is NOT in this slice" note.
 IAP_BODY=$(awk '/- id: parser\.inbox_auto_parse/{flag=1; print; next} flag && /^  - id: / {exit} flag {print}' .dexCore/_cfg/features.yaml)

@@ -207,10 +207,43 @@ case "$PLATFORM" in
     ;;
 esac
 
-# ─── Desktop dir existence check ────────────────────────────────────
-# Respect XDG_DESKTOP_DIR on Linux if set, else fall back to ~/Desktop.
-# (Full xdg-user-dirs.dirs parsing is 1.1 scope — see known_issues.)
-DESKTOP="${XDG_DESKTOP_DIR:-$HOME/Desktop}"
+# ─── Desktop dir resolution ─────────────────────────────────────────
+# Priority:
+#   1. $XDG_DESKTOP_DIR env var (most explicit — user knows what they want)
+#   2. $XDG_CONFIG_HOME/user-dirs.dirs line for XDG_DESKTOP_DIR
+#      (set by xdg-user-dirs-update on Linux; respects locale, so
+#      German systems have "Schreibtisch", French "Bureau", Chinese
+#      "桌面", Japanese "デスクトップ", etc.). Closes session-7 XDG
+#      known_issue — previously only env-var + hard-coded default,
+#      broke for localized Linux desktop environments.
+#   3. Default: $HOME/Desktop (works on macOS always, works on
+#      English-locale Linux, works when no xdg setup exists)
+resolve_desktop_dir() {
+  if [ -n "${XDG_DESKTOP_DIR:-}" ]; then
+    printf '%s' "$XDG_DESKTOP_DIR"
+    return
+  fi
+  local user_dirs="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
+  if [ -f "$user_dirs" ]; then
+    local parsed
+    # Extract the XDG_DESKTOP_DIR value. Handles:
+    #   XDG_DESKTOP_DIR="$HOME/Schreibtisch"  (default quoted form)
+    #   XDG_DESKTOP_DIR=/custom/path          (unquoted absolute)
+    #   # XDG_DESKTOP_DIR=...                 (commented — skip)
+    parsed=$(grep -E '^[[:space:]]*XDG_DESKTOP_DIR=' "$user_dirs" 2>/dev/null \
+             | grep -vE '^[[:space:]]*#' \
+             | head -1 \
+             | sed -E 's/^[[:space:]]*XDG_DESKTOP_DIR=["'"'"']?([^"'"'"']*)["'"'"']?[[:space:]]*$/\1/')
+    if [ -n "$parsed" ]; then
+      # Substitute $HOME literally (xdg-user-dirs convention).
+      parsed="${parsed//\$HOME/$HOME}"
+      printf '%s' "$parsed"
+      return
+    fi
+  fi
+  printf '%s' "$HOME/Desktop"
+}
+DESKTOP=$(resolve_desktop_dir)
 if [ ! -d "$DESKTOP" ]; then
   emit "desktop_missing" 3 "Desktop directory not found at $DESKTOP — create it first or pass --dry-run."
 fi
