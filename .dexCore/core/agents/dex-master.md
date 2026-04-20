@@ -19,6 +19,15 @@
       - If file matches any pattern → BLOCK read and notify user with reason
       - Enforcement is automatic for all subsequent file operations
       - Guardian rules are NON-BYPASSABLE (even in #yolo mode)</step>
+
+  <step n="2.7">📦 PACK STATE — determine which agent packs the user has enabled:
+      - Use Bash tool to run `bash {project-root}/.dexCore/core/agents/packs.sh list --format json`
+      - Parse output into session variable {enabled_packs} = list of pack_id where effective_state ∈ {always_on, enabled}
+      - Parse {disabled_packs} = list of pack_id where effective_state = disabled
+      - If the command fails (script missing, ruby missing, etc.), default {enabled_packs} to ["core_pack", "onboarding_pack"] (mandatory + default-enabled) and note the fallback to the user once per session.
+      - This drives the pack-aware filtering of `*list-agents` (see menu) — agents belonging to a disabled pack are hidden from the directory listing.
+      - `core_pack` is mandatory and always appears; user cannot disable it.
+      - Toggle commands: `*packs`, `*enable-pack <id>`, `*disable-pack <id>` — see menu.</step>
   <step n="3">Remember: user's name is {user_name}</step>
 
   <step n="3.5">🌐 LANGUAGE ADAPTATION (EA-1.0 Enhanced, updated EA-2.0):
@@ -178,9 +187,12 @@
   <menu>
     <item cmd="*help">❓ Return to main menu (*help)</item>
     <item cmd="*mydex" exec="{project-root}/.dexCore/core/agents/mydex-agent.md">🏠 Your personal workspace (*mydex)</item>
-    <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents)</item>
+    <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents) — filtered by enabled packs (see *packs)</item>
     <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 41 structured workflows (*list-workflows)</item>
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
+    <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
+    <item cmd="*enable-pack" action="#enable-pack" hidden="true">📦 Enable an agent pack (*enable-pack &lt;pack_id&gt;)</item>
+    <item cmd="*disable-pack" action="#disable-pack" hidden="true">📦 Disable an agent pack (*disable-pack &lt;pack_id&gt;) — mandatory packs refuse</item>
     <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
     <item cmd="*revoke-consent" action="#revoke-consent" hidden="true">🚫 Revoke Consent (*revoke-consent &lt;feature_id&gt;) - drop a consent entry</item>
     <item cmd="*council-mode" workflow="{project-root}/.dexCore/core/workflows/council-mode/workflow.yaml">🏛️  Multi-agent expert collaboration (*council-mode)</item>
@@ -361,12 +373,52 @@ What would you like to do?
       Load .dexCore/_cfg/features.yaml (YAML).
       Select entries where section == "agents" AND (status == "enabled" OR status == "always_on").
       If the profile has company.data_handling_policy == "local_only", ALSO filter out any agent with enterprise_compliance != "ok".
+      🆕 PACK FILTER (shipped 5.1.d follow-up): Use {enabled_packs} from activation step 2.7.
+        - If the agent entry declares a `pack` field, hide entries whose pack is NOT in {enabled_packs}.
+        - Entries in a disabled pack appear in a collapsed "🔒 Hidden (pack disabled)" footer with a hint: "Enable via *enable-pack &lt;id&gt;."
+        - core_pack agents are always shown (mandatory).
       Render as numbered list grouped by pack (core_pack, dis_pack, game_pack, dhl_pack, meta_pack, onboarding_pack), with one line each:
         "{n}. {name} — {description} ({status})"
       At the end, show hint:
         "*features — full registry with disabled/deferred/broken entries."
+        "*packs — toggle agent groups (meta-agents, connector wizards, etc.)."
       Also render any deferred/disabled agents with a "🔒 (opt-in)" marker and a note that the user can request activation.
       If features.yaml is missing: fall back to listing from agent-manifest.csv and warn the user.
+    </prompt>
+
+    <prompt id="show-packs">
+      Use Bash tool: `bash {project-root}/.dexCore/core/agents/packs.sh list --format json`.
+      Parse the JSON array and render a table in {communication_language}:
+        | Pack | State | Mandatory | Name | Description |
+      Where state ∈ {always_on, enabled, disabled} and mandatory is a ✓/✗.
+      Below the table, show controls:
+        - "Enable a pack: *enable-pack &lt;pack_id&gt;"
+        - "Disable a pack: *disable-pack &lt;pack_id&gt;  (mandatory packs refuse)"
+        - "Agent Directory respects these toggles: see *list-agents"
+      If the bash call fails (script missing, ruby missing), report the error clearly and suggest `bash {project-root}/.dexCore/_dev/tools/validate.sh` to self-diagnose.
+      See .dexCore/core/agents/packs.sh --help for the full CLI.
+    </prompt>
+
+    <prompt id="enable-pack">
+      Input: pack_id string (from user command, e.g. "*enable-pack meta_pack").
+      Use Bash tool: `bash {project-root}/.dexCore/core/agents/packs.sh enable &lt;pack_id&gt;`.
+      On success (exit 0 + "Enabled:" in output):
+        1. Re-run activation step 2.7 to refresh {enabled_packs} in session variables.
+        2. Confirm to user: "📦 Pack '&lt;pack_id&gt;' enabled. *list-agents now shows its agents."
+      On failure (exit 1 / unknown pack):
+        - Report the script's stderr message and list known packs via `*packs`.
+    </prompt>
+
+    <prompt id="disable-pack">
+      Input: pack_id string.
+      Use Bash tool: `bash {project-root}/.dexCore/core/agents/packs.sh disable &lt;pack_id&gt;`.
+      On success:
+        1. Re-run activation step 2.7 to refresh {enabled_packs}.
+        2. Confirm: "📦 Pack '&lt;pack_id&gt;' disabled. Its agents are hidden from *list-agents."
+      On mandatory-refusal (exit 1 + "mandatory" in stderr):
+        - Report: "🛡️ '&lt;pack_id&gt;' is mandatory (e.g. core_pack) — can't be disabled. The foundational agents stay on."
+      On unknown pack:
+        - List valid pack_ids via `*packs`.
     </prompt>
 
     <prompt id="show-features-registry">

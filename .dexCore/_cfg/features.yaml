@@ -284,8 +284,8 @@ agents:
     primary_target: github_copilot
 
   - id: agents.user_toggle_menu
-    name: "Agent Pack toggle system (packs.sh)"
-    description: "Shipped Phase 5.1.d first slice (2026-04-21). User-facing toggle for agent packs via .dexCore/core/agents/packs.sh. Subcommands: list (table or JSON), status <pack>, enable <pack>, disable <pack>. User state lives at myDex/.dex/config/packs.yaml (user-owned, gitignored); template at packs.yaml.example is tracked in-repo. Pack manifests (core_pack, meta_pack, onboarding_pack) are framework-shipped at .dexCore/core/agents/packs/. Mandatory packs (manifest: mandatory=true) cannot be disabled — core_pack enforces this. DexMaster-menu integration (rendering the enabled packs inside the main menu) is a follow-up slice that edits dex-master.md to read the state file at session start."
+    name: "Agent Pack toggle system (packs.sh + DexMaster menu integration)"
+    description: "Shipped Phase 5.1.d first slice + DexMaster menu follow-up (both 2026-04-21). CLI layer: .dexCore/core/agents/packs.sh with list / status / enable / disable subcommands + --format json + --state FILE. User state at myDex/.dex/config/packs.yaml (user-owned, gitignored); template at packs.yaml.example tracked. Pack manifests at .dexCore/core/agents/packs/ are framework-shipped. Mandatory packs (manifest: mandatory=true) refuse disable — core_pack enforces this. DexMaster menu layer: dex-master.md activation step 2.7 loads pack state at session start (bash packs.sh list --format json → {enabled_packs} session var); *packs / *enable-pack / *disable-pack menu items wrap the CLI with conversational prompts; *list-agents is pack-filtered (agents in disabled packs appear in a collapsed 'Hidden — pack disabled' footer). Space-in-path hardening (2026-04-21): NUL-safe find + bash array round-trip through discover_packs_into — regression-guarded by test 21."
     status: enabled
     phase: 5.1.d
     enterprise_compliance: ok
@@ -294,11 +294,14 @@ agents:
     docs: .dexCore/core/agents/packs.sh
     tests:
       - tests/e2e/21-agent-packs.test.sh
+      - tests/e2e/22-dexmaster-pack-rendering.test.sh
     primary_target: github_copilot
+    validated_at: "2026-04-21T03:30:00Z"
+    validation_notes: "Structurally validated: CLI layer end-to-end-tested (test 21: 62/62 incl. space-path regression); DexMaster menu layer asserted present (test 22: 27/27 — step 2.7, three menu items, three prompt handlers, list-agents pack filter, drift-check). Behavioral validation of the live agent session (menu rendering in an actual Claude/Copilot turn) is CLAUDE_E2E_LIVE-gated and deferred to a targeted live-walkthrough — not the same uncertainty class as the L2 embed arc's pre-live bugs because the surface is pure prompting, not bash + ruby logic."
     known_issues:
-      - "DexMaster menu doesn't yet consume packs.yaml — the toggle is plumbed and testable, but the menu rendering that shows/hides agents based on pack state is a follow-up slice (agent-side edit to dex-master.md)."
       - "YAML state-file I/O is minimal-grep-awk; hand-edited exotic layouts may not round-trip. Users should let packs.sh write the file or copy the template."
       - "No batch enable/disable in this slice. Future convenience flag: packs.sh enable-all / disable-all if the use case materializes."
+      - "Pack-filter in *list-agents depends on agent entries in features.yaml declaring a `pack` field. Today's agents don't uniformly carry this field — the filter no-ops for agents without a pack tag (they remain visible to all users). Populating `pack: meta_pack` on the 18 meta-agent entries is a minor follow-up."
 
 # ─────────────────────────────────────────────────────────────────────────
 # KNOWLEDGE LAYER — 3-tier (Wiki / Tank / Chronicle)
