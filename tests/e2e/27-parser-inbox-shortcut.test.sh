@@ -195,7 +195,7 @@ XDG_DOWNLOAD_DIR="$HOME/Downloads"
 UDIRS
 # unset XDG_DESKTOP_DIR so file-based path is used
 # Capture BOTH stdout and stderr so CI-only failures surface diagnostic info
-LOC_OUT=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+LOC_OUT=$(env -u XDG_DESKTOP_DIR -u XDG_CONFIG_HOME HOME="$XDG_SCRATCH" \
   bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>&1)
 LOC_EXIT=$?
 LOC_PATH=$(echo "$LOC_OUT" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"] rescue puts ""' 2>/dev/null)
@@ -210,7 +210,7 @@ cat > "$XDG_SCRATCH/.config/user-dirs.dirs" <<'UDIRS'
 # XDG_DESKTOP_DIR="$HOME/ShouldBeIgnored"
 XDG_DESKTOP_DIR="$HOME/Schreibtisch"
 UDIRS
-IGN_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+IGN_JSON=$(env -u XDG_DESKTOP_DIR -u XDG_CONFIG_HOME HOME="$XDG_SCRATCH" \
   bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
 IGN_PATH=$(echo "$IGN_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
 if echo "$IGN_PATH" | grep -q "/Schreibtisch/" && ! echo "$IGN_PATH" | grep -q "ShouldBeIgnored"; then
@@ -222,7 +222,7 @@ fi
 # Case 4: no env, no user-dirs.dirs → default $HOME/Desktop
 mkdir -p "$XDG_SCRATCH/Desktop"
 rm -f "$XDG_SCRATCH/.config/user-dirs.dirs"
-DEF_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+DEF_JSON=$(env -u XDG_DESKTOP_DIR -u XDG_CONFIG_HOME HOME="$XDG_SCRATCH" \
   bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
 DEF_PATH=$(echo "$DEF_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
 if echo "$DEF_PATH" | grep -qE "/Desktop/"; then
