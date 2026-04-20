@@ -182,39 +182,65 @@ fi
 # Compute the new YAML via ruby (minimal, dependency-free — no yq)
 mkdir -p "$(dirname "$OUT")"
 
-NEW_YAML=$(printf '%s' "$PROBE_RESULTS" | ruby -rjson -e '
+NEW_YAML=$(printf '%s' "$PROBE_RESULTS" | ruby -rjson -ryaml -e '
   probe_results = JSON.parse(STDIN.read)
   out_path = ARGV[0]
 
-  # Load existing file if present — parse simple YAML we control.
-  # We do a line-based read to preserve user notes + preferences keys
-  # we do not own.
+  # Load existing file via ruby stdlib YAML (Psych). Replaces the old
+  # line-based parser that stripped ALL quote characters — including
+  # internal ones in user-edited notes. Upgrading to a real YAML parser
+  # (shipped 2026-04-21 session-7 TODO #5) fixes the known limitation
+  # documented on parser.guided_setup_wizard: hand-edited notes can now
+  # contain quote marks, apostrophes, colons, or any other YAML-string
+  # characters and round-trip cleanly across re-probes.
+  #
+  # Emit remains line-based (structured deterministic output with
+  # sentinel comments) — YAML.dump would not preserve the header/
+  # auto-maintained comments and would reorder keys.
   existing_backends = {}
   preferences_block = ""
   if File.file?(out_path)
-    current_backend = nil
-    File.read(out_path).each_line do |line|
-      if line =~ /^    (\w+):\s*$/ && $1 != "backends" && $1 != "preferences"
-        # sub-key of parser.backends
-        current_backend = $1
-        existing_backends[current_backend] ||= {}
-      elsif current_backend && line =~ /^      (\w+):\s*(.*)$/
-        # Line-based YAML parser — strips surrounding quotes (single + double).
-        # Known limitation (documented in features.yaml known_issues):
-        # internal quote marks in hand-edited notes get stripped too. A real
-        # YAML parser would fix this but adds complexity; low-priority since
-        # script-generated notes have no internal quotes and users hand-
-        # editing notes rarely use quote marks. 2026-04-22 Agent-β
-        # investigated an alternative (strip-outer-only) but it caused
-        # backslash accumulation on re-probe — reverted as worse UX than
-        # the documented limitation.
-        existing_backends[current_backend][$1] = $2.strip.gsub(/["'"'"']/, "")
-      elsif line =~ /^  preferences:/
-        preferences_block = line
-        current_backend = nil
-      elsif preferences_block != "" && (line =~ /^    / || line.strip.empty? || line =~ /^#/)
-        preferences_block += line
+    begin
+      # YAML.safe_load(File.read(...)) rather than safe_load_file:
+      # Psych::safe_load_file was added in Psych 3.1 and isnt present
+      # on older rubies (including the stock macOS Ruby 2.6). Feeding
+      # File.read output is portable and semantically identical.
+      loaded = YAML.safe_load(File.read(out_path), aliases: true) || {}
+      backends = loaded.dig("parser", "backends")
+      if backends.is_a?(Hash)
+        backends.each do |id, fields|
+          next unless fields.is_a?(Hash)
+          existing_backends[id.to_s] = {}
+          fields.each do |k, v|
+            existing_backends[id.to_s][k.to_s] = v.nil? ? nil : v.to_s
+          end
+        end
       end
+      prefs = loaded.dig("parser", "preferences")
+      if prefs.is_a?(Hash)
+        pref_lines = ["  preferences:"]
+        prefs.each do |k, v|
+          val_str =
+            if v.nil?
+              "null"
+            elsif v == true || v == false || v.is_a?(Numeric)
+              v.to_s
+            else
+              # strings get quoted to survive round-trip stable
+              v.to_s.inspect
+            end
+          pref_lines << "    #{k}: #{val_str}"
+        end
+        preferences_block = pref_lines.join("\n") + "\n"
+      end
+    rescue => e
+      # Malformed / unsafe / version-incompatible YAML — treat as empty
+      # and let the probe rebuild from scratch. Same failure-mode as the
+      # old line-based parser: exotic input → defaults. Rescue is broad
+      # by design (covers Psych::SyntaxError, Psych::DisallowedClass, and
+      # older-Ruby NoMethodError on newer APIs).
+      existing_backends = {}
+      preferences_block = ""
     end
   end
 

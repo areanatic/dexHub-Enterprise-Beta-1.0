@@ -186,16 +186,15 @@ else
   fail "re-probe dropped preferences content (after-code=$AFTER_CODE: 0=ok, 1=header, 2=default_pdf_backend, 3=prefer_native_fallback, 4=user_custom_note key, 5=user_custom_note value)"
 fi
 
-# ─── Documented-limitation check: internal quotes in notes ─────────
-# The line-based YAML loader strips all quote marks, including internal
-# ones. A real YAML parser would preserve them; we chose honesty over
-# complexity (see features.yaml known_issues on parser.guided_setup_wizard).
-# This assertion DOCUMENTS the limitation rather than testing a fix:
-# if a user hand-edits notes to contain `"yes"` internally, those quotes
-# disappear on the next probe. The alternative fix attempted in 2026-04-22
-# caused backslash accumulation, which was worse UX. Users who want
-# quote-preservation should hand-edit the value to use apostrophe-free text.
-cat > "$SCRATCH_OUT.limitation-doc-test" <<'LIMQ'
+# ─── Internal-quote preservation (real YAML parser, session-7 TODO #5) ─
+# Regression guard for the 2026-04-21 upgrade from line-based parsing
+# to YAML.safe_load. The old parser stripped ALL quote characters on
+# load, silently corrupting hand-edited notes like:
+#   notes: "User said \"hello\""
+# This test writes a note WITH internal quotes, re-probes, and asserts
+# the internal quotes survive (both semantically via YAML parse + in
+# the emitted bytes).
+cat > "$SCRATCH_OUT.internal-quote-test" <<'INTQ'
 schema_version: "1"
 
 parser:
@@ -206,7 +205,7 @@ parser:
       compliance: ok
       last_probe: "2026-01-01T00:00:00Z"
       probe_status: "not_installed"
-      notes: "User said edit the notes quotes"
+      notes: "User said \"this has quotes\" in their note"
     ollama_vlm:
       installed: false
       version: null
@@ -219,15 +218,57 @@ parser:
     default_pdf_backend: null
     default_image_backend: null
     prefer_native_fallback: true
-LIMQ
-bash "$PROBE" --format text --out "$SCRATCH_OUT.limitation-doc-test" >/dev/null 2>&1
-# Quote-free user notes MUST survive (that's the contract we promise).
-if grep -q "User said edit the notes quotes" "$SCRATCH_OUT.limitation-doc-test"; then
-  pass "re-probe preserves quote-free user notes (the supported user-edit contract)"
+INTQ
+bash "$PROBE" --format text --out "$SCRATCH_OUT.internal-quote-test" >/dev/null 2>&1
+# After re-probe, the internal quotes MUST be present in the semantic
+# value when parsed via YAML. Use a real YAML parser to assert this
+# (grep would be too brittle — could match a comment or unrelated line).
+if ruby -ryaml -e '
+  data = YAML.safe_load(File.read(ARGV[0]), aliases: true) rescue nil
+  exit 1 if data.nil?
+  notes = data.dig("parser", "backends", "kreuzberg", "notes")
+  exit 1 if notes.nil?
+  # The semantic string MUST include the literal phrase "this has quotes"
+  # with the internal quote marks preserved.
+  exit 0 if notes.include?(%q{"this has quotes"})
+  exit 1
+' "$SCRATCH_OUT.internal-quote-test" 2>/dev/null; then
+  pass "re-probe preserves internal quote marks in user-edited notes (real YAML parser)"
 else
-  fail "re-probe dropped quote-free user notes — breaks supported contract"
+  fail "re-probe stripped internal quotes — YAML parser regression"
 fi
-rm -f "$SCRATCH_OUT.limitation-doc-test"
+# Also: quote-free notes MUST still survive (no regression on the
+# previously-supported contract)
+cat > "$SCRATCH_OUT.quote-free-test" <<'QFREE'
+schema_version: "1"
+parser:
+  backends:
+    kreuzberg:
+      installed: false
+      version: null
+      compliance: ok
+      last_probe: "2026-01-01T00:00:00Z"
+      probe_status: "not_installed"
+      notes: "User added this plain note"
+    ollama_vlm:
+      installed: false
+      version: null
+      compliance: local_vlm_required
+      last_probe: "2026-01-01T00:00:00Z"
+      probe_status: "not_installed"
+      notes: "Auto-generated."
+  preferences:
+    default_pdf_backend: null
+    default_image_backend: null
+    prefer_native_fallback: true
+QFREE
+bash "$PROBE" --format text --out "$SCRATCH_OUT.quote-free-test" >/dev/null 2>&1
+if grep -q "User added this plain note" "$SCRATCH_OUT.quote-free-test"; then
+  pass "re-probe preserves quote-free user notes (regression guard)"
+else
+  fail "re-probe dropped quote-free user notes — regression"
+fi
+rm -f "$SCRATCH_OUT.internal-quote-test" "$SCRATCH_OUT.quote-free-test"
 
 # ─── Idempotent re-probe doesn't spuriously rewrite ─────────────────
 # Hardened per 2026-04-22 audit (Agent D finding #5): old check only
