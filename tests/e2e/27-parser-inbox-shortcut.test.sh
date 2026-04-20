@@ -170,17 +170,32 @@ if [ "${CLAUDE_E2E_LIVE_INBOX_SETUP:-0}" = "1" ]; then
   else
     fail "[LIVE] create: status='$CREATE_STATUS'"
   fi
-  # Verify file exists on platform
+  # Verify file exists on platform AND points at the right inbox.
+  # Existence alone is weak — a buggy script could create a shortcut
+  # to /tmp and still pass. Per session-7 critical review: target must
+  # match the resolved inbox absolute path.
   UNAME_S=$(uname -s)
+  EXPECTED_ABS="$(cd "$SCRATCH_INBOX" && pwd)"
   if [ "$UNAME_S" = "Darwin" ]; then
     if [ -L "$LIVE_DESKTOP/DexHub-Inbox" ]; then
       pass "[LIVE] macOS: symlink exists at scratch Desktop"
+      LINK_TARGET=$(readlink "$LIVE_DESKTOP/DexHub-Inbox")
+      if [ "$LINK_TARGET" = "$EXPECTED_ABS" ]; then
+        pass "[LIVE] macOS: symlink target matches scratch inbox ($LINK_TARGET)"
+      else
+        fail "[LIVE] macOS: symlink points to '$LINK_TARGET', expected '$EXPECTED_ABS'"
+      fi
     else
       fail "[LIVE] macOS: symlink missing"
     fi
   else
     if [ -f "$LIVE_DESKTOP/DexHub-Inbox.desktop" ]; then
       pass "[LIVE] linux: .desktop file exists"
+      if grep -qF "URL=file://$EXPECTED_ABS" "$LIVE_DESKTOP/DexHub-Inbox.desktop"; then
+        pass "[LIVE] linux: .desktop URL points at scratch inbox"
+      else
+        fail "[LIVE] linux: .desktop URL doesn't match expected path '$EXPECTED_ABS'"
+      fi
     else
       fail "[LIVE] linux: .desktop file missing"
     fi

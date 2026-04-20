@@ -71,7 +71,7 @@ while [ $# -gt 0 ]; do
     --name)      NAME="$2"; shift 2 ;;
     --inbox)     INBOX_OVERRIDE="$2"; shift 2 ;;
     --help|-h)
-      sed -n '2,46p' "${BASH_SOURCE[0]}"
+      sed -n '2,50p' "${BASH_SOURCE[0]}"
       exit 0
       ;;
     -*)

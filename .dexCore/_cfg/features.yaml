@@ -699,7 +699,7 @@ parser:
     phase: 5.3.h
     enterprise_compliance: ok
     requires: [bash, ruby]
-    depends_on: [parser.inbox_auto_parse]
+    depends_on: []
     docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
     tests:
       - tests/e2e/27-parser-inbox-shortcut.test.sh
