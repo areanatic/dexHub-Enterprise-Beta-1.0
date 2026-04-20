@@ -133,6 +133,29 @@ ingest_file() {
     return
   fi
 
+  # Type guard: l2-ingest is markdown/text-native. Binary files (PDF,
+  # images, Office) must go through the parser router first. Without
+  # this check, binaries ran through the awk chunker produced zero
+  # chunks silently — an "OK: 0 chunks" line that confused users into
+  # thinking ingestion succeeded. (UX finding 2026-04-21 review.)
+  DETECT_MIME="$REPO_ROOT/.dexCore/core/parser/detect-mime.sh"
+  if [ -x "$DETECT_MIME" ]; then
+    ft=$("$DETECT_MIME" "$file" 2>/dev/null | awk '{print $1}')
+    case "$ft" in
+      text|code|data|email)
+        : # text-like — proceed
+        ;;
+      pdf|office|image|archive|unknown)
+        echo "  SKIP: $file (type=$ft — l2-ingest is text-only)"
+        echo "        Route it through the parser first:"
+        echo "          bash $REPO_ROOT/.dexCore/core/parser/parse-route.sh $file"
+        echo "        Then pipe the extracted text back into l2-ingest.sh."
+        echo "        (Phase 5.3.f parser.inbox_auto_parse will automate this loop.)"
+        return
+        ;;
+    esac
+  fi
+
   abs_file="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
   rel_path="$(relpath "$abs_file")"
   src_type="$(infer_source_type "$rel_path")"

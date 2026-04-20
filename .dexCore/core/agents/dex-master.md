@@ -191,6 +191,7 @@
     <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 41 structured workflows (*list-workflows)</item>
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
     <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
+    <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
     <item cmd="*enable-pack" action="#enable-pack" hidden="true">📦 Enable an agent pack (*enable-pack &lt;pack_id&gt;)</item>
     <item cmd="*disable-pack" action="#disable-pack" hidden="true">📦 Disable an agent pack (*disable-pack &lt;pack_id&gt;) — mandatory packs refuse</item>
     <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
@@ -397,6 +398,17 @@ What would you like to do?
       Fallback behavior:
         - If agent-manifest.csv is missing: report error + do NOT fabricate a list.
         - If pack manifest for an enabled pack is missing: skip that pack + warn once.
+    </prompt>
+
+    <prompt id="parser-setup">
+      Use Bash tool: `bash {project-root}/.dexCore/core/parser/capabilities-probe.sh --format text`.
+      Render the output as-is (it's already human-readable). After the probe table, add a short summary in {communication_language}:
+        - If any backend status is "ready" — say "✅ You can route documents of X, Y, Z types."
+        - If backend is "not_installed" — quote the install hint from the probe output + add: "Run the probe again after install: `bash {project-root}/.dexCore/core/parser/capabilities-probe.sh`."
+        - If backend is "partial" (Ollama daemon reachable but no VLM pulled) — name the missing piece.
+      Close with a one-line pointer:
+        "Drop files into myDex/inbox/ — the parser router reads capabilities.yaml to decide which backend handles each type. Auto-orchestration ships in Phase 5.3.f (parser.inbox_auto_parse)."
+      If the bash call fails (ruby missing, script missing), report the error + suggest `bash {project-root}/.dexCore/_dev/tools/validate.sh` for diagnostics.
     </prompt>
 
     <prompt id="show-packs">

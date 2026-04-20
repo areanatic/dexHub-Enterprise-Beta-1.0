@@ -209,12 +209,12 @@ else
           BACKEND="native"
           STATUS="ready"
           REASON="kreuzberg not installed — falling back to system pdftotext"
-          HINT="For richer PDF extraction: install kreuzberg (see parser.kreuzberg_backend)."
+          HINT="For richer PDF extraction: install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg)"
         else
           BACKEND="none"
           STATUS="backend_missing"
           REASON="PDF requires a backend (kreuzberg or system pdftotext)"
-          HINT="Install kreuzberg or poppler-utils (ships pdftotext)."
+          HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) or poppler-utils (ships pdftotext)."
         fi
       fi
       ;;
@@ -227,7 +227,7 @@ else
         BACKEND="none"
         STATUS="backend_missing"
         REASON="office formats require kreuzberg"
-        HINT="Install kreuzberg (see parser.kreuzberg_backend, Phase 5.3.b)."
+        HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) — handles DOCX, XLSX, PPTX, ODT, RTF and more."
       fi
       ;;
     image)
@@ -241,7 +241,7 @@ else
         BACKEND="none"
         STATUS="backend_missing"
         REASON="images require ollama_vlm (local VLM)"
-        HINT="Install Ollama + a vision model (see parser.ollama_vlm_backend, Phase 5.3.c)."
+        HINT="Install Ollama (https://ollama.com) and pull a vision model: ollama pull llama3.2-vision (or llava / moondream)."
       fi
       ;;
     archive)
