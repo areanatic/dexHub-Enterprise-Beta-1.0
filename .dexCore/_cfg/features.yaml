@@ -687,10 +687,28 @@ parser:
     primary_target: github_copilot
     known_issues:
       - "One-shot mode only — no file-system watcher. User must run the script (or DexMaster *inbox) manually. Continuous watching (fswatch on macOS / inotify on Linux) is a deferred enhancement."
-      - "Desktop-shortcut creation (user request 2026-04-21) — create a Finder alias / Linux .desktop / Windows .lnk pointing at the inbox — is NOT in this slice. Scaffolded as a follow-up: users can manually `ln -s $(pwd)/myDex/inbox ~/Desktop/DexHub-Inbox` today."
       - "Binary files whose backend is not installed return status=routed_but_backend_unavailable. They're NOT archived (stay in inbox for retry after the user installs the backend). This is intentional — don't penalize users for a deferred install."
       - "Kreuzberg/ollama_vlm adapter failures during extract surface as status=extract_failed with the backend's exit code in the error field. l2-ingest failures surface as status=ingest_failed with stderr excerpt."
       - "For very large inboxes (100s of files), the for-loop processes sequentially. Future --parallel N flag could speed this up. Not a blocker for Beta 1.0 scale."
+      - "Cosmetic: l2-query shows the source path as the ext_tmp basename (dexhub-inbox-ext-XXXXXX.md) rather than the original filename. The archived copy in .processed/ has the real name. Plumbing the original basename through l2-ingest is a low-priority polish follow-up."
+
+  - id: parser.inbox_shortcut_setup
+    name: "Inbox Desktop-Shortcut Setup (inbox-setup.sh + *inbox-setup menu)"
+    description: "Shipped Phase 5.3.h first slice (2026-04-22). .dexCore/core/parser/inbox-setup.sh creates (or removes) a Desktop shortcut pointing at the configured inbox, so users can drop files in with a drag-and-drop instead of navigating the repo tree. Platform-specific: macOS → symlink at ~/Desktop/<name> (Finder renders shortcut-arrow badge); Linux → .desktop Type=Link file at ~/Desktop/<name>.desktop (GNOME/KDE/XFCE/Cinnamon compatible); Windows → deferred to 1.1 roadmap (needs PowerShell .lnk COM recipe). Reversible via --remove. Idempotent: re-run without --force returns exit 5 and touches nothing. Honors --inbox override, --name custom, --dry-run plan-only, --format json|text. Uses the same inbox-resolution precedence as inbox-auto-parse.sh (flag > env > config.yaml > default). Only touches ~/Desktop/<name> — no repo writes, no package-manager invocations, no TCC/Automation prompts on macOS. Closes the session-6 known_issue on parser.inbox_auto_parse about desktop-shortcut creation."
+    status: enabled
+    phase: 5.3.h
+    enterprise_compliance: ok
+    requires: [bash, ruby]
+    depends_on: [parser.inbox_auto_parse]
+    docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
+    tests:
+      - tests/e2e/27-parser-inbox-shortcut.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Windows .lnk support deferred to 1.1 roadmap. Manual workaround in the setup script's error message: Right-click the myDex/inbox folder in Explorer → Send To → Desktop (create shortcut)."
+      - "Linux Desktop detection uses XDG_DESKTOP_DIR env override if set, else falls back to $HOME/Desktop. Full xdg-user-dirs.dirs parsing (Linux users with localized 'Schreibtisch' etc.) is 1.1 scope."
+      - "macOS shortcut is a symlink, not a Finder Alias. Symlinks render with the curved-arrow badge and open the inbox folder when double-clicked. True Finder Aliases require osascript + Automation permission (TCC prompt) — not worth the friction for Beta 1.0."
+      - "Live-verify gated behind CLAUDE_E2E_LIVE_INBOX_SETUP=1 (never touches real ~/Desktop; uses scratch dir via XDG_DESKTOP_DIR + HOME redirect)."
 
   - id: parser.guided_setup_wizard
     name: "Parser capabilities probe (parser.guided_setup_wizard) — probe-and-write layer"
@@ -1257,14 +1275,18 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 83
+  total: 84
   by_status:
     always_on: 7
-    enabled: 56
+    enabled: 57
     disabled: 0
     deferred: 20
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 7 (Option B ship — parser.inbox_shortcut_setup).
+  # Net since earlier session-7 update: +1 new enabled feature
+  # (parser.inbox_shortcut_setup — Desktop shortcut creator, 5.3.h first slice).
+  # Closes session-6 user-requested follow-up on parser.inbox_auto_parse.
   # Updated 2026-04-21 session 7 (holistic review + parser.inbox_auto_parse fix).
   # Net since session 6: 1 deferred → enabled (drift found during counts audit —
   # session 6 documented the flips but the counts block was off-by-one).

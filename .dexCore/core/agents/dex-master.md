@@ -193,6 +193,7 @@
     <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
     <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
     <item cmd="*inbox" action="#inbox-auto-parse">📥 Process Inbox (*inbox) - route + extract + ingest all files in myDex/inbox/</item>
+    <item cmd="*inbox-setup" action="#inbox-setup">🔗 Inbox Desktop Shortcut (*inbox-setup) - create (or remove) a Desktop shortcut pointing at myDex/inbox/</item>
     <item cmd="*enable-pack" action="#enable-pack" hidden="true">📦 Enable an agent pack (*enable-pack &lt;pack_id&gt;)</item>
     <item cmd="*disable-pack" action="#disable-pack" hidden="true">📦 Disable an agent pack (*disable-pack &lt;pack_id&gt;) — mandatory packs refuse</item>
     <item cmd="*consents" action="#show-consents" hidden="true">🔑 Saved Consents (*consents) - list granted cloud/connector permissions</item>
@@ -421,12 +422,35 @@ What would you like to do?
       If the user wants a different inbox location: "bash .dexCore/core/parser/inbox-auto-parse.sh --inbox /path/to/folder"
       or set $DEXHUB_INBOX. The `inbox_folder` field in .dexCore/_cfg/config.yaml is the persistent default.
 
-      Desktop-shortcut creation (e.g., a Finder alias on ~/Desktop pointing at the inbox) is a planned follow-up slice —
-      not implemented in this first slice. Users can create the shortcut manually today:
-        ln -s "$(pwd)/myDex/inbox" ~/Desktop/DexHub-Inbox
+      For a one-tap drag-and-drop UX, offer `*inbox-setup` — it creates a Desktop
+      shortcut (macOS symlink / Linux .desktop) pointing at the inbox.
 
       If the bash call fails (ruby missing, l2-ingest broken, etc.), report the error clearly + suggest
       `bash {project-root}/.dexCore/_dev/tools/validate.sh` for diagnostics.
+    </prompt>
+
+    <prompt id="inbox-setup">
+      Use Bash tool: `bash {project-root}/.dexCore/core/parser/inbox-setup.sh --format text`.
+      The script creates a Desktop shortcut pointing at the configured inbox
+      (same precedence as *inbox: --inbox flag, $DEXHUB_INBOX env, config.yaml inbox_folder,
+      default myDex/inbox/). Platform support: macOS (symlink) + Linux (.desktop file).
+      Windows is deferred to 1.1 — the script returns a helpful manual-workaround hint.
+
+      Render the script output as-is. Add a short summary in {communication_language}:
+        - On status=created: "✅ Shortcut created — drag files onto the Desktop icon to parse."
+        - On status=exists: "⚠️  A shortcut already exists. Re-run with `--force` to overwrite, or `--remove` to delete."
+        - On status=unsupported_platform: quote the hint from the script output (platform-specific manual fallback).
+        - On status=inbox_missing: "Run `*inbox` first — it creates myDex/inbox/.processed/ on first use."
+        - On status=desktop_missing: tell the user Desktop folder is missing + suggest `mkdir ~/Desktop`.
+
+      Useful overrides the user can request:
+        --name "My Inbox"    custom shortcut label
+        --inbox /path        pick a different inbox folder for the shortcut target
+        --dry-run            show what would happen without touching ~/Desktop
+        --remove             delete an existing shortcut (reversible)
+
+      Safety contract: the script ONLY touches ~/Desktop/&lt;name&gt;. No repo writes.
+      On macOS, uses a symlink (no TCC / Automation permission prompt).
     </prompt>
 
     <prompt id="parser-setup">
