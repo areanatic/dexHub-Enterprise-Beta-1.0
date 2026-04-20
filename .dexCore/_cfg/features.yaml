@@ -440,16 +440,21 @@ knowledge:
       - "Multi-word queries without explicit FTS5 operators are treated as phrase queries (wrapped in double-quotes). For OR / AND / NEAR, users can pass FTS5 syntax directly (double-quote-escape is handled)."
 
   - id: knowledge.l2_tank_wire_copilot
-    name: "L2 Tank → Copilot injection (deferred)"
-    description: "Future: build-instructions.sh invokes l2-query at build time, bakes top-N chunks into copilot-instructions.md under '## L2 TANK (retrieved)' section. Mirrors L1 Wiki injection pattern (commit 27e9dba) but with seed-query driven retrieval rather than everything-loaded. Ships in 5.2.b-wire-copilot."
-    status: deferred
+    name: "L2 Tank → Copilot injection — seed-query baked at build time"
+    description: "Shipped Phase 5.2.b-wire-copilot (2026-04-20). build-instructions.sh invokes l2-query.sh with user's seed query (from myDex/.dex/l2/copilot-seed-query.txt) at build time. Top-3 chunks bake into copilot-instructions.md under a '# L2 TANK (retrieved for seed query)' block. Cap: L2_MAX_COPILOT=2000 bytes (within 35KB copilot-instructions cap; stays ~3.5KB headroom with wiki empty). Opt-in per user — missing seed file / missing tank / empty tank / no query matches = silent no-op (no pollution). Drift-check correctly includes l2_block output in expected_hash."
+    status: enabled
     phase: 5.2.b-wire-copilot
     enterprise_compliance: ok
-    requires: [bash, sqlite3]
+    requires: [bash, sqlite3, ruby]
     depends_on: [knowledge.l2_tank_query, knowledge.l1_wiki_injection_copilot]
     docs: .dexCore/_dev/docs/L2-TANK.md
-    tests: []
+    tests:
+      - tests/e2e/15-l2-copilot-wire.test.sh
     primary_target: github_copilot
+    known_issues:
+      - "Seed query is user-configured static text in myDex/.dex/l2/copilot-seed-query.txt. No dynamic seeds (e.g. session-topic-driven) yet — future work if useful."
+      - "Top-N=3 hardcoded; could become configurable per build. For now reasonable default given 2KB cap."
+      - "Cap enforcement: oversized chunks get hard-truncated at L2_MAX_COPILOT with [L2 TRUNCATED] marker. Test 15 Scenario 6 verifies."
 
   - id: knowledge.l2_tank_enterprise_compliance
     name: "L2 Tank — enterprise compliance enforcement (deferred)"
@@ -1085,11 +1090,18 @@ counts:
   total: 78
   by_status:
     always_on: 6
-    enabled: 38
+    enabled: 39
     disabled: 0
-    deferred: 34
+    deferred: 33
     broken: 0
     experimental: 0
+  # Updated 2026-04-20 late-9 (Phase 5.2.b-wire-copilot: L2 → Copilot bake):
+  # - knowledge.l2_tank_wire_copilot: deferred → enabled
+  # Net: enabled 38→39, deferred 34→33.
+  # L2 Tank functional end-to-end for Copilot: author → ingest → query
+  # → auto-bake into copilot-instructions.md. Opt-in via seed file.
+  # Remaining L2 work: 5.2.b-embed (Ollama for semantic/cosine ranking),
+  #                    5.2.b-enterprise-audit (per-backend policy enforcement).
   # Updated 2026-04-20 late-8 (Phase 5.2.b-query: FTS5 search shipped):
   # - knowledge.l2_tank_query: experimental (STUB) → enabled (REAL FTS5)
   # Net: enabled 37→38, experimental 1→0.

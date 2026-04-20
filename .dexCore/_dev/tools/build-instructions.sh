@@ -39,6 +39,18 @@ LOAD_WIKI="$REPO_ROOT/.dexCore/core/knowledge/load-wiki.sh"
 WIKI_MAX_COPILOT=1000
 WIKI_MAX_CLAUDE=4096
 
+# L2 Tank injection (Phase 5.2.b-wire-copilot). Opt-in per user:
+# if myDex/.dex/l2/copilot-seed-query.txt exists + non-empty, build-time
+# query returns top-N chunks which get baked into copilot-instructions.md.
+# When the seed file is absent or empty, L2 injection is silent (no change).
+# Tank must also be initialized (tank.sqlite exists); otherwise silent.
+L2_QUERY="$REPO_ROOT/.dexCore/core/knowledge/l2/l2-query.sh"
+L2_TANK_DB="$REPO_ROOT/myDex/.dex/l2/tank.sqlite"
+L2_SEED_FILE="$REPO_ROOT/myDex/.dex/l2/copilot-seed-query.txt"
+L2_MAX_COPILOT=2000      # bytes — leaves headroom within 35KB copilot cap
+L2_MAX_CLAUDE=4096       # more lenient for Claude
+L2_TOP_N=3               # fewer but higher-quality chunks
+
 MODE="${1:-build}"
 
 # --- Validation ---
@@ -62,8 +74,56 @@ wiki_block() {
   if [ -x "$LOAD_WIKI" ]; then
     bash "$LOAD_WIKI" --max-total "$max_total" --max-file 2048 2>/dev/null || true
   fi
-  # load-wiki.sh exits silently when no user entries; wiki_block returns empty
-  # which is the correct no-op outcome.
+}
+
+# --- L2 Tank block helper ---
+# Runs l2-query.sh with user's seed query (if configured). Returns empty
+# unless all conditions met:
+#   1. L2_SEED_FILE exists and has non-empty content
+#   2. L2_TANK_DB exists (tank initialized)
+#   3. l2-query.sh is executable
+#   4. query returns at least one match
+# Output is wrapped in a header marker so agents can recognize the L2
+# section distinctly from L1 Wiki and main instruction content.
+l2_block() {
+  local max_total="$1"
+  [ -x "$L2_QUERY" ] || return 0
+  [ -f "$L2_TANK_DB" ] || return 0
+  [ -f "$L2_SEED_FILE" ] || return 0
+
+  local seed
+  seed="$(head -c 500 "$L2_SEED_FILE" | tr -d '\n' | sed 's/^ *//; s/ *$//')"
+  [ -z "$seed" ] && return 0
+
+  # Run quiet query — no chrome, just the chunks. Cap total output bytes.
+  local raw
+  raw=$(bash "$L2_QUERY" --db "$L2_TANK_DB" --top "$L2_TOP_N" --quiet "$seed" 2>/dev/null || true)
+  [ -z "$raw" ] && return 0
+
+  # Truncate to max_total
+  local size=${#raw}
+  if [ "$size" -gt "$max_total" ]; then
+    # Hard truncate at max_total with marker (avoid splitting mid-utf8 char)
+    raw="$(printf '%s' "$raw" | head -c "$max_total")"$'\n\n[L2 TRUNCATED — exceeds '"$max_total"' byte cap]'
+  fi
+
+  # Emit wrapped block
+  cat <<L2_HEADER
+
+# ═══════════════════════════════════════════════════════════
+# L2 TANK (retrieved for seed query: "$seed")
+# Top-$L2_TOP_N chunks, $size bytes, baked at build time.
+# ═══════════════════════════════════════════════════════════
+
+L2_HEADER
+  printf '%s' "$raw"
+  cat <<L2_FOOTER
+
+
+# ═══════════════════════════════════════════════════════════
+# END L2 TANK
+# ═══════════════════════════════════════════════════════════
+L2_FOOTER
 }
 
 # --- Copilot Build (concatenation + optional L1 wiki append) ---
@@ -82,9 +142,11 @@ build_copilot() {
     cat "$SHARED"
     echo ""
     cat "$COPILOT_TAIL"
-    # L1 Wiki injection — appears last so it's the most contextual layer.
-    # Empty when no user entries (no pollution on fresh installs).
+    # L1 Wiki injection — appears before L2 because wiki is "always loaded"
+    # (small, high-trust); L2 is "seed-query baked" (can be larger, more
+    # context-specific). Both empty when no user content = no pollution.
     wiki_block "$WIKI_MAX_COPILOT"
+    l2_block "$L2_MAX_COPILOT"
   } > "$target"
 }
 
@@ -106,8 +168,9 @@ build_claude_concat() {
     cat "$SHARED"
     echo ""
     cat "$CLAUDE_TAIL"
-    # L1 Wiki injection — Claude gets more room than Copilot.
+    # L1 Wiki + L2 Tank injection — Claude gets larger caps.
     wiki_block "$WIKI_MAX_CLAUDE"
+    l2_block "$L2_MAX_CLAUDE"
   } > "$target"
 }
 
@@ -143,6 +206,7 @@ expected_hash_copilot() {
     echo ""
     cat "$COPILOT_TAIL"
     wiki_block "$WIKI_MAX_COPILOT"
+    l2_block "$L2_MAX_COPILOT"
   } | shasum -a 256 | cut -d' ' -f1
 }
 
@@ -158,6 +222,7 @@ expected_hash_claude() {
     echo ""
     cat "$CLAUDE_TAIL"
     wiki_block "$WIKI_MAX_CLAUDE"
+    l2_block "$L2_MAX_CLAUDE"
   } | shasum -a 256 | cut -d' ' -f1
 }
 
