@@ -119,20 +119,18 @@ if command -v sqlite3 >/dev/null 2>&1; then
   fi
 fi
 
-# ─── Stubs emit honesty signal ────────────────────────────────────────
-INGEST_OUT=$(bash .dexCore/core/knowledge/l2/l2-ingest.sh --source /tmp/nope 2>&1 || true)
-if echo "$INGEST_OUT" | grep -q "\[L2 STUB\]"; then
-  pass "l2-ingest.sh emits [L2 STUB] honesty signal"
-else
-  fail "l2-ingest.sh missing [L2 STUB] signal — user may mistake scaffold for working pipeline"
-fi
-
+# ─── Stubs emit honesty signal (only query remains STUB — ingest is now REAL as of 5.2.b-ingest) ──
+# Functional assertion for ingest moved to test 13. Here we just verify the
+# remaining stub (l2-query.sh) still emits its honesty marker.
 QUERY_OUT=$(bash .dexCore/core/knowledge/l2/l2-query.sh "test query" 2>&1 || true)
 if echo "$QUERY_OUT" | grep -q "\[L2 STUB\]"; then
-  pass "l2-query.sh emits [L2 STUB] honesty signal"
+  pass "l2-query.sh emits [L2 STUB] honesty signal (still stub until 5.2.b-query)"
 else
   fail "l2-query.sh missing [L2 STUB] signal"
 fi
+
+# Note: l2-ingest.sh promoted from STUB to REAL CHUNKER in 5.2.b-ingest.
+# See test 13 for full functional coverage.
 
 # ─── Gitignore protection ────────────────────────────────────────────
 assert_file_contains ".gitignore" "myDex/.dex/l2/tank.sqlite" \

@@ -404,19 +404,22 @@ knowledge:
     primary_target: github_copilot
 
   - id: knowledge.l2_tank_ingest
-    name: "L2 Tank — ingest script (l2-ingest.sh)"
-    description: "SCAFFOLD STUB. Emits [L2 STUB] signal. Real implementation (chunker + embedder) ships in phases 5.2.b-ingest + 5.2.b-embed. Future contract: chunk markdown sources via heading-aware sliding window (2KB chunks, 200-byte overlap), SHA-256 for dedup, Ollama/nomic-embed-text default."
-    status: experimental
-    phase: 5.2.b-scaffold
+    name: "L2 Tank — ingest script (l2-ingest.sh) — REAL CHUNKER"
+    description: "Real implementation shipped Phase 5.2.b-ingest (2026-04-20). Chunks markdown sources via heading-aware splitter (l2-chunker.awk, MAX_SIZE=2048 default, per-chunk truncation on overflow). SHA-256-based dedup: unchanged source = no-op skip, changed source = delete-and-re-insert. Source-type auto-detected from path (wiki/chronicle/ingest). SQL generation via ruby (NUL-safe, single-quote-escape-safe). ingest_runs audit log per invocation. Embeddings NOT yet computed (5.2.b-embed is next slice)."
+    status: enabled
+    phase: 5.2.b-ingest
     enterprise_compliance: ok
-    requires: [bash, sqlite3]
+    requires: [bash, sqlite3, ruby, awk]
     depends_on: [knowledge.l2_tank_init]
     docs: .dexCore/_dev/docs/L2-TANK.md
     tests:
       - tests/e2e/12-knowledge-l2-tank-scaffold.test.sh
+      - tests/e2e/13-knowledge-l2-tank-ingest.test.sh
     primary_target: github_copilot
     known_issues:
-      - "Stub only — no real ingest. All invocations are no-ops. [L2 STUB] signal emitted so no downstream consumer mistakes scaffold for working pipeline."
+      - "Chunking v1 is heading-based (h1/h2, fallback to h3). No sliding-window overlap yet (future v2 if semantic search reveals blind spots). Per-chunk truncation on overflow is documented but fires only at MAX_SIZE+."
+      - "Source-type auto-detect works only for wiki / chronicle patterns; other paths default to 'ingest'. Extensible via path case in script."
+      - "Embeddings column remains empty after ingest — 5.2.b-embed slice fills it."
 
   - id: knowledge.l2_tank_query
     name: "L2 Tank — query script (l2-query.sh)"
@@ -1079,11 +1082,16 @@ counts:
   total: 78
   by_status:
     always_on: 6
-    enabled: 36
+    enabled: 37
     disabled: 0
     deferred: 34
     broken: 0
-    experimental: 2
+    experimental: 1
+  # Updated 2026-04-20 late-7 (Phase 5.2.b-ingest: REAL chunker shipped):
+  # - knowledge.l2_tank_ingest: experimental (STUB) → enabled (REAL CHUNKER)
+  # Net: enabled 36→37, experimental 2→1.
+  # Ingest pipeline now functional: chunk + dedup + re-ingest. Embeddings
+  # remain deferred to 5.2.b-embed slice.
   # Updated 2026-04-20 late-6 (Phase 5.2.b-scaffold: L2 Tank first slice):
   # - knowledge.l2_tank_sqlite: deferred → enabled (parent, wraps sub-features)
   # - knowledge.l2_tank_schema NEW enabled (SQLite schema v1)

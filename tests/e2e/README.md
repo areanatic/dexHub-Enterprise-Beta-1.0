@@ -90,6 +90,7 @@ If `claude` CLI is missing, live assertions fail with a clear message. Structura
 | 10 | `10-knowledge-l1-wiki-injection.test.sh` | Ruby or python3 + perl (size cap test) | ~20 structural + functional (design doc, load-wiki.sh executable + syntax-valid, 7 fixture-based cases: silent-on-empty, user-entry loads, template skipped, archived skipped, size-cap truncates, summary counts, nonexistent dir exit 0) | — | — |
 | 11 | `11-wiki-copilot-injection.test.sh` | bash | 16 structural + functional (build-instructions.sh wire exists, 3 fixture-round-trip scenarios: empty→no-inject, fixture installed→content reaches copilot-instructions.md, fixture removed→content gone; drift-check passes in all states; size cap 35KB honored) | — | — |
 | 12 | `12-knowledge-l2-tank-scaffold.test.sh` | bash + sqlite3 | ~22 structural + functional (design doc + schema SQL parses, l2-init.sh creates valid DB with all tables + FTS5 queryable + schema_version=1, stubs emit [L2 STUB] honesty signal, gitignore protects tank.sqlite, features.yaml declares sub-features) | — | — |
+| 13 | `13-knowledge-l2-tank-ingest.test.sh` | bash + sqlite3 + ruby + awk | ~18 structural + functional (chunker + ingest: fixture markdown → 5-8 chunks, titles preserved, single-quote content survives SQL escape, FTS5 finds terms post-ingest, dedup skips unchanged, edit-and-re-ingest grows chunk count, source-type auto-detect wiki/chronicle, dry-run writes nothing, ingest_runs audit log populated, features.yaml flipped to enabled) | — | — |
 
 ### Opt-in walkthroughs
 
