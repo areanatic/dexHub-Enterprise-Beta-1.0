@@ -1,0 +1,24 @@
+# Core Pack — always-on, cannot be disabled
+# ==========================================================
+# The 3 foundational agents that DexHub cannot function without.
+# Corresponds to agents.core_pack in features.yaml (status: always_on).
+# Users cannot toggle this pack off — packs.sh enforces `mandatory: true`.
+
+pack_id: core_pack
+name: "Core Pack (DexMaster + myDex)"
+description: "Foundational orchestration agents. Always active. Cannot be disabled."
+default_state: always_on
+mandatory: true
+compliance: ok
+version: 1
+
+agents:
+  - path: .dexCore/core/agents/dex-master.md
+    name: dex-master
+    role: "Meta-orchestrator — first responder on every user message"
+  - path: .dexCore/core/agents/mydex-agent.md
+    name: mydex-agent
+    role: "Project + workspace manager (myDex)"
+  - path: .dexCore/core/agents/mydex-project-manager.md
+    name: mydex-project-manager
+    role: "Project lifecycle management within myDex/"

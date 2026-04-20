@@ -255,37 +255,50 @@ agents:
     tests: []
 
   - id: agents.meta_pack
-    name: "Meta Pack (brownfield analysis)"
-    description: "18 meta-agents: codebase-analyzer, pattern-detector, api-documenter, tech-debt-auditor, etc."
-    status: deferred
+    name: "Meta Pack (brownfield analysis) — manifest shipped"
+    description: "Shipped Phase 5.1.d first slice (2026-04-21). Manifest at .dexCore/core/agents/packs/meta_pack.yaml declares the 18 meta-agents (existing at .dexCore/meta-agents/) as a single toggleable unit. Default state: disabled — users opt-in when they need codebase analysis / pattern detection / tech-debt audit tooling. Agents themselves have been in the repo for months; this slice adds the pack layer that makes them discoverable via the packs.sh list + selectable for the DexMaster menu (agents.user_toggle_menu)."
+    status: enabled
     phase: 5.1.d
     enterprise_compliance: ok
     requires: []
-    depends_on: []
+    depends_on: [agents.user_toggle_menu]
     docs: .dexCore/meta-agents/
-    tests: []
+    tests:
+      - tests/e2e/21-agent-packs.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Manifest covers 7 of 18 agents explicitly; the remaining 11 (in context/planning/research subfolders) are discovered dynamically by packs.sh via directory walk. A future slice may make the full list explicit."
+      - "Enabling the pack today just flips the state file — DexMaster menu integration (actually SHOWING the agents in the menu when enabled) lands in a later slice of agents.user_toggle_menu once the menu-rendering path is threaded through dex-master.md."
 
   - id: agents.onboarding_pack
-    name: "Onboarding Pack (connector-specific)"
-    description: "atlassian-onboarding, github-onboarding, figma-onboarding"
-    status: deferred
+    name: "Onboarding Pack (connector wizards) — manifest shipped"
+    description: "Shipped Phase 5.1.d first slice (2026-04-21). Manifest at .dexCore/core/agents/packs/onboarding_pack.yaml declares the 3 connector-onboarding agents (atlassian / github / figma) as a single toggleable unit. Default state: enabled — most users need at least one connector. Agents live at .github/agents/*-onboarding.agent.md (Copilot-native location); the manifest is here in .dexCore so the toggle system can find it. Supports disable for users who never use external integrations."
+    status: enabled
     phase: 5.1.d
     enterprise_compliance: ok
     requires: []
-    depends_on: []
-    docs: .dexCore/core/agents/
-    tests: []
+    depends_on: [agents.user_toggle_menu]
+    docs: .dexCore/core/agents/packs/onboarding_pack.yaml
+    tests:
+      - tests/e2e/21-agent-packs.test.sh
+    primary_target: github_copilot
 
   - id: agents.user_toggle_menu
-    name: "DexMaster *agents toggle menu"
-    description: "User can enable/disable individual agents and packs via DexMaster menu"
-    status: deferred
+    name: "Agent Pack toggle system (packs.sh)"
+    description: "Shipped Phase 5.1.d first slice (2026-04-21). User-facing toggle for agent packs via .dexCore/core/agents/packs.sh. Subcommands: list (table or JSON), status <pack>, enable <pack>, disable <pack>. User state lives at myDex/.dex/config/packs.yaml (user-owned, gitignored); template at packs.yaml.example is tracked in-repo. Pack manifests (core_pack, meta_pack, onboarding_pack) are framework-shipped at .dexCore/core/agents/packs/. Mandatory packs (manifest: mandatory=true) cannot be disabled — core_pack enforces this. DexMaster-menu integration (rendering the enabled packs inside the main menu) is a follow-up slice that edits dex-master.md to read the state file at session start."
+    status: enabled
     phase: 5.1.d
     enterprise_compliance: ok
-    requires: []
+    requires: [bash, ruby]
     depends_on: [agents.core_pack]
-    docs: pending
-    tests: []
+    docs: .dexCore/core/agents/packs.sh
+    tests:
+      - tests/e2e/21-agent-packs.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "DexMaster menu doesn't yet consume packs.yaml — the toggle is plumbed and testable, but the menu rendering that shows/hides agents based on pack state is a follow-up slice (agent-side edit to dex-master.md)."
+      - "YAML state-file I/O is minimal-grep-awk; hand-edited exotic layouts may not round-trip. Users should let packs.sh write the file or copy the template."
+      - "No batch enable/disable in this slice. Future convenience flag: packs.sh enable-all / disable-all if the use case materializes."
 
 # ─────────────────────────────────────────────────────────────────────────
 # KNOWLEDGE LAYER — 3-tier (Wiki / Tank / Chronicle)

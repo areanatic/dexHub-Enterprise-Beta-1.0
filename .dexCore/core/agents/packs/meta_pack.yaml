@@ -1,0 +1,48 @@
+# Meta Pack — brownfield analysis agents (pilot pack)
+# ==========================================================
+# 18 specialized agents for analyzing existing codebases: patterns,
+# tech debt, APIs, architecture, etc. Useful for joining a project in
+# flight or auditing legacy code. Disabled by default — users opt in
+# when they need deeper investigation tools.
+#
+# Corresponds to agents.meta_pack in features.yaml.
+# Agent files already live at .dexCore/meta-agents/ (shipped earlier);
+# this pack file is the manifest that makes them toggleable.
+
+pack_id: meta_pack
+name: "Meta Pack (brownfield analysis — 18 agents)"
+description: "Investigation + audit agents: codebase analysis, pattern detection, tech-debt audits, API docs. Disable to reduce menu noise if you never audit inherited code."
+default_state: disabled
+mandatory: false
+compliance: ok
+version: 1
+
+agents:
+  # Analysis (4)
+  - path: .dexCore/meta-agents/analysis/codebase-analyzer.md
+    name: codebase-analyzer
+    role: "Full-repo structural + dependency analysis"
+  - path: .dexCore/meta-agents/analysis/pattern-detector.md
+    name: pattern-detector
+    role: "Recurring design patterns + anti-patterns"
+  - path: .dexCore/meta-agents/analysis/api-documenter.md
+    name: api-documenter
+    role: "Auto-generate API surface docs from source"
+  - path: .dexCore/meta-agents/analysis/data-analyst.md
+    name: data-analyst
+    role: "Data model + schema analysis"
+
+  # Review (3)
+  - path: .dexCore/meta-agents/review/document-reviewer.md
+    name: document-reviewer
+    role: "Cross-check documentation vs code"
+  - path: .dexCore/meta-agents/review/technical-evaluator.md
+    name: technical-evaluator
+    role: "Technical fit evaluation for proposals"
+  - path: .dexCore/meta-agents/review/test-coverage-analyzer.md
+    name: test-coverage-analyzer
+    role: "Coverage gap + test-strategy review"
+
+  # Context + Planning + Research subfolders carry the remaining 11
+  # agents; they're discovered dynamically by packs.sh via the directory
+  # listing. Explicit entries above mirror the user-facing highlights.

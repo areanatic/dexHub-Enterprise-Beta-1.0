@@ -1,0 +1,29 @@
+# Onboarding Pack — connector-specific onboarding agents
+# ==========================================================
+# Wizard-style agents that walk users through setting up external
+# integrations (Atlassian, GitHub, Figma). Each agent handles its
+# platform's OAuth flow, consent capture, and capability verification.
+#
+# Corresponds to agents.onboarding_pack in features.yaml.
+# Agent files live at .github/agents/*-onboarding.agent.md (not inside
+# .dexCore because Copilot-specific, but the pack manifest is here so
+# users can toggle visibility in the DexMaster menu).
+
+pack_id: onboarding_pack
+name: "Onboarding Pack (connector wizards)"
+description: "Guided setup for external integrations — Atlassian (Jira/Confluence), GitHub, Figma. Includes enterprise-compliance consent flow. Disable if you never use external connectors."
+default_state: enabled
+mandatory: false
+compliance: ok
+version: 1
+
+agents:
+  - path: .github/agents/atlassian-onboarding.agent.md
+    name: atlassian-onboarding
+    role: "Jira + Confluence connector setup (MCP-based)"
+  - path: .github/agents/github-onboarding.agent.md
+    name: github-onboarding
+    role: "GitHub connector setup"
+  - path: .github/agents/figma-onboarding.agent.md
+    name: figma-onboarding
+    role: "Figma connector setup"

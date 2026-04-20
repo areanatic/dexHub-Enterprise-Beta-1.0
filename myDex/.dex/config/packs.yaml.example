@@ -1,0 +1,23 @@
+# DexHub Agent Packs — user state
+# ==========================================================
+# Tracks which non-mandatory agent packs you've chosen to enable or
+# disable. Packs not listed here fall back to their manifest's
+# `default_state`. Mandatory packs (core_pack) are always on and cannot
+# be listed here; packs.sh refuses disable attempts for them.
+#
+# Managed by: .dexCore/core/agents/packs.sh
+# (You can also edit by hand — it's just YAML.)
+#
+# Copy this file to myDex/.dex/config/packs.yaml and uncomment the
+# entries you want. The real file is gitignored (user state).
+
+schema_version: 1
+
+# Packs you've enabled (override default_state=disabled).
+enabled_packs: []
+#   - meta_pack
+#   - onboarding_pack
+
+# Packs you've explicitly disabled (override default_state=enabled).
+disabled_packs: []
+#   - dhl_pack
