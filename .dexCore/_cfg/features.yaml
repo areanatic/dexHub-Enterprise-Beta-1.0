@@ -671,17 +671,24 @@ parser:
       - "Silent stderr drops on success (2026-04-22 session-7 final-review low-severity finding): when pdftotext exits 0 but writes warnings to stderr (font-decode issues, encoding substitutions), the adapter discards them. Corrupted-text PDFs produce replacement characters that slip through as valid content. Acceptable for the target use case (clean vector PDFs / Figma exports); would matter more for scanned-document PDFs which should go through ollama_vlm anyway. Fix path: surface stderr summary as a 'warnings' field in the success JSON — deferred until real-world data shows it's needed."
 
   - id: parser.pattern_b_raster_6phase
-    name: "Pattern B Skill (Raster 6-Phase Pipeline)"
-    description: "Expensive but necessary: overview → cluster-detect → hi-res crops → per-cluster VLM → synthesis → verify"
+    name: "Pattern B Skill (Raster 6-Phase Pipeline) — SCAFFOLD"
+    description: "SCAFFOLDED 2026-04-21 session-7 (adapter at .dexCore/core/parser/backends/pattern-b-raster-6phase.sh emits BACKEND-ADAPTER-PATTERN JSON with status=deferred + hint_type=install_backend; REAL 6-phase impl deferred to 1.1). Pipeline target: (1) OVERVIEW — downscale PDF to ≤1800px via sips/convert, fits in one VLM context; (2) CLUSTER-DETECT — VLM identifies distinct content regions (tables, charts, body, diagrams) + returns bounding boxes; (3) HI-RES CROPS — crop original PDF to each bbox via pdftoppm/sips; (4) PER-CLUSTER VLM — region-specific prompts (tables→markdown, charts→data-extraction); (5) SYNTHESIS — VLM combines per-cluster outputs preserving reading order, fed the overview as layout context; (6) VERIFY — VLM sanity-check final output against overview, flag hallucinations. Target files: image-heavy PDFs (Figma boards, Miro exports, scanned docs) where pattern_a's text layer is absent/unreliable AND kreuzberg's classical extraction underperforms. 5-20× the VLM token cost of pattern_a — justified only for the hybrid oversize/visual-board case."
     status: deferred
     phase: 1.1
     enterprise_compliance: local_vlm_required
-    requires: [poppler-utils, sips, ollama]
+    requires: [poppler-utils, sips-or-imagemagick, ollama]
     depends_on: [parser.pattern_a_vector_text, parser.ollama_vlm_backend]
     docs:
-      - ~/.claude/projects/.../memory/feedback_raster_oversize_visual_boards.md
-      - ~/.claude/projects/.../memory/project_phase_5_3_parser_oversize_priority_feature.md
-    tests: []
+      - myDex/drafts/RESEARCH-DOCUMENT-PARSING-FEATURE.md
+      - myDex/drafts/CONCEPT-PARSER-ARCHITECTURE.md
+    tests:
+      - tests/e2e/30-parser-pattern-b-scaffold.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "SCAFFOLD only — --detect returns status=deferred + hint_type=install_backend; --extract returns status=deferred without attempting extraction. Reserves the backend ID in capabilities-probe KNOWN_BACKENDS + BACKEND-ADAPTER-PATTERN compliance so the real 6-phase impl in 1.1 plugs in without contract churn."
+      - "The 6-phase pipeline implementation is substantial (multi-phase VLM orchestration + clustering heuristics + hi-res page rasterization + synthesis prompt engineering). Split into 6 sub-phases for incremental shipping: parser.pattern_b_phase1_overview → phase2_cluster_detect → … each as its own feature flag."
+      - "Routing decision pending: parse-route.sh needs to decide WHEN to prefer Pattern B over Pattern A. Current oversize (≥100MB) triggers backend=defer with status=deferred — those requests will start routing to pattern_b_raster_6phase once phase1 ships."
+      - "Clustering method: tree-sitter-style bbox extraction via VLM OR classical OpenCV region segmentation. Design pending. VLM-bbox is simpler but accuracy depends on prompt engineering; OpenCV needs an additional dependency. First-slice impl will try VLM-only to keep dep surface minimal."
 
   - id: parser.inbox_auto_parse
     name: "Inbox Auto-Parse Orchestrator (inbox-auto-parse.sh + *inbox menu)"
