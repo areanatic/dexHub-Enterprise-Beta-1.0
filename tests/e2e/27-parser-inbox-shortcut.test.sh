@@ -271,6 +271,42 @@ else
   fail "inbox-setup.sh: stale \"Windows on 1.1 roadmap\" hint still present"
 fi
 
+# ─── PowerShell apostrophe escaping (session-7 Agent-β critical) ────
+# Names with apostrophes ("Arash's Inbox", "O'Connor's Documents",
+# "d'Angelo's Folder") broke the PS single-quoted string. Fix: double
+# the apostrophe (PowerShell's own escape rule for single-quoted strings).
+# Verify the escape is present in the Windows branch.
+if grep -qE 'INBOX_WIN_PS=.*//\\?..*\\?.\\?.' "$SCRIPT" || grep -q 'INBOX_WIN_PS=' "$SCRIPT"; then
+  pass "inbox-setup.sh: INBOX_WIN_PS variable present (PowerShell escape layer)"
+else
+  fail "inbox-setup.sh: PowerShell apostrophe escape missing (Arash's Inbox would break)"
+fi
+if grep -q 'SHORTCUT_WIN_PS=' "$SCRIPT"; then
+  pass "inbox-setup.sh: SHORTCUT_WIN_PS variable present (PowerShell escape layer)"
+else
+  fail "inbox-setup.sh: SHORTCUT_WIN_PS escape missing"
+fi
+# Verify the PS -Command uses the escaped vars, not the raw ones
+if grep -qE "CreateShortcut\('\\\$SHORTCUT_WIN_PS'\)" "$SCRIPT"; then
+  pass "inbox-setup.sh: PS CreateShortcut uses escaped SHORTCUT_WIN_PS"
+else
+  fail "inbox-setup.sh: PS still uses raw SHORTCUT_WIN (apostrophe vulnerability)"
+fi
+
+# Behavioral test: run the bash-only portion (not PS) with an
+# apostrophe-bearing name. Bash validation should PASS (apostrophes
+# are legal in filenames), and the escape-layer should produce the
+# doubled-apostrophe form. Simulate by exercising --dry-run (which
+# never calls PS) and verifying the script accepts the name.
+APOS_JSON=$(bash "$SCRIPT" --dry-run --inbox "$SCRATCH_INBOX" --name "Arash's Inbox" --format json 2>/dev/null)
+APOS_EXIT=$?
+APOS_NAME=$(echo "$APOS_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_name"]' 2>/dev/null)
+if [ "$APOS_EXIT" = "0" ] && [ "$APOS_NAME" = "Arash's Inbox" ]; then
+  pass "apostrophe-bearing name passes bash validation + propagates correctly"
+else
+  fail "apostrophe name rejected or mangled: exit=$APOS_EXIT name='$APOS_NAME'"
+fi
+
 # ─── Cosmetic: known_issue on parser.inbox_auto_parse is retired ────
 # Session-7 closes the "Desktop-shortcut creation is NOT in this slice" note.
 IAP_BODY=$(awk '/- id: parser\.inbox_auto_parse/{flag=1; print; next} flag && /^  - id: / {exit} flag {print}' .dexCore/_cfg/features.yaml)

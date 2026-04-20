@@ -1312,14 +1312,22 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 84
+  total: 85
   by_status:
     always_on: 7
-    enabled: 58
+    enabled: 59
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-21 session 7 late-batch (post Pattern-B scaffold + watcher):
+  # - parser.inbox_watcher NEW enabled (5.3.i) — total 84→85, enabled 58→59
+  # - parser.pattern_b_raster_6phase: SCAFFOLDED as deferred (description
+  #   rewritten + known_issues expanded; status unchanged deferred, no count
+  #   impact)
+  # Drift caught by session-7 final-review Agent A (declared enabled=58 but
+  # actual grep=59). Triggered addition of validate.sh §26 to prevent class
+  # of bugs where counts_block drifts from actual registry.
   # Updated 2026-04-22 session 7 (Option C ship — parser.pattern_a_vector_text).
   # Net since previous session-7 update: 1 flip deferred → enabled
   # (parser.pattern_a_vector_text, 5.3.d first slice with full hint_type contract).

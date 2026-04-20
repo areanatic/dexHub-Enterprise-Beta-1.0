@@ -49,7 +49,7 @@ echo -e "${BOLD}========================================${NC}"
 echo ""
 
 # ==================== SECTION 1: Byte Limits ====================
-echo -e "${BOLD}[1/25] Byte Limits${NC}"
+echo -e "${BOLD}[1/26] Byte Limits${NC}"
 
 BYTES=$(wc -c < .github/copilot-instructions.md)
 # Limit raised 2026-04-20 from 30,500 to 35,000 to accommodate Phase 5.2.d
@@ -62,7 +62,7 @@ else
 fi
 
 # ==================== SECTION 2: Bug Status ====================
-echo -e "\n${BOLD}[2/25] Bug Status${NC}"
+echo -e "\n${BOLD}[2/26] Bug Status${NC}"
 
 OPEN_BUGS=$(grep -c 'status: open\|status: confirmed' .dexCore/_dev/todos/bugs.md 2>/dev/null || true)
 OPEN_BUGS=$(echo "$OPEN_BUGS" | tr -d '[:space:]')
@@ -88,7 +88,7 @@ else
 fi
 
 # ==================== SECTION 3: Cross-Platform Consistency ====================
-echo -e "\n${BOLD}[3/25] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
+echo -e "\n${BOLD}[3/26] Cross-Platform Consistency (CLAUDE.md vs copilot-instructions.md)${NC}"
 
 if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
   skip "§3 cross-platform parity: enterprise bundle has only Copilot tail (nothing to parity-check against)"
@@ -168,7 +168,7 @@ else
 fi
 
 # ==================== SECTION 4: File Existence ====================
-echo -e "\n${BOLD}[4/25] Critical File Existence${NC}"
+echo -e "\n${BOLD}[4/26] Critical File Existence${NC}"
 
 FILES=(
   ".dexCore/core/agents/dex-master.md"
@@ -203,7 +203,7 @@ for f in "${FILES[@]}"; do
 done
 
 # ==================== SECTION 5: Feature Validation ====================
-echo -e "\n${BOLD}[5/25] Feature Artifact Validation${NC}"
+echo -e "\n${BOLD}[5/26] Feature Artifact Validation${NC}"
 
 # F-005: Guardrails G1-G6
 for g in G1 G2 G3 G4 G5 G6; do
@@ -297,7 +297,7 @@ else
 fi
 
 # ==================== SECTION 6: Architecture Rules ====================
-echo -e "\n${BOLD}[6/25] Architecture Rules${NC}"
+echo -e "\n${BOLD}[6/26] Architecture Rules${NC}"
 
 # G3: No files in root (except allowed)
 ALLOWED_ROOT="CONTRIBUTING.md|LICENSE|NOTICE|README.md|.gitignore|.gitattributes|myDex|tests"
@@ -323,7 +323,7 @@ else
 fi
 
 # ==================== SECTION 7: Sanity Checks ====================
-echo -e "\n${BOLD}[7/25] Sanity Checks${NC}"
+echo -e "\n${BOLD}[7/26] Sanity Checks${NC}"
 
 # Agent count
 AGENT_FILES=$(find .dexCore/dxm/agents -name "*.md" 2>/dev/null | wc -l)
@@ -341,7 +341,7 @@ else
 fi
 
 # ==================== SECTION 8: Agent File Validation ====================
-echo -e "\n${BOLD}[8/25] Agent File Validation${NC}"
+echo -e "\n${BOLD}[8/26] Agent File Validation${NC}"
 
 # Check all .agent.md files have required frontmatter
 for agent_file in .github/agents/*.agent.md; do
@@ -366,7 +366,7 @@ else
 fi
 
 # ==================== SECTION 9: Skill Validation ====================
-echo -e "\n${BOLD}[9/25] Skill Validation${NC}"
+echo -e "\n${BOLD}[9/26] Skill Validation${NC}"
 
 SKILL_COUNT=$(find .github/skills -name "SKILL.md" 2>/dev/null | wc -l)
 pass "Copilot Skills found: $SKILL_COUNT"
@@ -390,7 +390,7 @@ for skill_dir in .github/skills/*/; do
 done
 
 # ==================== SECTION 10: Manifest Sync ====================
-echo -e "\n${BOLD}[10/25] Manifest Sync${NC}"
+echo -e "\n${BOLD}[10/26] Manifest Sync${NC}"
 
 # Workflow manifest paths should use .dexCore/ not dex/
 BAD_PATHS=$(grep -c '"dex/' .dexCore/_cfg/workflow-manifest.csv 2>/dev/null || echo 0)
@@ -413,7 +413,7 @@ else
 fi
 
 # ==================== SECTION 11: Platform Hygiene ====================
-echo -e "\n${BOLD}[11/25] Platform Hygiene${NC}"
+echo -e "\n${BOLD}[11/26] Platform Hygiene${NC}"
 
 # No Claude Code refs in user-facing files
 CC_REFS=0
@@ -455,7 +455,7 @@ else
 fi
 
 # ==================== SECTION 12: Number Consistency ====================
-echo -e "\n${BOLD}[12/25] Number Consistency${NC}"
+echo -e "\n${BOLD}[12/26] Number Consistency${NC}"
 
 # Count actual values
 ACTUAL_AGENTS=$(tail -n +2 .dexCore/_cfg/agent-manifest.csv | wc -l | tr -d ' ')
@@ -488,7 +488,7 @@ else
 fi
 
 # ==================== SECTION 13: Workflow YAML Validation ====================
-echo -e "\n${BOLD}[13/25] Workflow YAML Validation${NC}"
+echo -e "\n${BOLD}[13/26] Workflow YAML Validation${NC}"
 
 WORKFLOW_PASS=0
 WORKFLOW_FAIL=0
@@ -514,7 +514,7 @@ if [ "$WORKFLOW_FAIL" -gt 0 ]; then
 fi
 
 # ==================== SECTION 14: Agent Persona Consistency ====================
-echo -e "\n${BOLD}[14/25] Agent Persona Consistency${NC}"
+echo -e "\n${BOLD}[14/26] Agent Persona Consistency${NC}"
 
 for agent_file in .github/agents/*.agent.md; do
   name=$(basename "$agent_file" .agent.md)
@@ -535,7 +535,7 @@ for agent_file in .github/agents/*.agent.md; do
 done
 
 # ==================== SECTION 15: Cross-Reference Integrity ====================
-echo -e "\n${BOLD}[15/25] Cross-Reference Integrity${NC}"
+echo -e "\n${BOLD}[15/26] Cross-Reference Integrity${NC}"
 
 # Check key paths mentioned in copilot-instructions.md
 CRITICAL_PATHS=(
@@ -557,7 +557,7 @@ for ref_path in "${CRITICAL_PATHS[@]}"; do
 done
 
 # ==================== SECTION 16: Onboarding Logic ====================
-echo -e "\n${BOLD}[16/25] Onboarding Logic${NC}"
+echo -e "\n${BOLD}[16/26] Onboarding Logic${NC}"
 
 QUESTIONS_FILE=".dexCore/_cfg/onboarding-questions.yaml"
 if [ -f "$QUESTIONS_FILE" ]; then
@@ -599,7 +599,7 @@ else
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================
-echo -e "\n${BOLD}[17/25] Guardrail Pattern Enforcement${NC}"
+echo -e "\n${BOLD}[17/26] Guardrail Pattern Enforcement${NC}"
 
 # Primary tail for guardrail checks: CLAUDE.md if present, else copilot-instructions.md
 GUARD_TAIL=".claude/CLAUDE.md"
@@ -649,7 +649,7 @@ else
 fi
 
 # ==================== SECTION 18: DexMemory & Chronicle Structure ====================
-echo -e "\n${BOLD}[18/25] DexMemory & Chronicle Structure${NC}"
+echo -e "\n${BOLD}[18/26] DexMemory & Chronicle Structure${NC}"
 
 # DexMemory infrastructure
 if [ -d "myDex/.dex/chronicle" ]; then
@@ -716,7 +716,7 @@ else
 fi
 
 # ==================== SECTION 19: SSOT Instruction Drift Detection ====================
-echo -e "\n${BOLD}[19/25] SSOT Instruction Drift Detection${NC}"
+echo -e "\n${BOLD}[19/26] SSOT Instruction Drift Detection${NC}"
 
 if [ "$HAS_CLAUDE_TAIL" = "0" ]; then
   skip "SSOT drift check — enterprise bundle has only Copilot tail; compiler-check compares both tails in dev mode only"
@@ -744,7 +744,7 @@ for gen_file in .claude/CLAUDE.md .github/copilot-instructions.md; do
 done
 
 # ==================== SECTION 20: Files-Manifest Integrity ====================
-echo -e "\n${BOLD}[20/25] Files-Manifest Integrity${NC}"
+echo -e "\n${BOLD}[20/26] Files-Manifest Integrity${NC}"
 
 if [ -f ".dexCore/_cfg/files-manifest.csv" ]; then
   MANIFEST_TOTAL=$(tail -n +2 .dexCore/_cfg/files-manifest.csv | wc -l | tr -d ' ')
@@ -812,7 +812,7 @@ else
 fi
 
 # ==================== SECTION 21: Source File Semantic Consistency ====================
-echo -e "\n${BOLD}[21/25] Source File Semantic Consistency (SHARED vs peer files)${NC}"
+echo -e "\n${BOLD}[21/26] Source File Semantic Consistency (SHARED vs peer files)${NC}"
 
 # Detect contradictions between SHARED.md and the platform-specific tails.
 # Catches the class of bug where SHARED.md asserts a new paradigm but a tail
@@ -876,7 +876,7 @@ if [ "$CONSISTENCY_ISSUES" -eq 0 ]; then
 fi
 
 # ==================== SECTION 22: CONTEXT.md Session State Schema (D1 Layer-2) ====================
-echo -e "\n${BOLD}[22/25] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
+echo -e "\n${BOLD}[22/26] CONTEXT.md Session State Schema (D1 Layer-2)${NC}"
 
 # CONTEXT.md is gitignored per-user state. Check schema ONLY if file exists.
 # Does not FAIL if absent (fresh users won't have one).
@@ -942,7 +942,7 @@ else
 fi
 
 # ==================== SECTION 23: Feature Registry Consistency ====================
-echo -e "\n${BOLD}[23/25] Feature Registry (features.yaml) Consistency${NC}"
+echo -e "\n${BOLD}[23/26] Feature Registry (features.yaml) Consistency${NC}"
 
 FEATURES_FILE=".dexCore/_cfg/features.yaml"
 
@@ -1118,7 +1118,7 @@ fi
 # enterprise bundle (no .git directory + anchor stripped by build-for-
 # enterprise.sh), §24 becomes meaningless — we're not in a dev worktree.
 # Detect this and skip cleanly instead of failing.
-echo -e "\n${BOLD}[24/25] Session Anchor (worktree-identity consistency)${NC}"
+echo -e "\n${BOLD}[24/26] Session Anchor (worktree-identity consistency)${NC}"
 
 ANCHOR_FILE=".dexcore-session-anchor"
 
@@ -1188,7 +1188,7 @@ fi
 # by_status.enabled, etc.) but forgot to update the matching numbers in
 # README.md's "Feature Matrix" table. Self-review caught it that day;
 # this gate catches it mechanically for everyone.
-echo -e "\n${BOLD}[25/25] README ↔ features.yaml Counts Consistency${NC}"
+echo -e "\n${BOLD}[25/26] README ↔ features.yaml Counts Consistency${NC}"
 
 README_FILE="README.md"
 if [ ! -f "$README_FILE" ] || [ ! -f "$FEATURES_FILE" ]; then
@@ -1272,6 +1272,102 @@ print(json.dumps({
     pass "README feature counts match features.yaml counts_block (total + 5 statuses)"
   else
     fail "README ↔ counts drift: ${MISMATCH_LIST%; }"
+  fi
+fi
+
+# ==================== SECTION 26: counts_block ↔ actual registry ====================
+# Complement to §25 (counts_block ↔ README). This one catches the class
+# where both counts_block + README agree but DIFFER from actual reality.
+# Triggered by session-7 final-review 2026-04-21: parser.inbox_watcher
+# was added as `enabled` in features.yaml but counts_block.enabled was
+# never incremented — README matched counts_block (58/58) so §25 passed,
+# but actual grep count was 59. Silent drift from reality.
+echo -e "\n${BOLD}[26/26] counts_block ↔ actual registry consistency${NC}"
+
+if [ ! -f "$FEATURES_FILE" ]; then
+  warn "counts↔actual check skipped — features.yaml missing"
+elif [ -z "${FEAT_YAML_TOOL:-}" ]; then
+  warn "counts↔actual check skipped — no YAML parser"
+else
+  # Actual counts — count lines at exactly 4-space indentation (sub-feature
+  # status entries). Sub-field status values inside known_issues / tests[]
+  # are at deeper indent so they don't collide. `|| true` guards against
+  # set -e killing the script when a status bucket has zero matches
+  # (grep -c returns 1 in that case — a count of 0 is not a failure here).
+  ACTUAL_TOTAL=$(grep -c "^    status:" "$FEATURES_FILE" || true)
+  ACTUAL_ALWAYS_ON=$(grep -c "^    status: always_on$" "$FEATURES_FILE" || true)
+  ACTUAL_ENABLED=$(grep -c "^    status: enabled$" "$FEATURES_FILE" || true)
+  ACTUAL_DISABLED=$(grep -c "^    status: disabled$" "$FEATURES_FILE" || true)
+  ACTUAL_DEFERRED=$(grep -c "^    status: deferred$" "$FEATURES_FILE" || true)
+  ACTUAL_BROKEN=$(grep -c "^    status: broken$" "$FEATURES_FILE" || true)
+  ACTUAL_EXPERIMENTAL=$(grep -c "^    status: experimental$" "$FEATURES_FILE" || true)
+
+  # Declared from counts_block (already parsed as COUNTS_JSON in §25).
+  # If §25 skipped (no YAML parser), this section also skips. We re-use the
+  # same extraction to avoid duplication.
+  if [ "$FEAT_YAML_TOOL" = "ruby" ]; then
+    DECLARED_JSON=$(ruby -ryaml -rjson -e "
+      data = YAML.load_file('$FEATURES_FILE') rescue {}
+      c = data['counts'] || {}
+      bs = c['by_status'] || {}
+      puts JSON.generate({
+        'total'        => c['total'].to_i,
+        'always_on'    => bs['always_on'].to_i,
+        'enabled'      => bs['enabled'].to_i,
+        'disabled'     => bs['disabled'].to_i,
+        'deferred'     => bs['deferred'].to_i,
+        'broken'       => bs['broken'].to_i,
+        'experimental' => bs['experimental'].to_i
+      })
+    " 2>/dev/null)
+  else
+    DECLARED_JSON=$(python3 -c "
+import yaml, json
+data = yaml.safe_load(open('$FEATURES_FILE')) or {}
+c = data.get('counts') or {}
+bs = c.get('by_status') or {}
+print(json.dumps({
+  'total': int(c.get('total') or 0),
+  'always_on': int(bs.get('always_on') or 0),
+  'enabled': int(bs.get('enabled') or 0),
+  'disabled': int(bs.get('disabled') or 0),
+  'deferred': int(bs.get('deferred') or 0),
+  'broken': int(bs.get('broken') or 0),
+  'experimental': int(bs.get('experimental') or 0),
+}))
+" 2>/dev/null)
+  fi
+
+  get_declared() {
+    echo "$DECLARED_JSON" | ruby -rjson -e "puts (JSON.parse(STDIN.read)['$1']).to_s" 2>/dev/null
+  }
+  DECL_TOTAL=$(get_declared "total")
+  DECL_ALWAYS_ON=$(get_declared "always_on")
+  DECL_ENABLED=$(get_declared "enabled")
+  DECL_DISABLED=$(get_declared "disabled")
+  DECL_DEFERRED=$(get_declared "deferred")
+  DECL_BROKEN=$(get_declared "broken")
+  DECL_EXPERIMENTAL=$(get_declared "experimental")
+
+  DRIFT_LIST=""
+  check_real() {
+    local label="$1" actual="$2" declared="$3"
+    if [ "$actual" != "$declared" ]; then
+      DRIFT_LIST="${DRIFT_LIST}${label}: actual=${actual} declared=${declared}; "
+    fi
+  }
+  check_real "total"        "$ACTUAL_TOTAL"        "$DECL_TOTAL"
+  check_real "always_on"    "$ACTUAL_ALWAYS_ON"    "$DECL_ALWAYS_ON"
+  check_real "enabled"      "$ACTUAL_ENABLED"      "$DECL_ENABLED"
+  check_real "disabled"     "$ACTUAL_DISABLED"     "$DECL_DISABLED"
+  check_real "deferred"     "$ACTUAL_DEFERRED"     "$DECL_DEFERRED"
+  check_real "broken"       "$ACTUAL_BROKEN"       "$DECL_BROKEN"
+  check_real "experimental" "$ACTUAL_EXPERIMENTAL" "$DECL_EXPERIMENTAL"
+
+  if [ -z "$DRIFT_LIST" ]; then
+    pass "counts_block matches actual registry (${ACTUAL_TOTAL} features, all status buckets aligned)"
+  else
+    fail "counts_block drifted from actual registry: ${DRIFT_LIST%; }"
   fi
 fi
 

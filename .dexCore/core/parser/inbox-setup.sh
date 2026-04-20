@@ -348,13 +348,18 @@ case "$PLATFORM" in
     fi
     rm -f "$SHORTCUT_PATH" 2>/dev/null
     # The PS one-liner: create a WScript.Shell COM object, build the
-    # shortcut, point at inbox, save. Quote-sensitive — path arguments
-    # wrapped in single-quotes inside PS (double-quotes inside would
-    # be evaluated for variable interpolation, which we don't want).
-    # Paths with literal single-quotes would need escaping (rare for
-    # Desktop + inbox; known_issue documented).
+    # shortcut, point at inbox, save. Path arguments wrapped in PS
+    # single-quoted strings (double-quotes would trigger variable
+    # interpolation we do not want). Literal apostrophes in paths
+    # (e.g., name "Arash's Inbox") break single-quoted PS strings —
+    # PS's own escape rule is to DOUBLE the apostrophe. Escape here
+    # in bash before injecting. Fixes session-7 Agent-B critical
+    # finding: common user names with apostrophes silently broke
+    # the PS command.
+    INBOX_WIN_PS="${INBOX_WIN//\'/\'\'}"
+    SHORTCUT_WIN_PS="${SHORTCUT_WIN//\'/\'\'}"
     "$POWERSHELL" -NoProfile -Command \
-      "\$s = (New-Object -ComObject WScript.Shell).CreateShortcut('$SHORTCUT_WIN'); \$s.TargetPath = '$INBOX_WIN'; \$s.Description = 'DexHub inbox — drag files here to parse into the Knowledge Tank'; \$s.Save()" \
+      "\$s = (New-Object -ComObject WScript.Shell).CreateShortcut('$SHORTCUT_WIN_PS'); \$s.TargetPath = '$INBOX_WIN_PS'; \$s.Description = 'DexHub inbox — drag files here to parse into the Knowledge Tank'; \$s.Save()" \
       >/dev/null 2>&1
     PS_EXIT=$?
     if [ "$PS_EXIT" = "0" ] && [ -f "$SHORTCUT_PATH" ]; then
