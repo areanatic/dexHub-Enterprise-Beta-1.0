@@ -197,11 +197,9 @@ emit() {
 }
 
 # ─── Platform-support guard ─────────────────────────────────────────
+# Windows is now supported via PowerShell .lnk (shipped 2026-04-21 session-7).
+# Unknown platforms still exit cleanly with an honest error.
 case "$PLATFORM" in
-  windows)
-    emit "unsupported_platform" 2 \
-      "Windows desktop-shortcut creation is on the 1.1 roadmap. Manual workaround: Right-click the myDex/inbox folder in Explorer → Send To → Desktop (create shortcut)."
-    ;;
   unknown)
     emit "unsupported_platform" 2 "Unrecognized platform: $UNAME_S"
     ;;
@@ -250,8 +248,9 @@ fi
 
 # ─── Compute shortcut path per platform ─────────────────────────────
 case "$PLATFORM" in
-  macos) SHORTCUT_PATH="$DESKTOP/$NAME" ;;
-  linux) SHORTCUT_PATH="$DESKTOP/${NAME}.desktop" ;;
+  macos)   SHORTCUT_PATH="$DESKTOP/$NAME" ;;
+  linux)   SHORTCUT_PATH="$DESKTOP/${NAME}.desktop" ;;
+  windows) SHORTCUT_PATH="$DESKTOP/${NAME}.lnk" ;;
 esac
 
 # ─── ACTION: remove ─────────────────────────────────────────────────
@@ -322,6 +321,46 @@ case "$PLATFORM" in
       emit "created" 0 "" "$SHORTCUT_PATH"
     else
       emit "create_failed" 4 "Could not write $SHORTCUT_PATH" "$SHORTCUT_PATH"
+    fi
+    ;;
+  windows)
+    # PowerShell COM-based .lnk creator. Works in Git Bash / MSYS2 / Cygwin /
+    # WSL (via powershell.exe interop) as long as PowerShell is on PATH.
+    # 2026-04-21 session-7 scaffold — graceful when PS missing, uses cygpath
+    # for bash↔Windows path conversion when available, honest hint otherwise.
+    POWERSHELL=""
+    if command -v pwsh.exe >/dev/null 2>&1; then
+      POWERSHELL="pwsh.exe"
+    elif command -v powershell.exe >/dev/null 2>&1; then
+      POWERSHELL="powershell.exe"
+    else
+      emit "missing_dependency" 2 "Windows shortcut creation requires PowerShell on PATH (pwsh.exe or powershell.exe). Install PowerShell 7+ from https://aka.ms/powershell, or run from Git Bash / MSYS2 / WSL where powershell.exe is reachable. Manual workaround: Right-click the inbox folder in Explorer → Send To → Desktop (create shortcut)."
+    fi
+    # Convert bash-style paths to Windows-native when cygpath is around
+    # (Git Bash / Cygwin / MSYS2 ship it). Without cygpath, pass bash
+    # paths directly — works on WSL where PowerShell handles both.
+    if command -v cygpath >/dev/null 2>&1; then
+      INBOX_WIN=$(cygpath -w "$INBOX_ABS" 2>/dev/null || printf '%s' "$INBOX_ABS")
+      SHORTCUT_WIN=$(cygpath -w "$SHORTCUT_PATH" 2>/dev/null || printf '%s' "$SHORTCUT_PATH")
+    else
+      INBOX_WIN="$INBOX_ABS"
+      SHORTCUT_WIN="$SHORTCUT_PATH"
+    fi
+    rm -f "$SHORTCUT_PATH" 2>/dev/null
+    # The PS one-liner: create a WScript.Shell COM object, build the
+    # shortcut, point at inbox, save. Quote-sensitive — path arguments
+    # wrapped in single-quotes inside PS (double-quotes inside would
+    # be evaluated for variable interpolation, which we don't want).
+    # Paths with literal single-quotes would need escaping (rare for
+    # Desktop + inbox; known_issue documented).
+    "$POWERSHELL" -NoProfile -Command \
+      "\$s = (New-Object -ComObject WScript.Shell).CreateShortcut('$SHORTCUT_WIN'); \$s.TargetPath = '$INBOX_WIN'; \$s.Description = 'DexHub inbox — drag files here to parse into the Knowledge Tank'; \$s.Save()" \
+      >/dev/null 2>&1
+    PS_EXIT=$?
+    if [ "$PS_EXIT" = "0" ] && [ -f "$SHORTCUT_PATH" ]; then
+      emit "created" 0 "" "$SHORTCUT_PATH"
+    else
+      emit "create_failed" 4 "PowerShell .lnk creation failed (exit $PS_EXIT). Check: $POWERSHELL on PATH; Desktop folder writable; no antivirus blocking COM object creation." "$SHORTCUT_PATH"
     fi
     ;;
 esac

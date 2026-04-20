@@ -231,6 +231,46 @@ fi
 
 rm -rf "$XDG_SCRATCH"
 
+# ─── Windows .lnk scaffold (session-7 TODO #6) ──────────────────────
+# Can't execute PowerShell on this macOS CI — assert STRUCTURAL presence
+# of the windows branch so future refactors don't silently drop it.
+if grep -qE '^\s+windows\)' "$SCRIPT"; then
+  pass "inbox-setup.sh: windows case present in create-action dispatch"
+else
+  fail "inbox-setup.sh: windows branch missing"
+fi
+if grep -qE '^\s+windows\)\s+SHORTCUT_PATH=.*\.lnk' "$SCRIPT"; then
+  pass "inbox-setup.sh: windows computes SHORTCUT_PATH as .lnk"
+else
+  fail "inbox-setup.sh: windows SHORTCUT_PATH not .lnk"
+fi
+if grep -q 'pwsh.exe' "$SCRIPT" && grep -q 'powershell.exe' "$SCRIPT"; then
+  pass "inbox-setup.sh: windows probes both pwsh.exe + powershell.exe"
+else
+  fail "inbox-setup.sh: PowerShell detection incomplete"
+fi
+if grep -q 'WScript.Shell' "$SCRIPT" && grep -q 'CreateShortcut' "$SCRIPT"; then
+  pass "inbox-setup.sh: windows uses WScript.Shell COM for .lnk creation"
+else
+  fail "inbox-setup.sh: COM shortcut creation missing"
+fi
+if grep -q 'cygpath' "$SCRIPT"; then
+  pass "inbox-setup.sh: windows uses cygpath for bash↔Windows path conversion"
+else
+  fail "inbox-setup.sh: cygpath conversion missing"
+fi
+if grep -qE '"missing_dependency".*pwsh.*powershell|PowerShell.*PATH' "$SCRIPT"; then
+  pass "inbox-setup.sh: missing-PowerShell case surfaces honest hint"
+else
+  fail "inbox-setup.sh: PowerShell-missing hint missing"
+fi
+# Help text must still exit 2 for unknown platforms (not windows anymore)
+if ! grep -q 'unsupported_platform.*2.*roadmap' "$SCRIPT"; then
+  pass "inbox-setup.sh: Windows-roadmap hint replaced by live scaffold (known_issue retired)"
+else
+  fail "inbox-setup.sh: stale \"Windows on 1.1 roadmap\" hint still present"
+fi
+
 # ─── Cosmetic: known_issue on parser.inbox_auto_parse is retired ────
 # Session-7 closes the "Desktop-shortcut creation is NOT in this slice" note.
 IAP_BODY=$(awk '/- id: parser\.inbox_auto_parse/{flag=1; print; next} flag && /^  - id: / {exit} flag {print}' .dexCore/_cfg/features.yaml)
