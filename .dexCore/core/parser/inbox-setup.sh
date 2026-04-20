@@ -85,6 +85,28 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# ─── Validate --name (Agent-β finding 2026-04-22 session-7) ────────
+# Reject control characters (newline, tab, NUL) and path separators in
+# the shortcut name. These would produce malformed filenames on disk,
+# corrupt .desktop files on Linux, or create unfixable Desktop state.
+# Printable chars (spaces, punctuation, UTF-8) are allowed — we only
+# block the truly dangerous ones.
+if [ -z "$NAME" ]; then
+  echo "ERROR: --name must not be empty" >&2
+  exit 1
+fi
+case "$NAME" in
+  */*)
+    echo "ERROR: --name must not contain path separators (/) — got: $NAME" >&2
+    exit 1
+    ;;
+esac
+# Check for control characters (POSIX [:cntrl:] class)
+if [ "$(printf '%s' "$NAME" | LC_ALL=C tr -d '[:cntrl:]')" != "$NAME" ]; then
+  echo "ERROR: --name must not contain control characters (newline/tab/NUL)" >&2
+  exit 1
+fi
+
 # ─── Resolve inbox path (mirrors inbox-auto-parse.sh) ───────────────
 INBOX=""
 INBOX_SOURCE="default"

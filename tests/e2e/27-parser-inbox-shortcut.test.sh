@@ -96,6 +96,32 @@ else
   fail "unknown flag: expected exit 1, got $BAD_EXIT"
 fi
 
+# ─── Bad --name → exit 1 (Agent-β finding 2026-04-22 session-7) ─────
+# Reject names containing path separators or control characters, which
+# would produce malformed filenames or corrupt .desktop files.
+bash "$SCRIPT" --inbox "$SCRATCH_INBOX" --name "bad/slash" >/dev/null 2>&1
+NAME_SLASH_EXIT=$?
+if [ "$NAME_SLASH_EXIT" = "1" ]; then
+  pass "--name with slash: exit 1"
+else
+  fail "--name with slash: expected exit 1, got $NAME_SLASH_EXIT"
+fi
+bash "$SCRIPT" --inbox "$SCRATCH_INBOX" --name "" >/dev/null 2>&1
+NAME_EMPTY_EXIT=$?
+if [ "$NAME_EMPTY_EXIT" = "1" ]; then
+  pass "--name empty: exit 1"
+else
+  fail "--name empty: expected exit 1, got $NAME_EMPTY_EXIT"
+fi
+# Control char: newline in the name
+bash "$SCRIPT" --inbox "$SCRATCH_INBOX" --name "$(printf 'line1\nline2')" >/dev/null 2>&1
+NAME_NL_EXIT=$?
+if [ "$NAME_NL_EXIT" = "1" ]; then
+  pass "--name with embedded newline: exit 1"
+else
+  fail "--name with newline: expected exit 1, got $NAME_NL_EXIT"
+fi
+
 # ─── Missing inbox dir → exit 4 ─────────────────────────────────────
 bash "$SCRIPT" --inbox "/tmp/does-not-exist-${RANDOM}${RANDOM}" --format json >/dev/null 2>&1
 MISS_EXIT=$?

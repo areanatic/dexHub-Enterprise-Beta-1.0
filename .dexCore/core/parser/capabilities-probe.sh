@@ -198,6 +198,15 @@ NEW_YAML=$(printf '%s' "$PROBE_RESULTS" | ruby -rjson -e '
         current_backend = $1
         existing_backends[current_backend] ||= {}
       elsif current_backend && line =~ /^      (\w+):\s*(.*)$/
+        # Line-based YAML parser — strips surrounding quotes (single + double).
+        # Known limitation (documented in features.yaml known_issues):
+        # internal quote marks in hand-edited notes get stripped too. A real
+        # YAML parser would fix this but adds complexity; low-priority since
+        # script-generated notes have no internal quotes and users hand-
+        # editing notes rarely use quote marks. 2026-04-22 Agent-β
+        # investigated an alternative (strip-outer-only) but it caused
+        # backslash accumulation on re-probe — reverted as worse UX than
+        # the documented limitation.
         existing_backends[current_backend][$1] = $2.strip.gsub(/["'"'"']/, "")
       elsif line =~ /^  preferences:/
         preferences_block = line
