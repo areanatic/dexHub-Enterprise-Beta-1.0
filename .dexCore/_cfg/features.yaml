@@ -604,15 +604,23 @@ parser:
       - "Large-PDF path (≥oversize) returns status=deferred with backend=defer — the pattern_b raster pipeline that actually handles this is 1.1 roadmap."
 
   - id: parser.kreuzberg_backend
-    name: "Kreuzberg Integration (91+ formats, MIT)"
-    description: "Primary backend for PDF/Office/etc. Rust core + Python bindings + MCP server"
-    status: deferred
+    name: "Kreuzberg backend adapter (parser.kreuzberg_backend) — shell wrapper"
+    description: "Shipped Phase 5.3.b first slice (2026-04-21). Thin shell adapter at .dexCore/core/parser/backends/kreuzberg.sh wrapping the Kreuzberg CLI (https://github.com/kreuzberg-dev/kreuzberg — Rust, MIT, 91+ formats). Two modes: --detect probes the binary cheaply (status ∈ {ready, not_installed, probe_failed, blocked}) and --extract PATH runs the parse. Stable JSON contract for both (backend, binary, version, status, setup_hint, supported[], compliance). Follows the L2 Tank adapter pattern: never blocks, always exits 0 by default, --require flag for callers that want hard-fail when backend missing. Install is user-initiated (brew install kreuzberg-dev/tap/kreuzberg OR cargo install kreuzberg-cli OR docker pull) — we never automate it. Docker-only installs are out of scope for this adapter (future --runner docker flag). Behavioral live validation requires install on the target machine; structural adapter surface is test-green without install."
+    status: enabled
     phase: 5.3.b
     enterprise_compliance: ok
-    requires: [pip, kreuzberg]
+    requires: [bash, ruby]
+    optional_deps: [kreuzberg-cli]
     depends_on: [parser.router]
     docs: myDex/drafts/RESEARCH-KREUZBERG-DEEP-DIVE.md
-    tests: []
+    tests:
+      - tests/e2e/23-parser-kreuzberg-backend.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Requires user to install the kreuzberg CLI — we don't automate brew/cargo/pip installs. Without install, --detect reports not_installed and --extract returns a graceful JSON with status=not_installed (exit 0 by default, exit 2 with --require)."
+      - "Docker-only installs (ghcr.io/kreuzberg-dev/kreuzberg) not yet supported in the adapter. Future: --runner docker flag."
+      - "Live behavioral coverage (actual extract of a real PDF/DOCX) is gated behind CLAUDE_E2E_LIVE_KREUZBERG=1 in test 23 — skipped when adapter status != ready. Default CI runs structural-only."
+      - "Router integration (parse-route.sh) today decides 'backend=kreuzberg' if capabilities.yaml declares installed=true; it does NOT yet auto-probe via the adapter's --detect. That unification is a natural follow-up slice — most valuable once guided_setup_wizard (5.3.g) automates capabilities.yaml maintenance."
 
   - id: parser.ollama_vlm_backend
     name: "Ollama VLM (GLM-OCR + RapidOCR)"
