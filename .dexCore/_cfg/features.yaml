@@ -677,15 +677,23 @@ parser:
     tests: []
 
   - id: parser.guided_setup_wizard
-    name: "Guided Setup Wizard"
-    description: "Chat-based onboarding, backend selection, health-check, install-per-dialog"
-    status: deferred
+    name: "Parser capabilities probe (parser.guided_setup_wizard) — probe-and-write layer"
+    description: "Shipped Phase 5.3.g first slice (2026-04-21). .dexCore/core/parser/capabilities-probe.sh iterates every registered backend adapter (kreuzberg, ollama_vlm today), calls each --detect, and merges the results into myDex/.dex/config/capabilities.yaml. Closes the known_issue on both kreuzberg + ollama_vlm backends about 'router does not yet auto-probe'. User-owned fields (notes, preferences) are preserved across re-probes; script-owned fields (installed, version, compliance, last_probe, probe_status) are overwritten per-probe. Never clobbers user-edited YAML that's outside the probe-owned keys. Atomic write via mktemp + mv. Idempotent — re-runs are safe. Conversational wrapper (*parser-setup DexMaster menu entry invoking this script + offering install commands when backends missing) is a follow-up slice."
+    status: enabled
     phase: 5.3.g
     enterprise_compliance: ok
-    requires: []
-    depends_on: [parser.router]
-    docs: myDex/drafts/CONCEPT-PARSER-USER-JOURNEY.md
-    tests: []
+    requires: [bash, ruby]
+    depends_on: [parser.router, parser.kreuzberg_backend, parser.ollama_vlm_backend]
+    docs: .dexCore/_dev/docs/BACKEND-ADAPTER-PATTERN.md
+    tests:
+      - tests/e2e/25-parser-capabilities-probe.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "YAML merge uses minimal line-based parser (no yq / Psych dependency). Exotic YAML (anchors, multi-line block scalars, non-standard indent) in capabilities.yaml may not round-trip cleanly. Stick to the template structure and let the probe manage the file; hand-edits should target notes/preferences fields only."
+      - "Registered backends are hardcoded in KNOWN_BACKENDS array at the top of capabilities-probe.sh. Adding a new backend requires a script edit. Alternative: discover backends by listing .dexCore/core/parser/backends/*.sh — consider for 5.3.h."
+      - "Router (parse-route.sh) still reads capabilities.yaml as the source of truth. It does NOT yet auto-invoke capabilities-probe.sh when capabilities.yaml is missing or stale. Auto-probe-on-missing wiring is a natural follow-up slice + closes the remaining kreuzberg + ollama_vlm known_issues about router-adapter unification."
+      - "Conversational wizard wrapper (*parser-setup DexMaster command) not shipped yet. Today users run `bash capabilities-probe.sh` directly. Chat UX is the second slice under 5.3.g."
+      - "New from critical review 2026-04-21: adapters could emit a structured `hint_type` field alongside `setup_hint` (values: install_backend | daemon_unreachable | missing_dependency | policy_blocked). Would let tests assert on type rather than regex-grep hint text. BACKEND-ADAPTER-PATTERN.md notes this as a future improvement."
 
   - id: parser.capabilities_yaml
     name: "capabilities.yaml (backend state tracking) — template shipped"
