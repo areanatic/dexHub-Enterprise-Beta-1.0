@@ -135,12 +135,17 @@ else
 fi
 rm -f "$ONE_TMP"
 
-# ─── Binary file routing: should report routed_but_backend_unavailable ─
-# Create a fake PDF (no actual backend to extract) and ensure orchestrator
-# gracefully reports routed_but_backend_unavailable rather than crashing.
-# Only assert the status if no kreuzberg — otherwise the test is on a
-# machine where it actually processes. Either outcome is valid; we just
-# require NO CRASH and a predictable status vocabulary.
+# ─── Binary file routing: should NOT silently ingest binary as text ─
+# Regression guard for the 2026-04-21 silent-corruption bug: parse-route.sh
+# sets backend=native + type=pdf when kreuzberg is absent AND pdftotext is
+# on PATH. The old native branch did `cp "$file" "$extract_tmp"` which
+# copied raw PDF bytes into an .md temp file; l2-ingest's extension-based
+# type-guard then accepted it as text and indexed binary as garbage.
+#
+# Fix: native+pdf now shells to pdftotext. This test enforces:
+#   (1) orchestrator never returns status=ok for a non-pdf binary dressed
+#       as a PDF without a real backend
+#   (2) structural: the native branch contains a pdftotext call
 echo "%PDF-1.4 fake" > "$SCRATCH/fake.pdf"
 PDF_JSON=$(bash "$SCRIPT" --inbox "$SCRATCH" --format json 2>/dev/null)
 PDF_STATUS=$(echo "$PDF_JSON" | ruby -rjson -e '
@@ -148,14 +153,44 @@ PDF_STATUS=$(echo "$PDF_JSON" | ruby -rjson -e '
   r = d["results"].find { |x| x["file"].to_s.end_with?("fake.pdf") }
   puts r ? r["status"] : "missing"
 ' 2>/dev/null)
-case "$PDF_STATUS" in
-  ok|routed_but_backend_unavailable|extract_failed|ingest_failed)
-    pass "PDF file: status='$PDF_STATUS' (valid vocabulary)"
-    ;;
-  *)
-    fail "PDF file: unexpected status '$PDF_STATUS'"
-    ;;
-esac
+
+# Determine expected status from installed tooling
+if command -v kreuzberg >/dev/null 2>&1; then
+  # With kreuzberg: a fake PDF header + "fake" body is still malformed,
+  # so extract_failed is plausible. ok is also plausible if kreuzberg
+  # produces any text at all. Both acceptable.
+  case "$PDF_STATUS" in
+    ok|extract_failed)
+      pass "PDF file (kreuzberg installed): status='$PDF_STATUS' (ok or extract_failed both valid)" ;;
+    *) fail "PDF file (kreuzberg installed): unexpected status '$PDF_STATUS'" ;;
+  esac
+elif command -v pdftotext >/dev/null 2>&1; then
+  # pdftotext rejects invalid PDFs — expect extract_failed, NEVER ok
+  # (ok here would mean the binary-copy bug is back).
+  case "$PDF_STATUS" in
+    extract_failed)
+      pass "PDF file (pdftotext fallback): status=extract_failed (pdftotext rejects malformed PDF)" ;;
+    ok)
+      fail "PDF file: status=ok with fake PDF + pdftotext — binary-copy regression!" ;;
+    *) fail "PDF file (pdftotext fallback): expected extract_failed, got '$PDF_STATUS'" ;;
+  esac
+else
+  # No kreuzberg, no pdftotext — router returns backend_missing
+  case "$PDF_STATUS" in
+    routed_but_backend_unavailable)
+      pass "PDF file (no backends): status=routed_but_backend_unavailable" ;;
+    *) fail "PDF file (no backends): expected routed_but_backend_unavailable, got '$PDF_STATUS'" ;;
+  esac
+fi
+
+# Structural regression check: native branch in orchestrator MUST
+# invoke pdftotext for PDFs. Prevents silent reintroduction of the
+# raw-cp bug during future refactors.
+if awk '/case "\$backend" in/,/^[[:space:]]*esac/' "$SCRIPT" | grep -A 20 'native)' | grep -q 'pdftotext'; then
+  pass "native branch: invokes pdftotext for PDF (regression guard)"
+else
+  fail "native branch: pdftotext not wired — silent binary-copy bug risk"
+fi
 
 # ─── Inbox missing: exit 3 ──────────────────────────────────────────
 bash "$SCRIPT" --inbox "/tmp/nonexistent-inbox-${RANDOM}" >/dev/null 2>&1

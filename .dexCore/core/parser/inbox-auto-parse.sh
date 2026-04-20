@@ -200,8 +200,33 @@ dispatch_file() {
 
   case "$backend" in
     native)
-      cp "$file" "$extract_tmp"
-      extract_exit=0
+      # Native backend handles two sub-cases. The route decides which:
+      #   text|code|data|email → direct cp (file is already readable text)
+      #   pdf                  → shell to pdftotext (route sets backend=native
+      #                           + type=pdf only when kreuzberg is absent AND
+      #                           pdftotext is on PATH — see parse-route.sh)
+      # Without the type-aware branch, PDFs silently got `cp`'d into an .md
+      # temp file, l2-ingest's extension-based type-guard accepted it as text,
+      # and binary bytes were indexed as garbage chunks (status=ok, false success).
+      # Found 2026-04-21 review; this is the fix.
+      case "$type" in
+        text|code|data|email)
+          cp "$file" "$extract_tmp"
+          extract_exit=0
+          ;;
+        pdf)
+          if command -v pdftotext >/dev/null 2>&1; then
+            pdftotext -layout "$file" "$extract_tmp" 2>/dev/null
+            extract_exit=$?
+          else
+            extract_exit=127
+          fi
+          ;;
+        *)
+          # Router gave us native for a type the native path can't handle.
+          extract_exit=98
+          ;;
+      esac
       ;;
     kreuzberg)
       if [ -x "$KREUZBERG" ]; then
