@@ -457,16 +457,20 @@ knowledge:
       - "Cap enforcement: oversized chunks get hard-truncated at L2_MAX_COPILOT with [L2 TRUNCATED] marker. Test 15 Scenario 6 verifies."
 
   - id: knowledge.l2_tank_enterprise_compliance
-    name: "L2 Tank — enterprise compliance enforcement (deferred)"
-    description: "Script-level enforcement: l2-ingest.sh + l2-query.sh read profile.company.data_handling_policy and block non-compliant embedding backends. Default: Ollama local (compliant with local_only). OpenAI/cloud backends: blocked unless cloud_llm_allowed + explicit consent. Overridable via *force-override (audit chronicle entry). Ships in 5.2.b-enterprise-audit."
-    status: deferred
+    name: "L2 Tank — enterprise compliance enforcement"
+    description: "Shipped Phase 5.2.b-enterprise-audit (2026-04-20). Script-level enforcement: l2-embed.sh + l2-query.sh read profile.company.data_handling_policy via l2-detect-backend.sh. When the configured backend's provider is cloud (openai, anthropic, …) AND policy ∈ {local_only, lan_only}, detection returns status=blocked and both scripts refuse the operation with a policy-specific error. l2-embed.sh additionally writes an ingest_runs audit row marked 'POLICY-BLOCK: ...' so the block leaves a persistent trail in the DB. Local backends (ollama/*) always pass. Users who need cloud embeddings must explicitly change profile.company.data_handling_policy — there is no silent bypass. Future: *force-override command for time-boxed exemptions with chronicle log."
+    status: enabled
     phase: 5.2.b-enterprise-audit
     enterprise_compliance: ok
-    requires: []
-    depends_on: [knowledge.l2_tank_ingest, knowledge.l2_tank_query, onboarding.data_handling_gate]
+    requires: [bash, sqlite3, ruby]
+    depends_on: [knowledge.l2_tank_embed, knowledge.l2_tank_hybrid_query, knowledge.l2_tank_backend_routing, onboarding.data_handling_gate]
     docs: .dexCore/_dev/docs/L2-TANK.md
-    tests: []
+    tests:
+      - tests/e2e/19-l2-tank-enterprise-compliance.test.sh
     primary_target: github_copilot
+    known_issues:
+      - "No --force-override flag today. Users who want a one-off cloud call must temporarily change profile.company.data_handling_policy (auditable via git log). Can add a flag with explicit audit-chronicle write if that becomes a real workflow."
+      - "Cloud provider implementation itself (OpenAI/Anthropic embedding calls) is still scaffolded-only — the policy layer is complete, but no cloud backend actually runs yet. Blocks kick in before any network call, so nothing leaks."
 
   - id: knowledge.l2_tank_embed
     name: "L2 Tank — embedding generator (l2-embed.sh) — Ollama nomic-embed-text"

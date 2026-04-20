@@ -87,8 +87,37 @@ MODEL=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); p
 STATUS=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["status"] || "none"' 2>/dev/null)
 SEMANTIC_AVAILABLE=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["semantic_available"] ? "true" : "false"' 2>/dev/null)
 HINT=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["setup_hint"] || ""' 2>/dev/null)
+POLICY=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["policy"] || "unset"' 2>/dev/null)
+POLICY_NOTE=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read); puts d["policy_note"] || ""' 2>/dev/null)
 
 echo "L2 Embed — backend: $BACKEND  [status: $(echo "$STATUS" | tr '[:lower:]' '[:upper:]')]"
+
+# Policy-block audit helper — writes an ingest_runs row whenever a block
+# fires, so the trail lives in the DB alongside normal runs.
+log_policy_block() {
+  local reason="$1"
+  sqlite3 "$DB" "INSERT INTO ingest_runs (started_at, source_count, chunks_added, chunks_updated, chunks_deleted, backend, notes) VALUES (datetime('now'), 0, 0, 0, 0, '$(printf "%s" "$BACKEND" | sed "s/'/''/g")', 'POLICY-BLOCK: $(printf "%s" "$reason" | sed "s/'/''/g")')" 2>/dev/null || true
+}
+
+if [ "$STATUS" = "blocked" ]; then
+  echo ""
+  echo "  ⛔  Backend BLOCKED by enterprise policy."
+  echo "      Backend: $BACKEND"
+  echo "      Policy:  data_handling_policy=$POLICY"
+  echo "      Reason:  $POLICY_NOTE"
+  echo ""
+  echo "  Options:"
+  echo "    1. Switch to a local backend (ollama/nomic-embed-text recommended)"
+  echo "    2. Update profile.company.data_handling_policy in myDex/.dex/config/profile.yaml"
+  echo "       (do NOT do this casually — the policy exists for compliance reasons)"
+  echo ""
+  echo "  Keyword-only search via l2-query.sh remains available."
+  log_policy_block "$BACKEND blocked under $POLICY ($POLICY_NOTE)"
+  if [ "$REQUIRE_BACKEND" = "1" ]; then
+    exit 4
+  fi
+  exit 0
+fi
 
 if [ "$SEMANTIC_AVAILABLE" != "true" ]; then
   echo ""

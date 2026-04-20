@@ -193,9 +193,9 @@ STATUS THIS COMMIT: **STUB**. Emits `[L2 STUB] query not yet implemented — FTS
 - ✅ **5.2.b-embed-detect** (2026-04-20) — `l2-detect-backend.sh` + `l2-status.sh` + mode banner in query. Graceful-degradation cornerstone.
 - ✅ **5.2.b-embed** (2026-04-20) — `l2-embed.sh` generates embeddings via Ollama `/api/embeddings`. Default model: `nomic-embed-text` (137 MB / 768 dim). Idempotent; `--all` refresh; `--dry-run`; `--require-backend` for scripts. Graceful exit 0 when backend not ready.
 - ✅ **5.2.b-hybrid-query** (2026-04-20) — BM25 + cosine hybrid ranking in `l2-query.sh`. `--keyword-only` / `--hybrid` / `--semantic-only` / `--alpha` flags. Auto-mode routes based on embeddings + backend readiness. JSON adds a `mode` field + per-result score breakdown.
-- ⬜ **5.2.b-enterprise-audit** — enterprise_compliance per backend; `data_handling_policy=local_only` blocks cloud backends.
+- ✅ **5.2.b-enterprise-audit** (2026-04-20) — Policy enforcement via `l2-detect-backend.sh`. `l2-embed.sh` + `l2-query.sh --hybrid/--semantic-only` refuse cloud backends when `data_handling_policy ∈ {local_only, lan_only}` with a policy-specific error. Persistent audit trail via `POLICY-BLOCK:` rows in `ingest_runs`. Local Ollama always passes; auto-mode query still works (falls back to keyword).
 
-8 of 9 slices shipped (2026-04-20). Only enterprise-audit remaining for the 5.2.b arc.
+**9 of 9 slices shipped.** The 5.2.b-embed arc is complete.
 
 ## Routing & Graceful Degradation
 

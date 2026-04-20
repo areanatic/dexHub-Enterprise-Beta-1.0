@@ -130,11 +130,17 @@ EMB_COUNT=$(sqlite3 "$DB" "SELECT COUNT(*) FROM embeddings" 2>/dev/null || echo 
 SEMANTIC_READY="false"
 BACKEND=""
 SETUP_HINT=""
+BACKEND_STATUS=""
+POLICY_VALUE=""
+POLICY_NOTE=""
 if [ -x "$SCRIPT_DIR/l2-detect-backend.sh" ]; then
   DETECT_JSON=$("$SCRIPT_DIR/l2-detect-backend.sh" --db "$DB" --format json 2>/dev/null || echo "{}")
   SEMANTIC_READY=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["semantic_available"] ? "true" : "false"' 2>/dev/null || echo "false")
   BACKEND=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["backend"] || ""' 2>/dev/null)
   SETUP_HINT=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["setup_hint"] || ""' 2>/dev/null)
+  BACKEND_STATUS=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["status"] || ""' 2>/dev/null)
+  POLICY_VALUE=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["policy"] || ""' 2>/dev/null)
+  POLICY_NOTE=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts d["policy_note"] || ""' 2>/dev/null)
 fi
 
 EFFECTIVE_MODE="keyword-only"
@@ -150,6 +156,12 @@ case "$MODE" in
     EFFECTIVE_MODE="keyword-only"
     ;;
   hybrid|semantic-only)
+    if [ "$BACKEND_STATUS" = "blocked" ]; then
+      echo "ERROR: --$MODE uses backend '$BACKEND' which is BLOCKED by data_handling_policy=$POLICY_VALUE." >&2
+      echo "       Reason: $POLICY_NOTE" >&2
+      echo "       Resolve: switch to a local backend (ollama/*) or update profile.yaml." >&2
+      exit 4
+    fi
     if [ "$SEMANTIC_READY" != "true" ]; then
       echo "ERROR: --$MODE requested but backend not ready (${SETUP_HINT:-no backend available})" >&2
       exit 4
