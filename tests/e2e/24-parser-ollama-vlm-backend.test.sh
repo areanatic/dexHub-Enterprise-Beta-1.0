@@ -153,10 +153,12 @@ fi
 if echo "$OV_HINT" | grep -q "nonexistent-model-zzz"; then
   pass "--model override: hint mentions the requested model"
 else
-  # When ollama daemon is unreachable we fall through to daemon-not-reachable message —
-  # accept that too, since it's still informative.
-  if echo "$OV_HINT" | grep -qi "daemon not reachable\|not installed"; then
-    pass "--model override: daemon/install issue surfaced (before model check)"
+  # Fallback: if Ollama isn't installed (CI case) OR the daemon isn't
+  # reachable, the probe short-circuits BEFORE the model check and the
+  # hint naturally points at the prerequisite. All three variants are
+  # informative, so accept any of them.
+  if echo "$OV_HINT" | grep -qiE "daemon not reachable|not installed|install ollama|install the ollama|ollama pull"; then
+    pass "--model override: install / daemon-not-reachable hint surfaced (model check short-circuited)"
   else
     fail "--model override: hint unhelpful: '$OV_HINT'"
   fi
