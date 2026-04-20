@@ -107,7 +107,7 @@ done
 
 # show-packs must invoke packs.sh list --format json
 # We use awk to extract the prompt body so adjacent prompts don't contaminate
-SHOW_PACKS_BODY=$(awk '/<prompt id="show-packs">/,/<\/prompt>/' "$DEX_MASTER")
+SHOW_PACKS_BODY=$(awk '/^[[:space:]]*<prompt id="show-packs">/,/^[[:space:]]*<\/prompt>/' "$DEX_MASTER")
 if echo "$SHOW_PACKS_BODY" | grep -q "packs.sh list --format json"; then
   pass "show-packs prompt invokes packs.sh list --format json"
 else
@@ -115,7 +115,7 @@ else
 fi
 
 # enable-pack must invoke packs.sh enable
-ENABLE_BODY=$(awk '/<prompt id="enable-pack">/,/<\/prompt>/' "$DEX_MASTER")
+ENABLE_BODY=$(awk '/^[[:space:]]*<prompt id="enable-pack">/,/^[[:space:]]*<\/prompt>/' "$DEX_MASTER")
 if echo "$ENABLE_BODY" | grep -q "packs.sh enable"; then
   pass "enable-pack prompt invokes packs.sh enable"
 else
@@ -128,7 +128,7 @@ else
 fi
 
 # disable-pack must invoke packs.sh disable + handle mandatory-refusal
-DISABLE_BODY=$(awk '/<prompt id="disable-pack">/,/<\/prompt>/' "$DEX_MASTER")
+DISABLE_BODY=$(awk '/^[[:space:]]*<prompt id="disable-pack">/,/^[[:space:]]*<\/prompt>/' "$DEX_MASTER")
 if echo "$DISABLE_BODY" | grep -q "packs.sh disable"; then
   pass "disable-pack prompt invokes packs.sh disable"
 else
@@ -141,7 +141,7 @@ else
 fi
 
 # ─── list-agents-from-registry consumes {enabled_packs} ─────────────
-LIST_BODY=$(awk '/<prompt id="list-agents-from-registry">/,/<\/prompt>/' "$DEX_MASTER")
+LIST_BODY=$(awk '/^[[:space:]]*<prompt id="list-agents-from-registry">/,/^[[:space:]]*<\/prompt>/' "$DEX_MASTER")
 if echo "$LIST_BODY" | grep -q "{enabled_packs}"; then
   pass "list-agents-from-registry prompt references {enabled_packs}"
 else

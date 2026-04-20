@@ -91,7 +91,9 @@ if [ "$HYBRID_EXIT" = "4" ]; then
 else
   fail "--hybrid without embeddings: expected exit 4, got $HYBRID_EXIT"
 fi
-if echo "$HYBRID_OUT" | grep -qi "backend not ready\|no embeddings"; then
+# Case-sensitive + require a meaningful verb; avoids accepting unrelated
+# messages that happen to contain "embeddings" or "ready" in passing.
+if echo "$HYBRID_OUT" | grep -qE "backend not ready|no embeddings in tank|Run l2-embed.sh first"; then
   pass "--hybrid without embeddings: error explains reason"
 else
   fail "--hybrid without embeddings: error unhelpful" "got: ${HYBRID_OUT:0:200}"

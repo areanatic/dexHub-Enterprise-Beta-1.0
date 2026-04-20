@@ -56,7 +56,7 @@ Status of this meta-toggle itself: `deferred`, phase `future`. **The matrix belo
 |---|---|---|
 | `onboarding.smart_v4_3` | ok | Questions + answers → local profile.yaml |
 | `onboarding.vollstandig_v4_3` | ok | Same |
-| `onboarding.minimal_v4_3` | ok | Same |
+| `onboarding.minimal_v5` | ok | Same (renamed from minimal_v4_3 2026-04-21 — the v4.3 variant never existed in YAML) |
 | `onboarding.questions_v5_holistic_review` | ok | Design task, no data flow |
 
 ### Agents
