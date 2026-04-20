@@ -435,7 +435,7 @@ knowledge:
       - tests/e2e/14-knowledge-l2-tank-query.test.sh
     primary_target: github_copilot
     known_issues:
-      - "Keyword-only today. No semantic (cosine-similarity) ranking yet — awaits knowledge.l2_tank_embed to populate the embeddings table."
+      - "Keyword-only ranking today. Embeddings table can be populated via knowledge.l2_tank_embed (shipped 5.2.b-embed, 2026-04-20), but l2-query.sh does not yet consume them for hybrid BM25+cosine ranking — that ships in knowledge.l2_tank_hybrid_query (5.2.b-hybrid-query)."
       - "FTS5 rank is BM25 (lower = better). Output shows raw rank values; no normalization (0..1 scale) yet — intentional, lets power-users see actual BM25 scores."
       - "Multi-word queries without explicit FTS5 operators are treated as phrase queries (wrapped in double-quotes). For OR / AND / NEAR, users can pass FTS5 syntax directly (double-quote-escape is handled)."
 
@@ -467,6 +467,25 @@ knowledge:
     docs: .dexCore/_dev/docs/L2-TANK.md
     tests: []
     primary_target: github_copilot
+
+  - id: knowledge.l2_tank_embed
+    name: "L2 Tank — embedding generator (l2-embed.sh) — Ollama nomic-embed-text"
+    description: "Shipped Phase 5.2.b-embed (2026-04-20). Generates embeddings for chunks via Ollama's /api/embeddings endpoint and stores them as JSON-array vectors in the embeddings table. Default backend: ollama/nomic-embed-text (137 MB, 768 dim, sweet-spot for local semantic search). Idempotent by default (skips already-embedded chunks); --all forces refresh after model switch; --batch N caps per-run; --dry-run shows plan; --require-backend flips the graceful default to exit 4 when backend unavailable. When Ollama is not installed / not running / model not pulled, the script exits 0 with a clear explanation + install hint — zero side effects, keyword-only search remains unaffected. Audit row written per run. Cloud backends (openai, anthropic) are scaffolded in the backend-routing detector but implementation is gated on knowledge.l2_tank_enterprise_compliance."
+    status: enabled
+    phase: 5.2.b-embed
+    enterprise_compliance: backend_gated
+    requires: [bash, sqlite3, ruby, curl]
+    optional_deps: [ollama, "nomic-embed-text-model"]
+    depends_on: [knowledge.l2_tank_init, knowledge.l2_tank_backend_routing]
+    docs: .dexCore/_dev/docs/L2-TANK.md
+    tests:
+      - tests/e2e/17-l2-tank-embed.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Single-backend today: only Ollama (local) works. OpenAI / Anthropic embedding paths are scaffolded in detect but not implemented — ship together with knowledge.l2_tank_enterprise_compliance."
+      - "Ruby + Open3 shells out to curl per chunk. Sequential. Throughput ~5-10 chunks/sec on nomic-embed-text. Fine for Beta 1.0 corpora; future: batch endpoint or parallel dispatch if need arises."
+      - "vector_json stored as TEXT (JSON array of floats) — inspectable but ~6-8× more bytes than BLOB float32. Schema v2 migration when a tank crosses ~100k chunks."
+      - "Opt-in live test coverage via CLAUDE_E2E_LIVE_EMBED=1 in tests/e2e/17-*. Default CI runs structural-only (always green)."
 
   - id: knowledge.l2_tank_backend_routing
     name: "L2 Tank — backend detection + graceful degradation"

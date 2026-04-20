@@ -185,15 +185,53 @@ STATUS THIS COMMIT: **STUB**. Emits `[L2 STUB] query not yet implemented — FTS
 
 ## Phase milestones
 
-- ✅ **5.2.b-scaffold** (2026-04-20, this commit) — design doc + schema SQL + script stubs + test 12 structural
-- ⬜ **5.2.b-init** — `l2-init.sh` live (actually applies schema; already stub-level working)
-- ⬜ **5.2.b-ingest** — real chunker (heading-aware sliding window, 2KB chunks, 200-byte overlap)
-- ⬜ **5.2.b-embed** — Ollama embedding backend (nomic-embed-text default) + alternate backend selection via `meta.default_embedding_backend`
-- ⬜ **5.2.b-query** — FTS5 + cosine-similarity hybrid ranking
-- ⬜ **5.2.b-wire-copilot** — build-instructions.sh invokes l2-query at build time, bakes top-N chunks into copilot-instructions.md (same pattern as L1 Wiki injection)
-- ⬜ **5.2.b-enterprise-audit** — enterprise_compliance per backend; `data_handling_policy=local_only` users get Ollama-only enforcement
+- ✅ **5.2.b-scaffold** (2026-04-20) — design doc + schema SQL + script stubs + test 12 structural
+- ✅ **5.2.b-init** (2026-04-20) — `l2-init.sh` applies schema, idempotent
+- ✅ **5.2.b-ingest** (2026-04-20) — real heading-aware chunker + NUL-safe Ruby SQL gen + SHA-256 dedup + edit detection
+- ✅ **5.2.b-query** (2026-04-20) — FTS5 BM25 keyword search, markdown + JSON output, --top / --source-type / --quiet
+- ✅ **5.2.b-wire-copilot** (2026-04-20) — build-instructions.sh bakes L2 seed-query results into copilot-instructions.md
+- ✅ **5.2.b-embed-detect** (2026-04-20) — `l2-detect-backend.sh` + `l2-status.sh` + mode banner in query. Graceful-degradation cornerstone.
+- ✅ **5.2.b-embed** (2026-04-20) — `l2-embed.sh` generates embeddings via Ollama `/api/embeddings`. Default model: `nomic-embed-text` (137 MB / 768 dim). Idempotent; `--all` refresh; `--dry-run`; `--require-backend` for scripts. Graceful exit 0 when backend not ready.
+- ⬜ **5.2.b-hybrid-query** — Adds BM25 + cosine-similarity hybrid ranking to `l2-query.sh`. `--keyword-only` / `--hybrid` / `--semantic-only` flags, tunable `--alpha`. Consumes embeddings table populated by 5.2.b-embed.
+- ⬜ **5.2.b-enterprise-audit** — enterprise_compliance per backend; `data_handling_policy=local_only` blocks cloud backends.
 
-Total realistic effort: 1-1.5 weeks across ~4-6 future sessions. This commit is session 1 of that arc.
+Total realistic effort: 1-1.5 weeks across ~4-6 sessions. 7 of 9 slices shipped (2026-04-20).
+
+## Routing & Graceful Degradation
+
+Semantic search is **opt-in and optional**. Users without Ollama still get full keyword search via FTS5 — L2 Tank never blocks on a missing install.
+
+Every L2 surface (query, status, embed) routes through `l2-detect-backend.sh`, which reports one of:
+
+| Status      | Meaning                                                    | User action                                    |
+|-------------|------------------------------------------------------------|------------------------------------------------|
+| `ready`     | Ollama running + model pulled + policy allows              | Run `l2-embed.sh` then query in hybrid mode    |
+| `partial`   | Ollama running but model not pulled                        | `ollama pull nomic-embed-text`                 |
+| `none`      | Ollama not installed / not running                         | Install Ollama, or stay on keyword-only        |
+| `blocked`   | Policy forbids the configured backend (e.g. cloud + local_only) | Switch backend or update policy           |
+| `deferred`  | Non-Ollama backend requested (cloud path not implemented)  | Use `ollama/*` for Beta 1.0                    |
+
+The mode banner printed at the top of every `l2-query.sh` output tells users which mode they're getting plus the concrete next step if they want to upgrade:
+
+```
+# L2 TANK — results for "authentication"
+
+  Mode: KEYWORD-ONLY (BM25 via FTS5)  ·  enable semantic: ollama pull nomic-embed-text
+```
+
+`--quiet` suppresses the banner — keeps the copilot-instructions.md drift-check clean.
+
+### Minimal embedding model
+
+DexHub defaults to `nomic-embed-text` — picked for **minimum viable embedding**:
+
+| Model                 | Size   | Dims | Fit |
+|-----------------------|--------|------|-----|
+| `all-minilm`          | 45 MB  | 384  | Too small — quality drop |
+| **`nomic-embed-text`**| **137 MB** | **768** | **Default — sweet-spot** |
+| `mxbai-embed-large`   | 670 MB | 1024 | Overkill for Beta scale   |
+
+Only used for **embeddings** (no generation / chat) — RAM + compute footprint stays minimal. Override via `UPDATE meta SET value='ollama/<model>' WHERE key='default_embedding_backend'`.
 
 ---
 

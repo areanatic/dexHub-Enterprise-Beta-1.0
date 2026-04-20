@@ -234,4 +234,19 @@ if [ "$DRY_RUN" = "0" ]; then
   echo ""
   TOTAL_CHUNKS=$(sqlite3 "$DB" "SELECT COUNT(*) FROM chunks" 2>/dev/null || echo "?")
   echo "Tank state: $TOTAL_CHUNKS chunks total"
+
+  # UX: one-time tip about semantic search when the backend looks reachable
+  # but embeddings aren't populated. Silent (no chrome) when backend not
+  # ready — users without Ollama should not be nagged.
+  DETECT="$SCRIPT_DIR/l2-detect-backend.sh"
+  if [ -x "$DETECT" ]; then
+    SEMANTIC_READY=$("$DETECT" --db "$DB" --format json 2>/dev/null | ruby -rjson -e 'd=JSON.parse(STDIN.read) rescue {}; puts (d["semantic_available"] ? "true" : "false")' 2>/dev/null || echo "false")
+    EMB_COUNT=$(sqlite3 "$DB" "SELECT COUNT(*) FROM embeddings" 2>/dev/null || echo 0)
+    if [ "$SEMANTIC_READY" = "true" ] && [ "$EMB_COUNT" = "0" ]; then
+      echo ""
+      echo "Tip:        Ollama + embedding model detected. Run"
+      echo "            bash $SCRIPT_DIR/l2-embed.sh"
+      echo "            to populate embeddings for hybrid semantic search."
+    fi
+  fi
 fi
