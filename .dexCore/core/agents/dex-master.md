@@ -370,20 +370,33 @@ What would you like to do?
     </template>
 
     <prompt id="list-agents-from-registry">
-      Load .dexCore/_cfg/features.yaml (YAML).
-      Select entries where section == "agents" AND (status == "enabled" OR status == "always_on").
-      If the profile has company.data_handling_policy == "local_only", ALSO filter out any agent with enterprise_compliance != "ok".
-      🆕 PACK FILTER (shipped 5.1.d follow-up): Use {enabled_packs} from activation step 2.7.
-        - If the agent entry declares a `pack` field, hide entries whose pack is NOT in {enabled_packs}.
-        - Entries in a disabled pack appear in a collapsed "🔒 Hidden (pack disabled)" footer with a hint: "Enable via *enable-pack &lt;id&gt;."
-        - core_pack agents are always shown (mandatory).
-      Render as numbered list grouped by pack (core_pack, dis_pack, game_pack, dhl_pack, meta_pack, onboarding_pack), with one line each:
-        "{n}. {name} — {description} ({status})"
-      At the end, show hint:
-        "*features — full registry with disabled/deferred/broken entries."
-        "*packs — toggle agent groups (meta-agents, connector wizards, etc.)."
-      Also render any deferred/disabled agents with a "🔒 (opt-in)" marker and a note that the user can request activation.
-      If features.yaml is missing: fall back to listing from agent-manifest.csv and warn the user.
+      Source of truth for the agent roster is .dexCore/_cfg/agent-manifest.csv (43 rows, columns incl. name, displayName, path, visibility). features.yaml under `agents:` only lists PACK-LEVEL entries (core_pack, dis_pack, etc.), not individual agents.
+
+      Step 1 — Build the enabled-agent-path set:
+        - For each pack_id in {enabled_packs} (from activation step 2.7), read {project-root}/.dexCore/core/agents/packs/&lt;pack_id&gt;.yaml and collect all `agents[].path` entries into {enabled_agent_paths}.
+        - core_pack is always included (mandatory).
+        - If a pack manifest is missing, log a warning + skip that pack (don't crash the list).
+
+      Step 2 — Load agent-manifest.csv and filter:
+        - For each row, check if its `path` column is in {enabled_agent_paths}.
+        - If yes → visible.
+        - If no BUT the path doesn't appear in ANY pack manifest at all → visible (orphan agents default-visible; avoids accidentally hiding agents that pre-date the pack system).
+        - If no AND the path IS in some disabled pack's manifest → hidden (collapse into "🔒 Hidden (pack disabled)" footer with: "Enable via *enable-pack &lt;pack_id&gt;.").
+
+      Enterprise filter (applied AFTER pack filter):
+        - If profile.company.data_handling_policy == "local_only", hide agents whose pack manifest declares compliance != "ok" AND != "local_vlm_required".
+
+      Rendering:
+        - Group visible agents by pack (core_pack first, then others alphabetically).
+        - Render as numbered list: "{n}. {displayName} — {title} ({visibility})" — use displayName + title from the CSV.
+        - At end, show:
+          "*features — full feature registry (includes disabled/deferred/broken)."
+          "*packs — toggle agent groups (meta-agents, connector wizards, etc.)."
+        - If any agents were hidden by pack filter, show the hidden count + "*enable-pack &lt;id&gt;" hint.
+
+      Fallback behavior:
+        - If agent-manifest.csv is missing: report error + do NOT fabricate a list.
+        - If pack manifest for an enabled pack is missing: skip that pack + warn once.
     </prompt>
 
     <prompt id="show-packs">

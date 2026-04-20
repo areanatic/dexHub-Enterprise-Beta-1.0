@@ -301,7 +301,7 @@ agents:
     known_issues:
       - "YAML state-file I/O is minimal-grep-awk; hand-edited exotic layouts may not round-trip. Users should let packs.sh write the file or copy the template."
       - "No batch enable/disable in this slice. Future convenience flag: packs.sh enable-all / disable-all if the use case materializes."
-      - "Pack-filter in *list-agents depends on agent entries in features.yaml declaring a `pack` field. Today's agents don't uniformly carry this field — the filter no-ops for agents without a pack tag (they remain visible to all users). Populating `pack: meta_pack` on the 18 meta-agent entries is a minor follow-up."
+      - "Pack-filter in *list-agents uses pack-manifest path lookup (agent's `path` in CSV vs. `agents[].path` in packs/*.yaml manifests), NOT a `pack:` field on individual features.yaml rows — that field would never work because agents aren't listed individually in features.yaml (features.yaml `agents:` section carries PACK-LEVEL entries only; individual agents live in agent-manifest.csv + on-disk files). Current manifests (core_pack 3 / meta_pack 7 / onboarding_pack 3) cover 13 of the 43 agents in the CSV; the other 30 are orphans + default-visible. Populating the remaining packs (dis_pack / game_pack / dhl_pack / potential additional meta agents) would close the coverage gap."
 
 # ─────────────────────────────────────────────────────────────────────────
 # KNOWLEDGE LAYER — 3-tier (Wiki / Tank / Chronicle)
