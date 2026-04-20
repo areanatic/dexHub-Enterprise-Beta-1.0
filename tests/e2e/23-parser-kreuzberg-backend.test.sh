@@ -97,6 +97,26 @@ case "$STATUS" in
     ;;
 esac
 
+# Hardened per 2026-04-22 audit (Agent D finding #2): status-vocab check
+# alone is weak — an adapter that hardcoded any plausible value would pass.
+# Assert behavioral invariants that must hold REGARDLESS of status:
+#   - setup_hint must be a non-empty string (every status needs some user-facing
+#     guidance, whether it's "you're good" or "install via X")
+#   - compliance must be a non-empty string matching the policy vocabulary
+#   - backend must be the literal "kreuzberg" (adapter identifies itself)
+if echo "$DETECT_JSON" | ruby -rjson -e '
+  d = JSON.parse(STDIN.read)
+  failures = []
+  failures << "setup_hint missing/empty" if d["setup_hint"].to_s.strip.empty?
+  failures << "compliance missing/empty" if d["compliance"].to_s.strip.empty?
+  failures << "backend must be \"kreuzberg\", got #{d["backend"].inspect}" unless d["backend"] == "kreuzberg"
+  abort failures.join("; ") unless failures.empty?
+' 2>/dev/null; then
+  pass "--detect: structural invariants hold across all status values (setup_hint, compliance, backend)"
+else
+  fail "--detect: invariant field missing — status-vocabulary alone is not enough"
+fi
+
 # On a CI box where kreuzberg is not installed (usual case), we expect
 # status=not_installed + a concrete install hint.
 if [ "$STATUS" = "not_installed" ]; then

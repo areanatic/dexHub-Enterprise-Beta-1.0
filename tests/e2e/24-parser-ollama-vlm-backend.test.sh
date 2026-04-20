@@ -93,6 +93,24 @@ case "$STATUS" in
     ;;
 esac
 
+# Hardened per 2026-04-22 audit (Agent D finding #2): invariant-field
+# assertion beyond vocab check. Every status value MUST deliver these:
+#   - setup_hint (non-empty) — ready state explains success, others explain fix
+#   - compliance (non-empty, matches policy vocabulary)
+#   - backend == "ollama_vlm" (adapter identifies itself)
+if echo "$DETECT_JSON" | ruby -rjson -e '
+  d = JSON.parse(STDIN.read)
+  failures = []
+  failures << "setup_hint missing/empty" if d["setup_hint"].to_s.strip.empty?
+  failures << "compliance missing/empty" if d["compliance"].to_s.strip.empty?
+  failures << "backend must be \"ollama_vlm\", got #{d["backend"].inspect}" unless d["backend"] == "ollama_vlm"
+  abort failures.join("; ") unless failures.empty?
+' 2>/dev/null; then
+  pass "--detect: structural invariants hold across all status values (setup_hint, compliance, backend)"
+else
+  fail "--detect: invariant field missing — vocab alone doesn't prove behavior"
+fi
+
 # Endpoint field should match OLLAMA_HOST or default
 ENDPOINT=$(echo "$DETECT_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["endpoint"]' 2>/dev/null)
 if echo "$ENDPOINT" | grep -qE "^https?://"; then

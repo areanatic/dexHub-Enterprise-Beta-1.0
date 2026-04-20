@@ -95,11 +95,20 @@ else
 fi
 
 # Audit row written to ingest_runs
+# Hardened per 2026-04-22 audit (Agent D finding #6): mere existence of a
+# row is a weak guarantee — an empty 'POLICY-BLOCK:' prefix would pass.
+# Assert the row's content names the offending policy (so an auditor can
+# tell WHICH policy fired without cross-referencing).
 AUDIT_ROW=$(sqlite3 "$SCRATCH_DB" "SELECT notes FROM ingest_runs WHERE notes LIKE 'POLICY-BLOCK:%' ORDER BY id DESC LIMIT 1" 2>/dev/null)
 if [ -n "$AUDIT_ROW" ]; then
   pass "l2-embed.sh: POLICY-BLOCK audit row written to ingest_runs"
 else
   fail "l2-embed.sh: no audit row for policy block"
+fi
+if echo "$AUDIT_ROW" | grep -qi "local_only\|policy"; then
+  pass "l2-embed.sh: audit row names the active policy (not just empty POLICY-BLOCK: prefix)"
+else
+  fail "l2-embed.sh: audit row is empty or prefix-only (content: '${AUDIT_ROW:0:80}')"
 fi
 
 # --require-backend: exit 4 on policy block

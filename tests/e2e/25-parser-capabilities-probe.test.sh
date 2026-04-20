@@ -148,33 +148,70 @@ cat >> "$SCRATCH_OUT" <<'USEREDIT'
     prefer_native_fallback: false
     user_custom_note: "This is my preference"
 USEREDIT
-# Actually the existing file already has preferences, so let's check the
-# preferences section survives a re-probe. First capture current content.
-BEFORE_PREF=$(grep "user_custom_note" "$SCRATCH_OUT" || echo "")
+
+# Hardened per 2026-04-22 session-7 test-quality audit (Agent D finding #1):
+# Old check: grep for the substring "user_custom_note" — passes on any
+# substring match, including comments, not structural. If the probe dropped
+# the preferences block but left "user_custom_note" in a comment somehow,
+# the grep would false-pass.
+# New check: assert all three VALUE-BEARING keys of the preferences block
+# survive as structural entries (indented under preferences:), not just
+# as a loose substring. If ANY of the three is lost, the test fails loudly.
+verify_preferences_block() {
+  local file="$1"
+  # Must have a preferences: header
+  grep -qE "^  preferences:\s*$" "$file" || return 1
+  # All three keys must be present AS KEYS (indented 4 spaces under preferences:)
+  grep -qE "^    default_pdf_backend:" "$file" || return 2
+  grep -qE "^    prefer_native_fallback:" "$file" || return 3
+  grep -qE "^    user_custom_note:" "$file" || return 4
+  # Value of user_custom_note must still be the user's string (not empty,
+  # not stripped to just a key)
+  grep -qE "^    user_custom_note:\s+\"?This is my preference" "$file" || return 5
+  return 0
+}
+
+verify_preferences_block "$SCRATCH_OUT"
+BEFORE_CODE=$?
 # Second probe
 bash "$PROBE" --format text --out "$SCRATCH_OUT" >/dev/null 2>&1
-AFTER_PREF=$(grep "user_custom_note" "$SCRATCH_OUT" || echo "")
-if [ "$BEFORE_PREF" = "$AFTER_PREF" ] && [ -n "$AFTER_PREF" ]; then
-  pass "re-probe preserves user-edited preferences block"
+verify_preferences_block "$SCRATCH_OUT"
+AFTER_CODE=$?
+
+if [ "$BEFORE_CODE" = "0" ] && [ "$AFTER_CODE" = "0" ]; then
+  pass "re-probe preserves user-edited preferences block (all keys + value survive)"
+elif [ "$BEFORE_CODE" != "0" ]; then
+  fail "preferences block not even present BEFORE re-probe (code=$BEFORE_CODE) — append step broken?"
 else
-  # Preferences preservation is best-effort in minimal YAML; if the
-  # grep-based parser can't capture the user's edit, we mark this as a
-  # known limitation for now. But note it.
-  fail "re-probe preferences preservation: BEFORE='${BEFORE_PREF:0:50}', AFTER='${AFTER_PREF:0:50}' — flag in known_issues"
+  fail "re-probe dropped preferences content (after-code=$AFTER_CODE: 0=ok, 1=header, 2=default_pdf_backend, 3=prefer_native_fallback, 4=user_custom_note key, 5=user_custom_note value)"
 fi
 
 # ─── Idempotent re-probe doesn't spuriously rewrite ─────────────────
-MTIME1=$(stat -f %m "$SCRATCH_OUT" 2>/dev/null || stat -c %Y "$SCRATCH_OUT" 2>/dev/null)
+# Hardened per 2026-04-22 audit (Agent D finding #5): old check only
+# validated two top-level anchors (schema_version + kreuzberg). Broader
+# idempotency guarantee: when we strip the volatile last_probe timestamp
+# (which legitimately changes per run), every other line should be
+# byte-identical between runs.
+# Strip both forms of the timestamp:
+#   line  18:      last_probe: "2026-04-20T19:03:40Z"   (YAML field)
+#   line   4: # Last probe: 2026-04-20T19:03:40Z        (header comment)
+# Both are expected to change per run. Everything else must be identical.
+strip_timestamps() {
+  grep -v -E "last_probe:|^# Last probe:" "$1" | sort
+}
+PRE_RESET=$(strip_timestamps "$SCRATCH_OUT")
 sleep 1  # ensure different second if file does get rewritten
 bash "$PROBE" --format text --out "$SCRATCH_OUT" >/dev/null 2>&1
-MTIME2=$(stat -f %m "$SCRATCH_OUT" 2>/dev/null || stat -c %Y "$SCRATCH_OUT" 2>/dev/null)
-# last_probe timestamp changes per-probe → file WILL rewrite. Accept either,
-# as long as the STRUCTURAL invariants (schema_version, both backends) are
-# preserved.
+POST_RESET=$(strip_timestamps "$SCRATCH_OUT")
 if grep -q "^schema_version:" "$SCRATCH_OUT" && grep -q "^    kreuzberg:" "$SCRATCH_OUT"; then
   pass "re-probe: structural invariants preserved"
 else
   fail "re-probe: structural invariants broken"
+fi
+if [ "$PRE_RESET" = "$POST_RESET" ]; then
+  pass "re-probe: content byte-identical except last_probe (true idempotency)"
+else
+  fail "re-probe: content drifted beyond last_probe timestamp — check diff"
 fi
 
 rm -f "$SCRATCH_OUT"
