@@ -100,17 +100,17 @@ Codebase Analyzer, Pattern Detector, API Documenter, Data Analyst, Requirements 
 
 ## Feature Matrix
 
-DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 61 features today, classified by status:
+DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 83 features today, classified by status:
 
 | Status | Count | What it means |
 |---|---|---|
-| `always_on` | 6 | Core infrastructure (DexMaster, SSOT compile, validate.sh, D1 state model) |
-| `enabled` | 20 | Shipped and tested — covered by this README |
-| `deferred` | 34 | Planned for 1.1 or later (Knowledge Layer, Parser Pattern B, Agent Pack toggle enforcement) |
-| `experimental` | 1 | Enterprise Mode status display (`*enterprise-mode` command) — full filter enforcement remains Tier 3 follow-up |
+| `always_on` | 7 | Core infrastructure (DexMaster, SSOT compile, validate.sh, D1 state model, consent tracking) |
+| `enabled` | 56 | Shipped and tested — covered by this README |
+| `deferred` | 20 | Planned for 1.1 or later (Parser Pattern B raster pipeline, native Workflow-Runner backend, watcher mode for inbox) |
+| `experimental` | 0 | No features currently in experimental status |
 | `broken` | 0 | No known-broken shipping features. 3 P0/P1 "bugs" inherited from Playground tracking were reclassified 2026-04-19: 2 were Playground-only (app/server.js never ported to Beta), 1 was fixed (Atlassian MCP install.sh v2.0 interactive wizard). |
 
-**Honest label for Beta 1.0 scope:** What ships today is a DexHub core framework (SSOT compile, agent boundary state model, onboarding variants, guardrails, 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh quality gate). **The Knowledge Layer, Document Parser, native Workflow-Runner backend, and Agent Pack UX are explicitly on the roadmap — see `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining build plan (Phases 5.2–5.4).**
+**Honest label for Beta 1.0 scope:** DexHub core framework (SSOT compile, agent boundary state model, onboarding variants, guardrails, 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh quality gate) **plus the L2 Knowledge Tank** (SQLite-backed, hybrid keyword+semantic search via optional Ollama, enterprise-compliance gate) **and the Document Parser arc** (router + kreuzberg/ollama-vlm backends + capabilities probe + inbox auto-parse — end-to-end usable for text/PDF/Office/image via `*inbox`). **Still deferred to 1.1+:** Parser Pattern B raster 6-phase pipeline for oversize files, native Workflow-Runner execution backend, watcher-mode inbox. See `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining plan.
 
 ---
 

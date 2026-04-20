@@ -1260,11 +1260,14 @@ counts:
   total: 83
   by_status:
     always_on: 7
-    enabled: 55
+    enabled: 56
     disabled: 0
-    deferred: 21
+    deferred: 20
     broken: 0
     experimental: 0
+  # Updated 2026-04-21 session 7 (holistic review + parser.inbox_auto_parse fix).
+  # Net since session 6: 1 deferred → enabled (drift found during counts audit —
+  # session 6 documented the flips but the counts block was off-by-one).
   # Updated 2026-04-21 session 6 (holistic review + UX + registry hardening).
   # Net since last update (78 → 83): added skills.copilot_skill_library +
   # skills.claude_code_testing_skill (registry/badge parity), flipped 3 parser
