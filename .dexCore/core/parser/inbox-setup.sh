@@ -223,30 +223,34 @@ resolve_desktop_dir() {
   fi
   local user_dirs="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
   if [ -f "$user_dirs" ]; then
-    # Extract via ruby rather than sed with complex bash-escaped quotes.
-    # BSD sed (macOS) + GNU sed (Linux) interpret the triple-escaped
-    # `["'"'"']?` pattern differently — CI (ubuntu) was returning empty
-    # on a pattern that worked on macOS. Ruby's regex is portable and
-    # handles quoted/unquoted + internal-space values uniformly.
+    # Extract XDG_DESKTOP_DIR value via pure shell — no sed/ruby regex
+    # gymnastics. Earlier attempts (sed with triple-escaped quotes; ruby
+    # with complex regex) failed on CI (Ubuntu) while passing on macOS
+    # due to subtle tool-version differences in how escape sequences
+    # were interpreted. Pure shell pipeline is predictable on any POSIX
+    # system + avoids process spawn overhead for a simple lookup.
     # Handles:
     #   XDG_DESKTOP_DIR="$HOME/Schreibtisch"   (default quoted form)
     #   XDG_DESKTOP_DIR=/custom/path           (unquoted absolute)
     #   XDG_DESKTOP_DIR='single-quoted'        (alt quote)
     #   # XDG_DESKTOP_DIR=...                  (commented — skipped)
     local parsed
-    parsed=$(ruby -e '
-      val = nil
-      File.foreach(ARGV[0]) do |line|
-        next if line =~ /^\s*#/
-        m = line.match(/^\s*XDG_DESKTOP_DIR=(?:"([^"]*)"|'"'"'([^'"'"']*)'"'"'|(\S+))/)
-        next unless m
-        val = m[1] || m[2] || m[3]
-        break
-      end
-      puts val if val
-    ' "$user_dirs" 2>/dev/null)
+    # Step 1: grab the first non-comment line defining XDG_DESKTOP_DIR
+    parsed=$(grep -E '^[[:space:]]*XDG_DESKTOP_DIR=' "$user_dirs" 2>/dev/null \
+             | grep -vE '^[[:space:]]*#' \
+             | head -1)
     if [ -n "$parsed" ]; then
-      # Substitute $HOME literally (xdg-user-dirs convention).
+      # Step 2: strip leading whitespace + key prefix
+      parsed="${parsed#"${parsed%%[![:space:]]*}"}"    # ltrim whitespace
+      parsed="${parsed#XDG_DESKTOP_DIR=}"
+      # Step 3: strip trailing whitespace
+      parsed="${parsed%"${parsed##*[![:space:]]}"}"
+      # Step 4: strip surrounding quote pair (double OR single) if present
+      case "$parsed" in
+        \"*\") parsed="${parsed#\"}"; parsed="${parsed%\"}" ;;
+        \'*\') parsed="${parsed#\'}"; parsed="${parsed%\'}" ;;
+      esac
+      # Step 5: substitute $HOME literal (xdg-user-dirs convention).
       parsed="${parsed//\$HOME/$HOME}"
       printf '%s' "$parsed"
       return

@@ -194,13 +194,15 @@ XDG_DESKTOP_DIR="$HOME/Schreibtisch"
 XDG_DOWNLOAD_DIR="$HOME/Downloads"
 UDIRS
 # unset XDG_DESKTOP_DIR so file-based path is used
-LOC_JSON=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
-  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>/dev/null)
-LOC_PATH=$(echo "$LOC_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"]' 2>/dev/null)
+# Capture BOTH stdout and stderr so CI-only failures surface diagnostic info
+LOC_OUT=$(env -u XDG_DESKTOP_DIR HOME="$XDG_SCRATCH" \
+  bash "$SCRIPT" --dry-run --inbox "$XDG_SCRATCH/inbox" --format json 2>&1)
+LOC_EXIT=$?
+LOC_PATH=$(echo "$LOC_OUT" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["shortcut_path"] rescue puts ""' 2>/dev/null)
 if echo "$LOC_PATH" | grep -q "/Schreibtisch/"; then
   pass "xdg-user-dirs.dirs file: localized Desktop (Schreibtisch) resolved"
 else
-  fail "xdg-user-dirs resolution failed: got '$LOC_PATH'"
+  fail "xdg-user-dirs resolution failed: exit=$LOC_EXIT shortcut_path='$LOC_PATH' full_output:$(echo "$LOC_OUT" | head -20 | tr '\n' '|')"
 fi
 
 # Case 3: commented-out line must be ignored (edge-case hardening)
