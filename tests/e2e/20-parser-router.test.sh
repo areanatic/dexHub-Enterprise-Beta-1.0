@@ -209,6 +209,9 @@ fi
 # Verify: if user edits capabilities.yaml to say kreuzberg.installed=true,
 # the router picks it up. Write a custom yaml + point --capabilities at it.
 CUSTOM_CAPS="$SCRATCH/capabilities.yaml"
+# Includes ALL KNOWN_BACKENDS so the stale-detection path (added
+# 2026-04-22 session-7) doesn't re-probe. The stale-caps regression
+# block below explicitly tests re-probe behavior.
 cat > "$CUSTOM_CAPS" <<EOF
 schema_version: "1"
 parser:
@@ -221,6 +224,10 @@ parser:
       installed: true
       version: "latest"
       compliance: local_vlm_required
+    pattern_a_vector_text:
+      installed: false
+      version: null
+      compliance: ok
 EOF
 WITH_KW_OUT=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$CUSTOM_CAPS" "$SCRATCH/d.docx" 2>/dev/null)
 WITH_KW_BACKEND=$(echo "$WITH_KW_OUT" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["backend"]' 2>/dev/null)
@@ -300,14 +307,67 @@ else
   fail "--no-auto-probe: auto_probe_used=$NOAP_USED (expected false)"
 fi
 
-# When capabilities.yaml EXISTS (no need to probe):
-# auto_probe_used must be false regardless of default
+# When capabilities.yaml EXISTS + contains every KNOWN_BACKENDS entry
+# (fresh): auto_probe_used must be false — no unnecessary probe.
 WITH_CAPS_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$CUSTOM_CAPS" "$SCRATCH/a.txt" 2>/dev/null)
 WITH_CAPS_USED=$(echo "$WITH_CAPS_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
 if [ "$WITH_CAPS_USED" = "false" ]; then
-  pass "existing capabilities.yaml → auto_probe_used=false (no unnecessary probe)"
+  pass "fresh capabilities.yaml (all KNOWN_BACKENDS present) → auto_probe_used=false"
 else
-  fail "existing caps: auto_probe_used=$WITH_CAPS_USED (expected false)"
+  fail "fresh caps: auto_probe_used=$WITH_CAPS_USED (expected false)"
+fi
+
+# ─── STALE caps.yaml → auto-probe re-fires (session-7 Alt-3 logic) ──
+# Regression guard for the decision made 2026-04-22 session-7: when
+# parse-route.sh removed its legacy native-pdftotext fallback, existing
+# users with a capabilities.yaml from BEFORE pattern_a_vector_text
+# shipped would otherwise see backend_missing for PDFs they handled
+# fine yesterday. Auto-probe-on-stale closes that regression: if
+# caps.yaml is missing any KNOWN_BACKENDS entry, the probe re-fires
+# and the in-memory result fills the gap. User sees the upgrade work
+# silently (on next router call), no manual *parser-setup needed.
+STALE_CAPS="$SCRATCH/stale-caps.yaml"
+cat > "$STALE_CAPS" <<EOF
+schema_version: "1"
+parser:
+  backends:
+    kreuzberg:
+      installed: false
+    ollama_vlm:
+      installed: false
+EOF
+# pattern_a_vector_text is deliberately absent → file is stale
+
+# With auto-probe (default): should fire + auto_probe_used=true
+STALE_AUTO_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$STALE_CAPS" "$SCRATCH/c.pdf" 2>/dev/null)
+STALE_AUTO_USED=$(echo "$STALE_AUTO_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
+if [ "$STALE_AUTO_USED" = "true" ]; then
+  pass "stale caps.yaml (missing KNOWN_BACKENDS entry) → auto-probe re-fires"
+else
+  fail "stale caps: auto_probe_used=$STALE_AUTO_USED (expected true — missing pattern_a should trigger re-probe)"
+fi
+
+# --no-auto-probe: should NOT fire, router decides with stale data only
+STALE_NOAP_JSON=$(bash .dexCore/core/parser/parse-route.sh --capabilities "$STALE_CAPS" --no-auto-probe "$SCRATCH/c.pdf" 2>/dev/null)
+STALE_NOAP_USED=$(echo "$STALE_NOAP_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["auto_probe_used"]' 2>/dev/null)
+STALE_NOAP_STATUS=$(echo "$STALE_NOAP_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"]' 2>/dev/null)
+if [ "$STALE_NOAP_USED" = "false" ]; then
+  pass "stale caps.yaml + --no-auto-probe → probe respects opt-out"
+else
+  fail "stale + --no-auto-probe: auto_probe_used=$STALE_NOAP_USED (expected false)"
+fi
+# Without legacy-native fallback (removed session-7), stale+no-probe means PDF
+# returns backend_missing with a hint pointing at *parser-setup.
+if [ "$STALE_NOAP_STATUS" = "backend_missing" ]; then
+  pass "stale + --no-auto-probe + PDF → backend_missing (legacy native fallback removed)"
+else
+  fail "stale + --no-auto-probe + PDF: status=$STALE_NOAP_STATUS (expected backend_missing)"
+fi
+STALE_NOAP_HINT=$(echo "$STALE_NOAP_JSON" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["hint"]' 2>/dev/null)
+if echo "$STALE_NOAP_HINT" | grep -qE 'capabilities-probe\.sh|parser-setup'; then
+  pass "stale + --no-auto-probe + PDF: hint names the fix (*parser-setup / capabilities-probe.sh)"
+else
+  fail "stale hint doesn't point user at the fix: got '${STALE_NOAP_HINT:0:100}'"
 fi
 
 test_summary

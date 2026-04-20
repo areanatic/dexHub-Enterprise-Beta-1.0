@@ -111,22 +111,57 @@ EXISTS=$(printf "%s" "$DETECT_JSON" | ruby -rjson -e 'd=JSON.parse(STDIN.read) r
 # Default so bash arithmetic doesn't blow up on malformed SIZE
 [ -z "$SIZE" ] || ! [[ "$SIZE" =~ ^[0-9]+$ ]] && SIZE=0
 
-# ─── Auto-probe (when capabilities.yaml missing) ────────────────────
-# Closes the known_issue flagged on both kreuzberg + ollama_vlm
-# adapters: the router used to return backend_missing whenever the
-# user hadn't hand-edited capabilities.yaml. Now: if the file is
-# missing AND auto-probe is enabled (default), we call the probe
-# script once in --dry-run mode and keep the JSON in memory. No file
-# writes. If the user wants pure capabilities.yaml behavior (e.g. for
-# a deterministic test), pass --no-auto-probe.
-if [ "$AUTO_PROBE_ENABLED" = "1" ] && [ ! -f "$CAPS" ]; then
+# ─── Auto-probe (when capabilities.yaml missing OR stale) ───────────
+# Closes two related known_issues:
+#  1. (2026-04-21) Router used to return backend_missing when caps.yaml
+#     was absent — auto-probe now fills that in.
+#  2. (2026-04-22 session-7) STALE caps.yaml — file exists but doesn't
+#     list one of the currently-shipped backends (common pattern: user
+#     ran probe yesterday, new backend shipped today, file is behind).
+#     Previously, the legacy native-pdftotext branch hid this staleness
+#     silently. We removed that branch; without stale-detection the
+#     router would regress to backend_missing for any upgrade-path user.
+#     Stale-detection queries capabilities-probe.sh's KNOWN_BACKENDS
+#     (single source of truth) and compares against caps.yaml. Re-probes
+#     safely preserve user-set notes/preferences.
+#
+# Opt out via --no-auto-probe (deterministic tests).
+
+caps_has_all_known_backends() {
+  # Returns 0 if caps.yaml has an entry for every KNOWN_BACKENDS id that
+  # capabilities-probe.sh registers. Returns 1 if file is missing, any
+  # entry is missing, or the probe script isn't readable (fail-open so
+  # we re-probe rather than trust a possibly-incomplete file).
+  local caps_file="$1"
+  [ ! -f "$caps_file" ] && return 1
+
+  local probe_script="$SCRIPT_DIR/capabilities-probe.sh"
+  [ ! -r "$probe_script" ] && return 1
+
+  # Extract known backend IDs from the probe script's KNOWN_BACKENDS array.
+  # Source-of-truth lives in one place (the probe); this is a read-only mirror.
+  local known_ids
+  known_ids=$(awk '/^KNOWN_BACKENDS=\(/,/^\)/' "$probe_script" \
+              | grep -oE '"[a-z_]+:' \
+              | tr -d '":')
+  [ -z "$known_ids" ] && return 1  # couldn't parse probe — fail-open
+
+  for id in $known_ids; do
+    if ! grep -qE "^    ${id}:[[:space:]]*$" "$caps_file"; then
+      return 1  # backend known but not in caps.yaml — stale
+    fi
+  done
+  return 0  # fresh
+}
+
+if [ "$AUTO_PROBE_ENABLED" = "1" ] && ! caps_has_all_known_backends "$CAPS"; then
   PROBE_SCRIPT="$SCRIPT_DIR/capabilities-probe.sh"
   if [ -x "$PROBE_SCRIPT" ]; then
     PROBE_JSON=$("$PROBE_SCRIPT" --dry-run --format json 2>/dev/null || echo "")
     if [ -n "$PROBE_JSON" ] && printf "%s" "$PROBE_JSON" | ruby -rjson -e 'JSON.parse(STDIN.read)' >/dev/null 2>&1; then
       AUTO_PROBE_USED="true"
     else
-      PROBE_JSON=""  # malformed — fall through to file-based (which is missing)
+      PROBE_JSON=""  # malformed — fall through to file-based
     fi
   fi
 fi
@@ -205,28 +240,28 @@ else
         REASON="PDF + kreuzberg installed (native PDF extraction, 91+ formats)"
       elif [ "$(cap_backend_installed pattern_a_vector_text)" = "true" ]; then
         # Pattern A — poppler pdftotext adapter. PDF-only, faster than
-        # kreuzberg, ships the full hint_type contract. Preferred over
-        # the legacy `native` branch below because it is a first-class
-        # adapter (install-prompted by capabilities-probe, structurally
-        # tested, pattern-compliant).
+        # kreuzberg, ships the full hint_type contract.
         BACKEND="pattern_a_vector_text"
         STATUS="ready"
         REASON="PDF + pattern_a_vector_text (poppler pdftotext) installed — fast layout-preserving extraction"
       else
-        # Legacy fallback — pdftotext on PATH but capabilities-probe
-        # never ran. Same binary as pattern_a but without the adapter
-        # contract. Kept for backwards compatibility with users who
-        # skipped onboarding; remove in 1.1 once everyone's migrated.
+        # Neither kreuzberg nor pattern_a registered in capabilities.yaml.
+        # Before session-7 we had a legacy `native` fallback that called
+        # pdftotext directly when found on PATH. That was removed 2026-04-22
+        # (session-7) because it duplicated pattern_a_vector_text without
+        # the adapter contract. Auto-probe (enabled by default) discovers
+        # pdftotext as pattern_a when capabilities.yaml is missing — so
+        # fresh-install users are never stranded here. Users who hit this
+        # branch have a STALE capabilities.yaml and need to re-run the
+        # probe once. The hint names that action explicitly.
+        BACKEND="none"
+        STATUS="backend_missing"
         if command -v pdftotext >/dev/null 2>&1; then
-          BACKEND="native"
-          STATUS="ready"
-          REASON="kreuzberg + pattern_a both absent from capabilities.yaml — falling back to system pdftotext"
-          HINT="For richer PDF extraction: install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg). Or run 'bash .dexCore/core/parser/capabilities-probe.sh' to register your already-installed pdftotext as pattern_a."
+          REASON="PDF requires a registered backend — you have pdftotext on PATH but capabilities.yaml doesn't list it"
+          HINT="Run 'bash .dexCore/core/parser/capabilities-probe.sh' to register pdftotext as pattern_a, OR install kreuzberg for richer extraction (https://github.com/kreuzberg-dev/kreuzberg)."
         else
-          BACKEND="none"
-          STATUS="backend_missing"
           REASON="PDF requires a backend (kreuzberg or poppler pdftotext)"
-          HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) or poppler (ships pdftotext)."
+          HINT="Install kreuzberg (https://github.com/kreuzberg-dev/kreuzberg) or poppler (ships pdftotext), then run 'bash .dexCore/core/parser/capabilities-probe.sh'."
         fi
       fi
       ;;
