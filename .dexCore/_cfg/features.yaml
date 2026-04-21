@@ -670,6 +670,27 @@ parser:
       - "Routing precedence: router prefers kreuzberg when installed (richer output), else pattern_a (fast PDF), else legacy native pdftotext fallback. The legacy fallback duplicates pattern_a's core capability — kept for backwards compatibility with users who skipped capabilities-probe. Candidate for removal in 1.1 once everyone's onboarded to capabilities.yaml."
       - "Silent stderr drops on success (2026-04-22 session-7 final-review low-severity finding): when pdftotext exits 0 but writes warnings to stderr (font-decode issues, encoding substitutions), the adapter discards them. Corrupted-text PDFs produce replacement characters that slip through as valid content. Acceptable for the target use case (clean vector PDFs / Figma exports); would matter more for scanned-document PDFs which should go through ollama_vlm anyway. Fix path: surface stderr summary as a 'warnings' field in the success JSON — deferred until real-world data shows it's needed."
 
+  - id: parser.pattern_b_phase1_overview
+    name: "Pattern B Phase 1 — Overview (raster → VLM description)"
+    description: "Shipped 2026-04-22 session-8. First phase of the 6-phase Pattern B raster pipeline, extracted as its own feature for standalone usability. Rasterizes a PDF's first page (pdftoppm/sips/convert) or an input image, downscales to ≤1800px long edge, feeds to the ollama_vlm adapter with an overview prompt, returns the VLM description in BACKEND-ADAPTER-PATTERN JSON (content = holistic document description, overview_png_bytes = raster size). NOT auto-routed from parse-route.sh (opt-in: invoke adapter directly with --extract PATH). Returns DESCRIPTION, not verbatim content — use pattern_a for text-layer PDFs; use this when the text layer is absent/unreliable (Figma/Miro exports, scanned PDFs) AND a holistic overview is more valuable than per-region OCR. Shipping Phase 1 standalone proves out the raster→VLM chain and unblocks Phases 2-6 (cluster-detect, hi-res crops, per-cluster VLM, synthesis, verify) which remain deferred under parser.pattern_b_raster_6phase."
+    status: enabled
+    phase: 5.3.k
+    enterprise_compliance: local_vlm_required
+    requires: [bash, ruby, poppler-utils-or-sips-or-imagemagick, ollama]
+    depends_on: [parser.ollama_vlm_backend]
+    docs:
+      - myDex/drafts/RESEARCH-DOCUMENT-PARSING-FEATURE.md
+      - myDex/drafts/CONCEPT-PARSER-ARCHITECTURE.md
+    tests:
+      - tests/e2e/31-parser-pattern-b-phase1.test.sh
+    primary_target: github_copilot
+    known_issues:
+      - "Phase 1 only. Phases 2-6 (cluster-detect, hi-res crops, per-cluster VLM, synthesis, verify) remain deferred under parser.pattern_b_raster_6phase. The full pipeline is the target for image-heavy oversize PDFs where per-region extraction matters; Phase 1 alone answers 'what is in this document' without verbatim content."
+      - "NOT auto-routed from parse-route.sh. This is opt-in: users invoke the adapter directly (bash pattern-b-phase1-overview.sh --extract PATH) or via a future *overview menu entry. Auto-routing would surprise users expecting pattern_a-style text extraction — the returned content is a VLM DESCRIPTION, structurally different."
+      - "Live-verify requires CLAUDE_E2E_LIVE_PATTERN_B_PHASE1=1 + weasyprint + a VLM model pulled in Ollama (~7.8GB for llama3.2-vision). Dev-box live-verify pending: pipeline structurally complete, awaiting first VLM-equipped developer to record a live assertion capturing magic-phrase recovery from the overview."
+      - "Max-px defaults to 1800 (long-edge downscale) — balances context size vs. VLM tokens. Overridable via --max-px N. Very dense pages may benefit from higher; very sparse pages may benefit from lower. No adaptive sizing in first slice."
+      - "First-page only for multi-page PDFs. Using pdftoppm -singlefile -f 1 -l 1. Full-document overview (stitched thumbnail grid OR page-by-page overview + synthesis) is a Phase 2 concern and deferred."
+
   - id: parser.pattern_b_raster_6phase
     name: "Pattern B Skill (Raster 6-Phase Pipeline) — SCAFFOLD"
     description: "SCAFFOLDED 2026-04-21 session-7 (adapter at .dexCore/core/parser/backends/pattern-b-raster-6phase.sh emits BACKEND-ADAPTER-PATTERN JSON with status=deferred + hint_type=install_backend; REAL 6-phase impl deferred to 1.1). Pipeline target: (1) OVERVIEW — downscale PDF to ≤1800px via sips/convert, fits in one VLM context; (2) CLUSTER-DETECT — VLM identifies distinct content regions (tables, charts, body, diagrams) + returns bounding boxes; (3) HI-RES CROPS — crop original PDF to each bbox via pdftoppm/sips; (4) PER-CLUSTER VLM — region-specific prompts (tables→markdown, charts→data-extraction); (5) SYNTHESIS — VLM combines per-cluster outputs preserving reading order, fed the overview as layout context; (6) VERIFY — VLM sanity-check final output against overview, flag hallucinations. Target files: image-heavy PDFs (Figma boards, Miro exports, scanned docs) where pattern_a's text layer is absent/unreliable AND kreuzberg's classical extraction underperforms. 5-20× the VLM token cost of pattern_a — justified only for the hybrid oversize/visual-board case."
@@ -1323,14 +1344,19 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 86
+  total: 87
   by_status:
     always_on: 7
-    enabled: 60
+    enabled: 61
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 8 B (Pattern B Phase 1 Overview):
+  # - parser.pattern_b_phase1_overview NEW enabled (5.3.k) —
+  #   total 86→87, enabled 60→61. Split from parser.pattern_b_raster_6phase
+  #   scaffold (which remains deferred). Phase 1 (raster→VLM overview) is
+  #   standalone-useful; Phases 2-6 stay in the scaffold's roadmap.
   # Updated 2026-04-22 session 8 G (§27 gate):
   # - quality.validate_sh_§27_test_syntax NEW enabled (5.1.debt) —
   #   total 85→86, enabled 59→60

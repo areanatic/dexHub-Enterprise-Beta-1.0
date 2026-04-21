@@ -60,6 +60,7 @@ KNOWN_BACKENDS=(
   "kreuzberg:kreuzberg.sh"
   "ollama_vlm:ollama-vlm.sh"
   "pattern_a_vector_text:pattern-a-vector-text.sh"
+  "pattern_b_phase1_overview:pattern-b-phase1-overview.sh"
 )
 
 while [ $# -gt 0 ]; do
