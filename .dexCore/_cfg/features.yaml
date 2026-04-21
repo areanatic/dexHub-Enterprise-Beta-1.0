@@ -23,9 +23,9 @@
 # Rule: Changes to this file require validate.sh and bash tests/e2e/run-all.sh green before commit.
 
 schema_version: "1.0"
-registry_version: "0.2.0"
-updated_at: "2026-04-20"
-last_audit: "2026-04-20"
+registry_version: "0.2.1"
+updated_at: "2026-04-21"
+last_audit: "2026-04-21"
 
 # ─────────────────────────────────────────────────────────────────────────
 # CORE INFRASTRUCTURE — always_on, no toggle
@@ -665,7 +665,7 @@ parser:
       - tests/e2e/28-parser-pattern-a-backend.test.sh
     primary_target: github_copilot
     known_issues:
-      - "Optional sips-based overview PNG is NOT shipped in this first slice — pattern_a produces text-only extraction today. Overview PNG correlation is scope for pattern_b_raster_6phase (1.1 roadmap) where it is architecturally load-bearing."
+      - "pattern_a is text-only by design — no image output. Users who want a raster overview of a PDF alongside the text should invoke parser.pattern_b_phase1_overview (shipped 2026-04-21 session-8, 5.3.k). pattern_a and pattern_b_phase1_overview are complementary: text extraction + VLM overview description."
       - "Only 'pdf' is in the supported[] list. If a user tries --extract on a non-PDF, pdftotext emits an error to stderr which we surface as status=extract_failed. Router should not route non-PDF to this adapter; callers that bypass the router get honest failure, not silent garbage."
       - "Routing precedence: router prefers kreuzberg when installed (richer output), else pattern_a (fast PDF), else legacy native pdftotext fallback. The legacy fallback duplicates pattern_a's core capability — kept for backwards compatibility with users who skipped capabilities-probe. Candidate for removal in 1.1 once everyone's onboarded to capabilities.yaml."
       - "Silent stderr drops on success (2026-04-22 session-7 final-review low-severity finding): when pdftotext exits 0 but writes warnings to stderr (font-decode issues, encoding substitutions), the adapter discards them. Corrupted-text PDFs produce replacement characters that slip through as valid content. Acceptable for the target use case (clean vector PDFs / Figma exports); would matter more for scanned-document PDFs which should go through ollama_vlm anyway. Fix path: surface stderr summary as a 'warnings' field in the success JSON — deferred until real-world data shows it's needed."
@@ -707,8 +707,8 @@ parser:
     primary_target: github_copilot
     known_issues:
       - "SCAFFOLD only — --detect returns status=deferred + hint_type=install_backend; --extract returns status=deferred without attempting extraction. Reserves the backend ID in capabilities-probe KNOWN_BACKENDS + BACKEND-ADAPTER-PATTERN compliance so the real 6-phase impl in 1.1 plugs in without contract churn."
-      - "The 6-phase pipeline implementation is substantial (multi-phase VLM orchestration + clustering heuristics + hi-res page rasterization + synthesis prompt engineering). Split into 6 sub-phases for incremental shipping: parser.pattern_b_phase1_overview → phase2_cluster_detect → … each as its own feature flag."
-      - "Routing decision pending: parse-route.sh needs to decide WHEN to prefer Pattern B over Pattern A. Current oversize (≥100MB) triggers backend=defer with status=deferred — those requests will start routing to pattern_b_raster_6phase once phase1 ships."
+      - "Split into 6 sub-phases for incremental shipping. **Phase 1 SHIPPED 2026-04-21 session-8** as parser.pattern_b_phase1_overview (5.3.k, enabled). Phases 2-6 remain deferred here: phase2_cluster_detect → phase3_hi_res_crops → phase4_per_cluster_vlm → phase5_synthesis → phase6_verify. Each phase ~1 session. Full pipeline graduation requires: all 6 sub-phases enabled + parse-route routing decision + this scaffold's status flip to enabled + full-pipeline test."
+      - "Routing decision pending: parse-route.sh needs to decide WHEN to prefer Pattern B over Pattern A. Phase 1 (shipped 2026-04-21 session-8) is deliberately NOT auto-routed — it's opt-in because it returns a VLM description, not verbatim content. Auto-routing would surprise pattern_a-expecting users. Once Phases 2-6 ship with verbatim-preserving synthesis, routing heuristics (file size ≥100MB, page-count-to-text-density ratio, explicit user opt-in) will need codification."
       - "Clustering method: tree-sitter-style bbox extraction via VLM OR classical OpenCV region segmentation. Design pending. VLM-bbox is simpler but accuracy depends on prompt engineering; OpenCV needs an additional dependency. First-slice impl will try VLM-only to keep dep surface minimal."
 
   - id: parser.inbox_auto_parse
@@ -724,7 +724,7 @@ parser:
       - tests/e2e/26-parser-inbox-auto-parse.test.sh
     primary_target: github_copilot
     known_issues:
-      - "One-shot mode only — no file-system watcher. User must run the script (or DexMaster *inbox) manually. Continuous watching (fswatch on macOS / inotify on Linux) is a deferred enhancement."
+      - "One-shot invocation by default (run via DexMaster *inbox or cron). For CONTINUOUS auto-processing, use parser.inbox_watcher (5.3.i, shipped 2026-04-21 session-7) — wraps this orchestrator with fswatch (macOS) / inotifywait (Linux) / poll (universal fallback) and re-invokes on each new file. Invoke via DexMaster *inbox-watch or `bash .dexCore/core/parser/inbox-watch.sh --start`."
       - "Binary files whose backend is not installed return status=routed_but_backend_unavailable. They're NOT archived (stay in inbox for retry after the user installs the backend). This is intentional — don't penalize users for a deferred install."
       - "Kreuzberg/ollama_vlm adapter failures during extract surface as status=extract_failed with the backend's exit code in the error field. l2-ingest failures surface as status=ingest_failed with stderr excerpt."
       - "For very large inboxes (100s of files), the for-loop processes sequentially. Future --parallel N flag could speed this up. Not a blocker for Beta 1.0 scale."
