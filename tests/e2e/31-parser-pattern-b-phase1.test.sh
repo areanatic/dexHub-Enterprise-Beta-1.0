@@ -140,19 +140,24 @@ else
   fail "--extract missing: expected 3, got $MISS_EXIT"
 fi
 
-# ─── --extract --require without backend → exit 2 (only if not ready) ──
-if [ "$STATUS" != "ready" ]; then
-  TMP_IMG=$(mktemp -t pb31-XXXXXX).png
-  printf '\x89PNG\r\n\x1a\n' > "$TMP_IMG"
-  bash "$ADAPTER" --extract "$TMP_IMG" --require >/dev/null 2>&1
-  REQ_EXIT=$?
-  if [ "$REQ_EXIT" = "2" ]; then
-    pass "--extract --require without backend: exit 2"
-  else
-    fail "--extract --require without backend: expected 2, got $REQ_EXIT"
-  fi
-  rm -f "$TMP_IMG"
+# ─── --extract --require without backend → exit 2 (always covered) ──
+# Previously gated on `$STATUS != ready`, which silently SKIPPED this
+# assertion on boxes with a full VLM setup. Agent-β review (session-8)
+# flagged this — users with working Ollama had zero coverage of the
+# --require path. Fix: force-unreachable OLLAMA_HOST to drive the probe
+# into `partial` status regardless of real system state. The ollama-vlm
+# sub-adapter reads OLLAMA_HOST from env, so inheriting it down is
+# enough.
+TMP_IMG=$(mktemp -t pb31-XXXXXX).png
+printf '\x89PNG\r\n\x1a\n' > "$TMP_IMG"
+OLLAMA_HOST="http://127.0.0.1:1" bash "$ADAPTER" --extract "$TMP_IMG" --require >/dev/null 2>&1
+REQ_EXIT=$?
+if [ "$REQ_EXIT" = "2" ]; then
+  pass "--extract --require with unreachable VLM: exit 2 (forced not-ready)"
+else
+  fail "--extract --require: expected 2 with unreachable VLM, got $REQ_EXIT"
 fi
+rm -f "$TMP_IMG"
 
 # ─── Unknown flag → exit 1 ──────────────────────────────────────────
 bash "$ADAPTER" --nonsense >/dev/null 2>&1
@@ -206,6 +211,28 @@ if [ -n "$TEXT_OUT" ]; then
   pass "--extract --format text: emits output (not silent)"
 else
   fail "--extract --format text: silent output"
+fi
+
+# ─── Regression: 0-byte / missing raster output guards (Agent-1 review) ─
+# pdftoppm / sips / convert can exit 0 while producing empty output
+# (encrypted PDF, permission issue, catalog corruption). Without -s size
+# check we would pass garbage to VLM. Test: adapter source must have a
+# -s post-raster guard + an emit_error path for 0-byte overview PNG.
+if grep -q '\[ ! -s "\$downscale_out" \]' "$ADAPTER"; then
+  pass "adapter has 0-byte overview PNG guard (Agent-review session-8 fix)"
+else
+  fail "adapter missing 0-byte overview PNG guard — raster tools can exit 0 with empty output"
+fi
+
+# ─── Regression: ollama-vlm sub-adapter exit-code check (Agent-1 review) ─
+# Previously only stdout JSON was captured; a VLM crash (timeout, OOM)
+# produced empty output swallowed by `rescue ""`. Adapter must now
+# capture vlm_exit separately + branch on non-zero with a concrete
+# error path.
+if grep -q 'vlm_exit=\$?' "$ADAPTER" && grep -q '"\$vlm_exit" != "0"' "$ADAPTER"; then
+  pass "adapter captures ollama_vlm sub-adapter exit code (Agent-review session-8 fix)"
+else
+  fail "adapter missing explicit vlm_exit capture — VLM crash invisible to error handling"
 fi
 
 # ─── scaffold backward-compat: pattern_b_raster_6phase stays deferred ─

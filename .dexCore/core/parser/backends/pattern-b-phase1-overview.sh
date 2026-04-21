@@ -345,19 +345,39 @@ extract_file() {
       ;;
   esac
 
+  # Post-raster existence + non-empty checks. pdftoppm / sips / convert
+  # may silently produce a 0-byte PNG on encrypted-PDF / permission
+  # failure / catalog corruption — they return exit 0 but no image.
+  # Without an `-s` check we would feed garbage to the VLM and surface
+  # a confusing "no content" error downstream instead of the real
+  # root cause. (Agent-β review finding, session-8.)
   if [ ! -f "$downscale_out" ]; then
     emit_error "$file" "Overview PNG missing after raster pipeline — unexpected internal failure."
+    exit 4
+  fi
+  if [ ! -s "$downscale_out" ]; then
+    emit_error "$file" "Overview PNG is 0 bytes — raster tool produced empty output. Likely cause: encrypted/corrupted PDF or missing permissions."
     exit 4
   fi
 
   # Delegate to ollama_vlm for the actual vision call. Force JSON so we
   # can parse content reliably regardless of outer --format.
-  local vlm_out vlm_content vlm_bytes overview_bytes
+  # Capture exit code separately — previously we trusted stdout JSON
+  # alone, which meant a VLM crash (timeout, OOM) produced empty output
+  # that `rescue ""` silently swallowed. Explicit exit-code check
+  # distinguishes "backend crashed" from "backend returned empty".
+  local vlm_out vlm_exit vlm_content vlm_bytes overview_bytes
   vlm_out=$(bash "$SCRIPT_DIR/ollama-vlm.sh" \
     --extract "$downscale_out" \
     ${MODEL_OVERRIDE:+--model "$MODEL_OVERRIDE"} \
     --prompt "$OVERVIEW_PROMPT" \
     --format json 2>/dev/null)
+  vlm_exit=$?
+
+  if [ "$vlm_exit" != "0" ]; then
+    emit_error "$file" "ollama_vlm sub-adapter exited with status $vlm_exit. Check: bash .dexCore/core/parser/backends/ollama-vlm.sh --detect"
+    exit 4
+  fi
 
   vlm_content=$(echo "$vlm_out" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["content"] rescue ""' 2>/dev/null)
   vlm_bytes=$(echo "$vlm_out"   | ruby -rjson -e 'puts JSON.parse(STDIN.read)["bytes"].to_s' 2>/dev/null)
