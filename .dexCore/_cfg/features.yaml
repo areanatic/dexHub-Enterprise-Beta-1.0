@@ -69,7 +69,7 @@ core:
 
   - id: core.validate_sh
     name: "validate.sh structural quality gate"
-    description: "22 sections of structural invariant checks (file existence, hash integrity, SSOT drift, manifest)"
+    description: "27 sections of structural invariant checks (file existence, hash integrity, SSOT drift, manifest, feature-registry, session-anchor, README↔counts, counts↔actual, test-file shell-syntax)"
     status: always_on
     phase: 1.0
     enterprise_compliance: ok
@@ -997,6 +997,17 @@ quality:
     docs: pending
     tests: []
 
+  - id: quality.validate_sh_§27_test_syntax
+    name: "validate.sh §27 test-file shell-syntax validity"
+    description: "Shipped 2026-04-22 session-8. Complements §23: §23 verifies referenced test paths exist on disk; §27 verifies they PARSE (bash -n). Catches commits where a test file has a syntax error (unterminated heredoc, mismatched fi/done). Without §27, run-all.sh would still catch it but with a noisy failure; §27 localizes to the broken file at the validate.sh stage, before e2e runs. Same skip rules as §23 (self-hosting, tests/e2e/integrations/* which are stripped from enterprise builds). Covers 27 .sh test files at shipping."
+    status: enabled
+    phase: 5.1.debt
+    enterprise_compliance: ok
+    requires: [bash]
+    depends_on: [meta.features_yaml, quality.validate_sh_§23_features_yaml]
+    docs: .dexCore/_dev/tools/validate.sh
+    tests: []
+
   - id: quality.copilot_smoke_weekly
     name: "Live Copilot Smoke Test (recurring, 1h/week)"
     description: "Open Beta in Copilot, walk through 3 workflows, log bugs, never skip"
@@ -1312,14 +1323,17 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 85
+  total: 86
   by_status:
     always_on: 7
-    enabled: 59
+    enabled: 60
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 8 G (§27 gate):
+  # - quality.validate_sh_§27_test_syntax NEW enabled (5.1.debt) —
+  #   total 85→86, enabled 59→60
   # Updated 2026-04-21 session 7 late-batch (post Pattern-B scaffold + watcher):
   # - parser.inbox_watcher NEW enabled (5.3.i) — total 84→85, enabled 58→59
   # - parser.pattern_b_raster_6phase: SCAFFOLDED as deferred (description
