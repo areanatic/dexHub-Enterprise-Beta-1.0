@@ -30,13 +30,20 @@ Enterprise deployments: see [Enterprise Compliance Matrix](.dexCore/_dev/docs/EN
 ## Install
 
 ```bash
-git clone https://github.com/areanatic/dexhub-ea-beta.git
-cd dexhub-ea-beta
+git clone https://github.com/areanatic/dexHub-Enterprise-Beta-1.0.git
+cd dexHub-Enterprise-Beta-1.0
 ```
 
-Open in VS Code with GitHub Copilot. Type `@dex-master hi`. Done.
+Open in VS Code with GitHub Copilot Enterprise. Type `@dex-master hi`. Done.
 
-Works with any AI-capable IDE (Copilot, Cursor, Windsurf, etc.).
+Works with any AI-capable IDE (Copilot, Cursor, Windsurf, Anthropic CLI, JetBrains, etc.).
+
+### Getting-Started Docs (für Non-Devs)
+
+- 📦 **[INSTALLATION.md](.dexCore/_dev/docs/INSTALLATION.md)** — Schritt-für-Schritt für Non-Devs (IDE-Wahl, Git, optionale Parser + lokale KI, Disk-Budget)
+- 🚀 **[FIRST-5-MINUTES.md](.dexCore/_dev/docs/FIRST-5-MINUTES.md)** — Die ersten 5 Minuten nach der Installation (Profil, Agenten treffen, Workflow laufen lassen, Projekt anlegen)
+- ❓ **[FAQ.md](.dexCore/_dev/docs/FAQ.md)** — "Was heißt Data-Local?", "Welches LLM?", "Wie viel Platz?", "Eigene Agenten?"
+- 🔧 **[TROUBLESHOOTING.md](.dexCore/_dev/docs/TROUBLESHOOTING.md)** — "@dex-master antwortet nicht", "Ollama Port 11434 belegt", Validate-FAILs erklärt, Git-Push-rejected
 
 ---
 
