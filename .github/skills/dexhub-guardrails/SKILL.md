@@ -45,7 +45,7 @@ NEVER reference files or paths that don't exist. Verify with file system first.
 - Delete files without confirmation
 - Modify config without telling user
 - Execute workflows without explicit approval
-- Share data with external services (100% local)
+- Share user working data with external services without explicit consent (data-local discipline: working data on disk; LLMs + connectors opt-in only)
 
 **ALWAYS:**
 - Ask before migrating files

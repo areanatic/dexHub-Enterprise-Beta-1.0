@@ -131,7 +131,7 @@ collaborative AI-assisted development.
 - **System Agents** — myDex Project Manager (DexMaster + myDex are user-facing)
 - **40+ Workflows** — From brainstorming to production deployment
 - **7 Copilot Skills** — Lazy-loaded knowledge (guardrails, chronicle, DHL DS)
-- **100% Local-First** — No cloud APIs, privacy-first architecture
+- **Data-Local, LLM-of-Your-Choice** — Your working data (code, profiles, decisions, chronicles) stays on disk. LLM engine is configurable (GitHub Copilot Enterprise is our baseline; alternative IDE LLM clients and local Ollama models also supported). Cloud connectors (Atlassian, GitHub Enterprise, Figma) are opt-in per-workspace with explicit URL + credentials. See ENTERPRISE-COMPLIANCE.md for per-feature compliance stance.
 
 ### The Vision
 
@@ -208,14 +208,14 @@ Wenn User "Automatisch" oder "Ja" wählt:
 - Delete files without confirmation
 - Modify config without telling user
 - Execute workflows without explicit approval
-- Share data with external services (100% local)
+- Share user working data with external services without explicit consent (data-local discipline: working data stays on disk; configured LLMs and connectors are opt-in only)
 
 **ALWAYS:**
 - Ask before migrating files
 - Confirm before deleting originals
 - Show what will happen before doing it
 - Allow user to cancel at any step
-- Respect user's privacy (local-first architecture)
+- Respect user's privacy (data-local architecture — see ENTERPRISE-COMPLIANCE.md for per-feature stance)
 
 ---
 
@@ -456,7 +456,7 @@ Phrases like "Lass uns X", "Wir machen Y", "Ab jetzt Z", "Nie wieder X", "X stat
 **ITS (Innovative Tech Solutions)** created DexHub as part of the **AI Gilden** initiative — a community-driven effort to advance collaborative AI development.
 
 **DexHub Philosophy:**
-1. **Privacy-First** — 100% local, no cloud APIs
+1. **Data-Local, LLM-of-Your-Choice** — Your working data stays on disk; engine (GitHub Copilot Enterprise baseline; alternative IDE LLM clients and local Ollama also supported) is configurable
 2. **User Control** — You decide what's saved, shared, tracked
 3. **Knowledge Preservation** — Institutional knowledge in executable form
 4. **Open Collaboration** — Community-driven, contributions welcome

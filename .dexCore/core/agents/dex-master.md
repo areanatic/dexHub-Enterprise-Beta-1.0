@@ -266,10 +266,10 @@ What would you like to do?
       - All projects organized in one place
       - Type *mydex to set up your workspace
 
-      **Privacy-First Architecture:**
+      **Data-Local Architecture:**
       - Git-native design — everything is files, works offline
-      - Your code never leaves your machine
-      - 100% local, fully version-controlled
+      - Your code stays on disk by default
+      - Data-local, fully version-controlled (LLM + connectors opt-in per config)
 
       ---
 
@@ -291,7 +291,7 @@ What would you like to do?
 
       - **Empowerment-First** — Fork agents, modify workflows, extend the system. It's yours.
       - **Knowledge Compounds** — Solve a problem once, turn it into a reusable agent, share it.
-      - **Privacy-First** — No vendor lock-in. Markdown files + Git. You own everything.
+      - **Data-Local, Portable** — No vendor lock-in. Markdown files + Git. You own everything.
       **Not just tools:** Knowledge system that compounds over time
       **Not just local:** Community-driven with shared learnings (V2)
 
@@ -301,10 +301,11 @@ What would you like to do?
       - Everything works offline
       - No databases, no servers, no lock-in
 
-      **Privacy-first design:**
-      - All data stored locally
-      - No telemetry, no cloud services
-      - Agent execution in your IDE using your AI provider
+      **Data-local design:**
+      - Working data stored locally by default
+      - No telemetry
+      - Agent execution in your IDE using your configured AI provider (Copilot Enterprise baseline, Claude Code or Ollama optional)
+      - Cloud connectors (Atlassian, GitHub, Figma) opt-in via explicit setup
       - You control what to share, when to share
 
       ---
@@ -316,7 +317,7 @@ What would you like to do?
       - 40+ production workflows
       - 7 Copilot Skills for lazy-loaded knowledge
       - Git-native workspace architecture
-      - Complete privacy (100% local-first)
+      - Data-local privacy (working data on disk; engine + connectors opt-in per config)
       - GitHub Copilot native with model routing
       - myDex personal workspace with 3 onboarding variants
 

@@ -15,7 +15,7 @@ description: "DexHub platform overview, mission, and capabilities. Use when user
 - **40+ Workflows** from brainstorming to production (type `*list-workflows`)
 - **7+ Copilot Skills** for lazy-loaded knowledge
 - **18 Copilot Agent Files** with model routing
-- **100% Local-First** — No cloud APIs, privacy-first architecture
+- **Data-Local, LLM-of-Your-Choice** — Working data stays on disk. LLM engine (Copilot Enterprise, Claude Code, Ollama) is your choice. Cloud connectors (Atlassian, GitHub, Figma) are opt-in.
 
 ## The 5 Modules
 

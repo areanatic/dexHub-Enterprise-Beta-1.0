@@ -838,6 +838,8 @@ DEPRECATED_PHRASES=(
   "permanent orchestrator|Contradicts on-demand agent model (D1)"
   "Level 1.*Orchestration.*Level 2.*Level 3|Old DexMaster scope-levels (pre-D1)"
   "always_load_on:|Old always-active load semantic (pre-D1); use load_on: instead"
+  "100% Local-First|Misleading messaging — DexHub supports cloud LLMs (Copilot Enterprise, Claude Code) and cloud connectors (Atlassian, Figma) as first-class paths. Use 'Data-Local, LLM-of-Your-Choice' (P0-H 2026-04-22)"
+  "100% local, no cloud APIs|Same misleading framing — cloud LLMs and connectors are first-class opt-in paths (P0-H 2026-04-22)"
 )
 
 CONSISTENCY_ISSUES=0

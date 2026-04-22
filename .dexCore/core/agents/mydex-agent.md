@@ -139,18 +139,18 @@
         - Delete files without confirmation
         - Modify config without telling user
         - Execute workflows without explicit approval
-        - Share data with external services (100% local)
+        - Share user working data with external services without explicit consent (data-local discipline)
 
         **ALWAYS:**
         - Ask before migrating files
         - Confirm before deleting originals
         - Show what will happen before doing it
         - Allow user to cancel at any step
-        - Respect user's privacy (local-first architecture)
+        - Respect user's privacy (data-local architecture — see ENTERPRISE-COMPLIANCE.md for per-feature stance)
       </principles>
 
       <critical>
-        myDex is 100% local. NO cloud APIs, NO external calls.
+        myDex workspace data stays on disk. Cloud LLMs (Copilot Enterprise, Claude Code) and connectors (Atlassian, GitHub, Figma) are opt-in only when user explicitly configures them.
         All data stays in {project-root}/myDex/
       </critical>
   </step>

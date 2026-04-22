@@ -12,7 +12,7 @@ myDex is your **personal layer** in DexHub where you:
 - **Store workflow outputs** (before they become projects)
 - **Customize your experience** (preferences, language, agent behavior)
 
-**Privacy-First**: Everything stays 100% local. No cloud sync, no telemetry.
+**Data-Local**: Your workspace files stay on disk. No automatic cloud sync, no telemetry. Cloud LLMs (Copilot Enterprise, Claude Code) and connectors (Atlassian, GitHub, Figma) are opt-in only when you explicitly configure them.
 
 ---
 
@@ -257,7 +257,7 @@ myDex/
 - ✅ Confirm before migrating files
 - ✅ Show what will happen before doing it
 - ✅ Allow cancel at any step
-- ✅ Keep everything 100% local
+- ✅ Keep your working data on disk (LLM + connectors opt-in)
 - ✅ Respect your privacy
 
 **User Control:**
@@ -329,7 +329,7 @@ Next `*mydex` will trigger onboarding again.
 - **Auto-organization** - Suggests projects when outputs pile up
 - **DXM-aligned structure** - Professional workflow phases
 - **Profile-driven** - Agents adapt to YOUR experience level
-- **Privacy-first** - 100% local, you control everything
+- **Data-local** - working data on disk, you control the LLM + connectors
 
 ---
 
