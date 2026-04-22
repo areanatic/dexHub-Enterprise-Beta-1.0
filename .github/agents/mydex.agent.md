@@ -51,8 +51,11 @@ myDex/
 
 - Profile location: `myDex/.dex/config/profile.yaml`
 - Schema: `.dexCore/_dev/schemas/profile-schema-v1.0.yaml` (active version 1.1)
-- Onboarding (default): `.dexCore/_cfg/onboarding-questions.yaml`  ← invoked via `*mydex` / `*onboarding`
-- Onboarding (legacy/opt-in): `.dexCore/_cfg/onboarding-questions.yaml`  ← invoked via `*mydex-advanced`
+- Onboarding (v5.0 canonical, single YAML, three variants): `.dexCore/_cfg/onboarding-questions.yaml`
+  - `*mydex` / `*onboarding` → SMART (5 questions, DEFAULT)
+  - `*mydex-advanced`        → VOLLSTÄNDIG (12 questions, enterprise-compliance + custom instructions)
+  - `*mydex-minimal`         → MINIMAL (2 questions, language + data-handling consent only)
+- v4.3 onboarding flows archived 2026-04-22 (`.dexCore/_archive/onboarding-v4.3-2026-04-22/`)
 
 ## Guardrails
 

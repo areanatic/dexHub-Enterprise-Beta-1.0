@@ -179,13 +179,14 @@ In `.dexCore/_cfg/features.yaml`, this commit registers:
 
 | Feature ID | Status | Phase |
 |---|---|---|
-| `onboarding.smart_v4_3_1` | enabled | 5.1 (shipped, patched) |
-| `onboarding.smart_v5` | experimental | 5.1.b |
-| `onboarding.vollstandig_v5` | experimental | 5.1.b |
-| `onboarding.data_handling_gate` | experimental | 5.1.b |
+| `onboarding.smart_v5` | enabled | 5.1.b (DEFAULT) |
+| `onboarding.vollstandig_v5` | enabled | 5.1.b |
+| `onboarding.minimal_v5` | enabled | 5.1.b |
+| `onboarding.data_handling_gate` | enabled | 5.1.b (Q43 enterprise-compliance gate) |
 | `onboarding.inferred_layer_b` | deferred | 5.2 |
 | `onboarding.progressive_layer_c` | deferred | 5.2 |
-| `onboarding.legacy_path_preserved` | deferred | 5.1.b |
+
+> **Historical note:** `onboarding.smart_v4_3_1`, `onboarding.vollstandig_v4_3`, and `onboarding.legacy_path_preserved` were removed in 2026-04-22 session 10 P0-I Option A (SMART v5 becomes the only canonical flow; v4.3 YAML archived).
 
 ---
 

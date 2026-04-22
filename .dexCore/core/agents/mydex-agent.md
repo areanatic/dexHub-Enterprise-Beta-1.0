@@ -11,11 +11,12 @@
 > does it on a given session is a function of whether the LLM follows the spec.
 >
 > **Spec is defined for:**
-> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v4.3.1, 42 questions total) AND `.dexCore/_cfg/onboarding-questions.yaml` (v5.0, 3-layer model)
+> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v5.0, 3-layer model: SMART / VOLLSTÄNDIG / MINIMAL). v4.3 flows archived 2026-04-22 to `.dexCore/_archive/onboarding-v4.3-2026-04-22/`.
 > - Profile generation against `myDex/.dex/config/profile.yaml.example` template (schema v1.1)
-> - Onboarding routing (v5.0 is DEFAULT, v4.3.1 is legacy/opt-in):
->   - `*mydex` or `*onboarding` → v5.0 variants (SMART 5q / VOLLSTÄNDIG 12q / MINIMAL 2q)
->   - `*mydex-advanced` → v4.3.1 legacy (SMART 18q / VOLLSTÄNDIG 42q) for engagement-deep personalization
+> - Onboarding routing (v5.0 is the only path as of Beta 1.0):
+>   - `*mydex` or `*onboarding` → SMART v5 (5 questions, DEFAULT)
+>   - `*mydex-advanced` → VOLLSTÄNDIG v5 (12 questions, enterprise-compliance + custom instructions)
+>   - `*mydex-minimal` → MINIMAL v5 (2 questions, language + data-handling consent only)
 > - Welcome + completion prompts, bilingual DE/EN
 > - Integration hooks for project-manager and dex-master
 >
@@ -199,12 +200,14 @@
 
     <!-- ONBOARDING EXECUTION RULES (Priority-Based) -->
     <rule priority="CRITICAL" id="R1-routing">
-      Two onboarding question sets exist. Choose per user invocation:
-      - Default `*mydex` / `*onboarding` → load .dexCore/_cfg/onboarding-questions.yaml
-        (v5.0 — SMART 5q, VOLLSTÄNDIG 12q, MINIMAL 2q; includes Q43 enterprise gate)
-      - Legacy `*mydex-advanced` → load .dexCore/_cfg/onboarding-questions.yaml
-        (v4.3.1 — SMART 18q, VOLLSTÄNDIG 42q; deep engagement survey)
-      NEVER proceed if the chosen file is missing or invalid.
+      One canonical onboarding question set: .dexCore/_cfg/onboarding-questions.yaml (v5.0).
+      Variant is chosen per user invocation:
+      - `*mydex` / `*onboarding` → SMART variant (5 questions, DEFAULT, includes Q43 enterprise gate)
+      - `*mydex-advanced`        → VOLLSTÄNDIG variant (12 questions, enterprise-compliance + custom instructions)
+      - `*mydex-minimal`         → MINIMAL variant (2 questions, language + data-handling consent only)
+      v4.3 flows archived 2026-04-22 (see .dexCore/_archive/onboarding-v4.3-2026-04-22/).
+      If someone invokes a legacy command that referenced v4.3: fall through to VOLLSTÄNDIG v5 and note the substitution in the greeting.
+      NEVER proceed if the YAML is missing or invalid.
       On error: Show friendly message + exit gracefully.
     </rule>
 
@@ -248,13 +251,11 @@
 
       Mapping (loaded file → output metadata):
 
-      | Loaded YAML                                          | onboarding.variant | onboarding.version | variant_total (denominator for completion_percentage) |
+      | Loaded YAML variant                                  | onboarding.variant | onboarding.version | variant_total (denominator for completion_percentage) |
       |------------------------------------------------------|--------------------|--------------------|-------------------------------------------------------|
-      | .dexCore/_cfg/onboarding-questions.yaml (SMART) | smart_v5           | v5.0               | 5                                                     |
-      | .dexCore/_cfg/onboarding-questions.yaml (VOLL.) | vollstandig_v5     | v5.0               | 12                                                    |
-      | .dexCore/_cfg/onboarding-questions.yaml (MIN.)  | minimal_v5         | v5.0               | 2                                                     |
-      | .dexCore/_cfg/onboarding-questions.yaml (legacy SMART)| smart             | v4.3.1             | 18                                                    |
-      | .dexCore/_cfg/onboarding-questions.yaml (legacy VOLL)| vollständig        | v4.3.1             | 42                                                    |
+      | onboarding-questions.yaml → smart_v5                 | smart_v5           | v5.0               | 5                                                     |
+      | onboarding-questions.yaml → vollstandig_v5           | vollstandig_v5     | v5.0               | 12                                                    |
+      | onboarding-questions.yaml → minimal_v5               | minimal_v5         | v5.0               | 2                                                     |
 
       Fields:
         - onboarding.variant: MUST be exact value from column 2
