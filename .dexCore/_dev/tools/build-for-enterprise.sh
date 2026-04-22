@@ -73,12 +73,20 @@ echo ""
 # ─── Step 1: Enumerate paths to strip ─────────────────────────────
 # Defined here + should match the policy doc.
 STRIP_PATHS=(
-  ".claude"
-  "tests/e2e/integrations"
-  ".dexcore-session-anchor"                     # dev-safety for parallel-session anchor; not enterprise-relevant
-  ".dexCore/_dev/tools/build-for-enterprise.sh" # self: not needed in enterprise bundle
-  ".dexCore/_dev/docs/LEARNINGS-CLAUDE-CODE-REMOVABILITY.md"  # dev learning
+  ".claude"                                                   # Claude Code tail — enterprise bundle targets Copilot
+  "tests/e2e/integrations"                                    # integration-specific tests (e.g. Claude Code suite)
+  ".dexcore-session-anchor"                                   # parallel-session safety marker, dev-only
+  ".dexCore/_dev/tools/build-for-enterprise.sh"               # self: the bundle builder doesn't ship inside bundles
+  ".dexCore/_dev/docs/LEARNINGS-CLAUDE-CODE-REMOVABILITY.md"  # dev learning (Claude-Code removability analysis)
+  ".dexCore/_dev/portfolio"                                   # workstreams.csv + changelog — internal dev tracking, not user-relevant (session-10 C8)
+  ".dexCore/_dev/docs/adr"                                    # 9 ADRs = internal architecture-decision history, not product-relevant for enterprise consumers (session-10 C8)
 )
+# Intentional exclusions (do NOT strip — framework dependencies):
+#   .dexCore/_dev/CHANGELOG.md        required by validate.sh §4
+#   .dexCore/_dev/agents/             required by validate.sh §4 + dev-mode-master.md is an active user feature
+#   .dexCore/_dev/todos/              required by validate.sh §2 + §4 (skeleton templates users fill)
+#   .dexCore/_dev/schemas/            required by validate.sh + tests/e2e/05-consent-tracking.test.sh
+#   tests/                            required by features.yaml references (structural tests stay)
 
 echo -e "${BOLD}[1/5] Paths to strip:${NC}"
 for path in "${STRIP_PATHS[@]}"; do
