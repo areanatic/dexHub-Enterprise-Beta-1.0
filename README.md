@@ -185,6 +185,8 @@ myDex/                       Your workspace (local, gitignored)
   inbox/ → drafts/ → export/ File pipeline
 ```
 
+> **Note on counts.** The top-of-README badges show **46** agents and **46** workflows — those are the total Copilot-activation counts (`.github/agents/*.agent.md` and `workflow.yaml` files across all modules). Per-module lines above (`dxm/14 agents`, `dis/5 agents`) break the same total down by module. Authoritative agent registry: [`.dexCore/_cfg/agent-manifest.csv`](.dexCore/_cfg/agent-manifest.csv) (43 source personas; 3 onboarding wizards share 1 activation, producing the 46 Copilot-activation count).
+
 **Design principles:**
 - **Plain markdown** — agents and workflows are markdown files, portable to any LLM
 - **Data-local** — your files stay on disk; LLM + connectors are your choice
