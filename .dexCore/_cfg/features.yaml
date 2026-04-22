@@ -1008,6 +1008,17 @@ quality:
     docs: .dexCore/_dev/tools/validate.sh
     tests: []
 
+  - id: quality.validate_sh_§28_copilot_drift
+    name: "validate.sh §28 Copilot-activation ↔ source-persona drift"
+    description: "Shipped 2026-04-22 session-10 (C6). Every .github/agents/*.agent.md (Copilot activation stub) references a source persona file under .dexCore/ via its activation steps. §28 iterates every .agent.md, extracts all .dexCore/**/*.md refs, and verifies each referenced file exists. Skips _cfg/ (config) and settings-style refs to avoid false positives. Catches silent drift where a source persona was renamed/moved but the Copilot stub wasn't updated — Copilot loads the stub fine, but the persona-reload step silently fails, producing a disoriented agent. Lightweight drift-guard while the full compile-agents.sh SSOT tooling (DF4) ships in 1.1. Current coverage: 46 activation stubs, all persona refs verified."
+    status: enabled
+    phase: 5.1.debt
+    enterprise_compliance: ok
+    requires: [bash, grep]
+    depends_on: [meta.features_yaml]
+    docs: .dexCore/_dev/tools/validate.sh
+    tests: []
+
   - id: quality.copilot_smoke_weekly
     name: "Live Copilot Smoke Test (recurring, 1h/week)"
     description: "Open Beta in Copilot, walk through 3 workflows, log bugs, never skip"
@@ -1323,14 +1334,18 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 84
+  total: 85
   by_status:
     always_on: 8
-    enabled: 57
+    enabled: 58
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 10 Phase 7 (C6 Drift-Check):
+  # - quality.validate_sh_§28_copilot_drift NEW enabled (5.1.debt)
+  #   Copilot-activation ↔ source-persona drift guard (46 stubs verified).
+  #   total 84→85, enabled 57→58.
   # Updated 2026-04-22 session 10 P0-I Option A (Onboarding Consolidation):
   # Removed 3 obsolete v4.3 onboarding features + their legacy-preservation
   # command (user directive "einen brauchen wir — SMART v5; keine anderen"):

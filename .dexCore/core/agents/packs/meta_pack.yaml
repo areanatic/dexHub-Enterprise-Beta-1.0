@@ -43,6 +43,20 @@ agents:
     name: test-coverage-analyzer
     role: "Coverage gap + test-strategy review"
 
-  # Context + Planning + Research subfolders carry the remaining 11
-  # agents; they're discovered dynamically by packs.sh via the directory
-  # listing. Explicit entries above mirror the user-facing highlights.
+  # Context + Planning + Research subfolders carry the remaining 11 agents;
+  # they're discovered dynamically by packs.sh via the directory listing
+  # (Intentional design — not a maintenance gap. This is documented as the
+  # meta-pack's "dynamic discovery" convention: adding a new meta-agent in
+  # those 3 subfolders automatically joins the pack without a manifest edit.
+  # The 7 explicit entries above are the user-facing highlights shown in
+  # `*list-agents` when meta_pack is enabled; the remaining 11 are listed in
+  # the full output.)
+  #
+  # Session-10 audit (2026-04-22, C5): Self-verify confirmed 33 of 43
+  # source agents are "orphans" (not in any pack manifest), but 22 of
+  # them are DIS/DXM-Core/DXB/Custom agents that default to VISIBLE by
+  # dex-master's list-agents-from-registry rule ("if path in NO pack
+  # manifest at all → visible"). Only the 11 meta-orphans in
+  # planning/research/context subfolders are hidden-when-pack-disabled,
+  # which is the INTENDED behavior (meta_pack is opt-in for brownfield
+  # work). No action required beyond this clarifying note.

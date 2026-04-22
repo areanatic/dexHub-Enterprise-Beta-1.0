@@ -1190,7 +1190,7 @@ fi
 # by_status.enabled, etc.) but forgot to update the matching numbers in
 # README.md's "Feature Matrix" table. Self-review caught it that day;
 # this gate catches it mechanically for everyone.
-echo -e "\n${BOLD}[25/27] README ↔ features.yaml Counts Consistency${NC}"
+echo -e "\n${BOLD}[25/28] README ↔ features.yaml Counts Consistency${NC}"
 
 README_FILE="README.md"
 if [ ! -f "$README_FILE" ] || [ ! -f "$FEATURES_FILE" ]; then
@@ -1284,7 +1284,7 @@ fi
 # was added as `enabled` in features.yaml but counts_block.enabled was
 # never incremented — README matched counts_block (58/58) so §25 passed,
 # but actual grep count was 59. Silent drift from reality.
-echo -e "\n${BOLD}[26/27] counts_block ↔ actual registry consistency${NC}"
+echo -e "\n${BOLD}[26/28] counts_block ↔ actual registry consistency${NC}"
 
 if [ ! -f "$FEATURES_FILE" ]; then
   warn "counts↔actual check skipped — features.yaml missing"
@@ -1379,7 +1379,7 @@ fi
 # pairing). run-all.sh would also catch this (test runs fail), but catching
 # it at validate.sh level is faster + localizes the failure to the broken
 # file instead of a noisy run-all summary.
-echo -e "\n${BOLD}[27/27] Test-file shell-syntax validity${NC}"
+echo -e "\n${BOLD}[27/28] Test-file shell-syntax validity${NC}"
 
 if [ ! -f "$FEATURES_FILE" ]; then
   warn "test-syntax check skipped — features.yaml missing"
@@ -1448,6 +1448,51 @@ for p in sorted(seen): print(p)
     pass "test-file shell-syntax: ${SYNTAX_CHECKED} .sh test files parse cleanly (bash -n)"
   else
     fail "test-file shell-syntax: ${SYNTAX_FAILED}/${SYNTAX_CHECKED} .sh test files have syntax errors: ${SYNTAX_FAIL_LIST%; }"
+  fi
+fi
+
+# ==================== SECTION 28: Copilot-activation ↔ source-persona drift ====================
+# Every .github/agents/*.agent.md (Copilot activation stub) references a source
+# persona file via "Read <path> for your full persona and menu" or similar
+# wording. If that referenced path doesn't exist, the activation stub loads a
+# broken persona (invisible drift — Copilot loads the stub fine, but the
+# persona-reload step silently fails). §28 catches this.
+#
+# Session-10 C6: introduced as lightweight drift-guard while the full compile-
+# agents.sh SSOT tooling (DF4) ships in 1.1.
+echo -e "\n${BOLD}[28/28] Copilot-activation ↔ source-persona drift${NC}"
+
+COPILOT_AGENTS_DIR=".github/agents"
+if [ ! -d "$COPILOT_AGENTS_DIR" ]; then
+  warn "no .github/agents directory — skipping drift check"
+else
+  DRIFT_CHECKED=0
+  DRIFT_FAILED=0
+  DRIFT_FAIL_LIST=""
+  for STUB in "$COPILOT_AGENTS_DIR"/*.agent.md; do
+    [ -f "$STUB" ] || continue
+    DRIFT_CHECKED=$((DRIFT_CHECKED + 1))
+    # Extract persona refs: paths starting .dexCore/ ending .md.
+    # `|| true` protects against set -euo pipefail when grep finds nothing.
+    REFS=$(grep -oE '\.dexCore/[a-zA-Z0-9_/.-]+\.md' "$STUB" 2>/dev/null | sort -u || true)
+    [ -z "$REFS" ] && continue
+    while IFS= read -r REF; do
+      [ -z "$REF" ] && continue
+      case "$REF" in
+        *"_cfg/"*|*"settings"*) continue ;;
+      esac
+      if [ ! -f "$REF" ]; then
+        DRIFT_FAILED=$((DRIFT_FAILED + 1))
+        DRIFT_FAIL_LIST="${DRIFT_FAIL_LIST}${STUB##*/} → ${REF} (missing); "
+      fi
+    done <<< "$REFS"
+  done
+  if [ "$DRIFT_CHECKED" -eq 0 ]; then
+    warn "drift check: 0 .agent.md files found — nothing to verify"
+  elif [ "$DRIFT_FAILED" -eq 0 ]; then
+    pass "copilot-activation ↔ persona drift: ${DRIFT_CHECKED} activation stubs, all persona refs resolve"
+  else
+    fail "copilot-activation drift: ${DRIFT_FAILED} broken persona refs — ${DRIFT_FAIL_LIST%; }"
   fi
 fi
 
