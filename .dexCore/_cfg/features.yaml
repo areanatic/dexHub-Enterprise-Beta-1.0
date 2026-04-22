@@ -97,48 +97,29 @@ core:
 # ONBOARDING — user's first 5 minutes with DexHub
 # ─────────────────────────────────────────────────────────────────────────
 onboarding:
-  - id: onboarding.smart_v4_3_1
-    name: "SMART onboarding v4.3.1 (18 questions, 5-6 min)"
-    description: "Current shipped SMART variant. v4.3.1 patch (2026-04-19): Q40-42 custom instructions removed from SMART (moved to VOLLSTÄNDIG only, per holistic review)"
-    status: enabled
-    phase: 5.1
-    enterprise_compliance: ok
-    requires: []
-    depends_on: [core.dexmaster_orchestrator]
-    docs: .dexCore/_cfg/onboarding-questions.yaml
-    tests:
-      - tests/e2e/01-onboarding-smart.test.sh (structural 15 + live 4)
-    known_issues:
-      - "Full walkthrough end-to-end NOT yet tested with scripted answers → profile.yaml produced"
-      - "v5.0 draft supersedes this; v4.3.1 kept as legacy engagement path via *mydex-advanced"
-
-  - id: onboarding.vollstandig_v4_3
-    name: "VOLLSTÄNDIG onboarding v4.3 (42 questions, 17-22 min)"
-    description: "Full legacy variant — preserved as *mydex-advanced opt-in engagement path. Variant defined in onboarding-questions.yaml (keyed as 'vollständig'). Agent-driven: mydex-agent reads the YAML and asks the question set; no behavioral CLAUDE_E2E_LIVE test yet — structural existence is all we check today."
-    status: enabled
-    phase: 5.1
-    enterprise_compliance: ok
-    requires: []
-    depends_on: [core.dexmaster_orchestrator]
-    docs: .dexCore/_cfg/onboarding-questions.yaml
-    tests: []
-    validation_notes: "Variant key 'vollständig' confirmed present in .dexCore/_cfg/onboarding-questions.yaml (42 questions, smart + vollständig + minimal NOT defined in v4.3 — minimal only exists in v5.0 onboarding-questions-v5.0.yaml). Behavioral walkthrough test is a CLAUDE_E2E_LIVE candidate tracked for session 6+."
-
-  # NOTE: onboarding.minimal_v4_3 was REMOVED 2026-04-21 — the variant
-  # never existed in the v4.3 YAML (.dexCore/_cfg/onboarding-questions.yaml
-  # only defines smart + vollständig). The minimal variant is v5-only,
-  # registered below as onboarding.minimal_v5.
+  # NOTE: Three features removed 2026-04-22 session 10 P0-I Option A
+  # (user directive: "einen brauchen wir — SMART v5; keine anderen Varianten"):
+  #   - onboarding.smart_v4_3_1            legacy 18-Q SMART, referenced archived v4.3 YAML
+  #   - onboarding.vollstandig_v4_3        legacy 42-Q VOLLSTÄNDIG, referenced archived v4.3 YAML
+  #   - onboarding.legacy_path_preserved   *mydex-advanced command preserving v4.3 flow
+  # v4.3 YAML archived to .dexCore/_archive/onboarding-v4.3-2026-04-22/
+  # with SHA256SUMS.txt + MANIFEST.md. Restore procedure documented there.
+  # counts_block: total 87→84, enabled 60→57. Details in counts: section at EOF.
+  #
+  # Historical note (2026-04-21): onboarding.minimal_v4_3 was also removed —
+  # the variant never existed in v4.3 YAML (only smart + vollständig). The
+  # minimal variant is v5-only, registered below as onboarding.minimal_v5.
   - id: onboarding.minimal_v5
     name: "MINIMAL onboarding v5.0 (2 questions, ~30s)"
-    description: "Bare-minimum variant: language + data_handling_policy consent. For experienced users who just want to unblock the rest of the system. Defined in .dexCore/_cfg/onboarding-questions-v5.0.yaml (questions: [1, 43]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet."
+    description: "Bare-minimum variant: language + data_handling_policy consent. For experienced users who just want to unblock the rest of the system. Defined in .dexCore/_cfg/onboarding-questions.yaml (questions: [1, 43]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet."
     status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator, onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml
+    docs: .dexCore/_cfg/onboarding-questions.yaml
     tests: []
-    validation_notes: "Variant key 'minimal_v5' confirmed present in .dexCore/_cfg/onboarding-questions-v5.0.yaml with questions [1, 43] (language + data_handling_policy). Earlier features.yaml entry 'minimal_v4_3' referenced a variant that never existed in v4.3 YAML — renamed to minimal_v5 during 2026-04-21 registry audit."
+    validation_notes: "Variant key 'minimal_v5' confirmed present in .dexCore/_cfg/onboarding-questions.yaml with questions [1, 43] (language + data_handling_policy). Earlier features.yaml entry 'minimal_v4_3' referenced a variant that never existed in v4.3 YAML — renamed to minimal_v5 during 2026-04-21 registry audit."
 
   - id: onboarding.smart_v5
     name: "SMART onboarding v5.0 (5 questions, 60-90 sec)"
@@ -148,7 +129,7 @@ onboarding:
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator]
-    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml + .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
+    docs: .dexCore/_cfg/onboarding-questions.yaml + .dexCore/_dev/docs/ONBOARDING-DESIGN.md
     tests:
       - tests/e2e/01-onboarding-smart.test.sh
       - tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
@@ -160,15 +141,15 @@ onboarding:
 
   - id: onboarding.vollstandig_v5
     name: "VOLLSTÄNDIG onboarding v5.0 (12 questions, 3-5 min)"
-    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41). Active via *mydex variant selection. Defined in .dexCore/_cfg/onboarding-questions-v5.0.yaml (vollstandig_v5 variant: questions [0, 1, 3, 4, 43, 44, 45, 46, 47, 48, 49, 40, 41]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet — structural existence is what we verify today."
+    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41). Active via *mydex variant selection. Defined in .dexCore/_cfg/onboarding-questions.yaml (vollstandig_v5 variant: questions [0, 1, 3, 4, 43, 44, 45, 46, 47, 48, 49, 40, 41]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet — structural existence is what we verify today."
     status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
     depends_on: [core.dexmaster_orchestrator, onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml
+    docs: .dexCore/_cfg/onboarding-questions.yaml
     tests: []
-    validation_notes: "Variant key 'vollstandig_v5' confirmed present in .dexCore/_cfg/onboarding-questions-v5.0.yaml. Structural verification only; multi-turn walkthrough test via CLAUDE_E2E_LIVE_WALKTHROUGH=1 is deferred to session 6+ (opt-in cost ~\\$3-5 per live run)."
+    validation_notes: "Variant key 'vollstandig_v5' confirmed present in .dexCore/_cfg/onboarding-questions.yaml. Structural verification only; multi-turn walkthrough test via CLAUDE_E2E_LIVE_WALKTHROUGH=1 is deferred to session 6+ (opt-in cost ~\\$3-5 per live run)."
 
   - id: onboarding.inferred_layer_b
     name: "Layer B: Inferred-and-confirmed profile (repo scanner)"
@@ -178,7 +159,7 @@ onboarding:
     enterprise_compliance: ok
     requires: []
     depends_on: [onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml (inferred_layer_b_candidates section)
+    docs: .dexCore/_cfg/onboarding-questions.yaml (inferred_layer_b_candidates section)
     tests: []
 
   - id: onboarding.progressive_layer_c
@@ -189,7 +170,7 @@ onboarding:
     enterprise_compliance: ok
     requires: []
     depends_on: [onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions-v5.0.yaml (progressive_disclosure_triggers section)
+    docs: .dexCore/_cfg/onboarding-questions.yaml (progressive_disclosure_triggers section)
     tests: []
 
   - id: onboarding.data_handling_gate
@@ -205,16 +186,10 @@ onboarding:
     known_issues:
       - "Question is asked and stored; feature-filter that consumes it (Enterprise Mode Filter) is Tier 3 pending"
 
-  - id: onboarding.legacy_path_preserved
-    name: "Legacy *mydex-advanced command"
-    description: "Existing users + engagement seekers can still run the 42-question v4.3.1 flow via *mydex-advanced (wired in mydex-agent R1-routing)"
-    status: enabled
-    phase: 5.1.b
-    enterprise_compliance: ok
-    requires: []
-    depends_on: [onboarding.vollstandig_v4_3]
-    docs: .dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md
-    tests: []
+  # onboarding.legacy_path_preserved REMOVED 2026-04-22 session 10 P0-I Option A
+  # — depended on vollstandig_v4_3 which was also removed; the *mydex-advanced
+  # engagement path to v4.3 is no longer offered. v5 VOLLSTÄNDIG remains as the
+  # advanced variant via *mydex-advanced (routes to onboarding.vollstandig_v5).
 
 # ─────────────────────────────────────────────────────────────────────────
 # AGENT SYSTEM — Pack-based, user-togglable
@@ -1348,14 +1323,21 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 87
+  total: 84
   by_status:
     always_on: 8
-    enabled: 60
+    enabled: 57
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 10 P0-I Option A (Onboarding Consolidation):
+  # Removed 3 obsolete v4.3 onboarding features + their legacy-preservation
+  # command (user directive "einen brauchen wir — SMART v5; keine anderen"):
+  # - onboarding.smart_v4_3_1         (enabled, referenced archived v4.3 YAML)
+  # - onboarding.vollstandig_v4_3     (enabled, referenced archived v4.3 YAML)
+  # - onboarding.legacy_path_preserved (enabled, depended on removed vollstandig_v4_3)
+  # total 87→84, enabled 60→57. v4.3 YAML archived to .dexCore/_archive/.
   # Updated 2026-04-22 session 10 (Registry-Honesty P0-A):
   # - knowledge.l3_chronicle reclassified enabled → always_on
   #   (infrastructure layer — session state persistence never user-toggled).

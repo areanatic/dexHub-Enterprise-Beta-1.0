@@ -28,7 +28,7 @@ scope: |
     - 46 .agent.md agents + 46 workflows + 12 skills
     - .dexCore/_cfg/features.yaml feature registry
     - Guardrails G1-G9 + validate.sh 23 sections
-    - onboarding-questions.yaml (v4.3.1) + onboarding-questions-v5.0.yaml
+    - onboarding-questions.yaml (v5.0 canonical; v4.3 archived 2026-04-22 to .dexCore/_archive/onboarding-v4.3-2026-04-22/)
     - Integration wizards (atlassian-mcp, github-mcp, figma-mcp)
     - tests/e2e/ structural + live harness
 

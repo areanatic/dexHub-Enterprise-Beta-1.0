@@ -374,7 +374,7 @@ fields:
         values: ["local_only", "lan_only", "cloud_llm_allowed", "hybrid"]
         description: "P0 enterprise gate. Locks cloud-LLM vs local-only. Filters all downstream feature availability."
         example: "local_only"
-        producer_source: "Q43 in onboarding-questions-v5.0.yaml (SMART + VOLLSTÄNDIG + MINIMAL)"
+        producer_source: "Q43 in onboarding-questions.yaml (SMART + VOLLSTÄNDIG + MINIMAL)"
         consumer_usage: "{profile_data_handling} - every cloud feature checks this before surfacing"
         enterprise_compliance_priority: "P0"
 
@@ -385,7 +385,7 @@ fields:
         values: ["ollama_local", "copilot_enterprise", "claude_api", "openai_public", "none"]
         description: "Which LLM providers the organization has approved for use"
         example: ["ollama_local", "copilot_enterprise"]
-        producer_source: "Q44 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q44 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Filters LLM integration menu — only approved providers appear"
         enterprise_compliance_priority: "P0"
         default: []
@@ -397,7 +397,7 @@ fields:
         values: ["github_enterprise", "atlassian_cloud", "atlassian_server", "figma", "internal_git", "none"]
         description: "Which tool integrations are approved and reachable"
         example: ["github_enterprise", "atlassian_server"]
-        producer_source: "Q45 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q45 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Connector wizard menu filters against this list"
         enterprise_compliance_priority: "P0"
         default: []
@@ -408,7 +408,7 @@ fields:
         values: ["not_required", "local_logs_only", "soc2", "iso27001", "hipaa", "dhl_supply_chain", "other"]
         description: "Audit/compliance framework the user operates under"
         example: "dhl_supply_chain"
-        producer_source: "Q46 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q46 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Drives chronicle format + commit signing + log retention"
         enterprise_compliance_priority: "P0"
 
@@ -418,7 +418,7 @@ fields:
         values: ["direct_internet", "corporate_proxy", "vpn_required", "air_gapped", "hybrid"]
         description: "Network access pattern for outbound calls"
         example: "vpn_required"
-        producer_source: "Q47 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q47 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Every MCP connector + cloud-LLM call respects this"
         enterprise_compliance_priority: "P1"
 
@@ -429,7 +429,7 @@ fields:
         values: ["gdpr", "hipaa", "sox", "iso27001", "pci_dss", "none"]
         description: "Regulations that apply to the work"
         example: ["gdpr"]
-        producer_source: "Q48 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q48 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Agent output avoids regulation-violating patterns"
         enterprise_compliance_priority: "P1"
         default: []
@@ -441,7 +441,7 @@ fields:
         max_items: 20
         description: "Git remotes/URLs that must not be pushed to (e.g. tombstoned enterprise targets)"
         example: ["git.dhl.com/azamani1/*", "gitlab.legacy.corp/archive/*"]
-        producer_source: "Q49 in onboarding-questions-v5.0.yaml (VOLLSTÄNDIG only)"
+        producer_source: "Q49 in onboarding-questions.yaml (VOLLSTÄNDIG only)"
         consumer_usage: "Pre-push guard: warn/block if destination matches"
         enterprise_compliance_priority: "P1"
         default: []

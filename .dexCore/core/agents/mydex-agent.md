@@ -11,7 +11,7 @@
 > does it on a given session is a function of whether the LLM follows the spec.
 >
 > **Spec is defined for:**
-> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v4.3.1, 42 questions total) AND `.dexCore/_cfg/onboarding-questions-v5.0.yaml` (v5.0, 3-layer model)
+> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v4.3.1, 42 questions total) AND `.dexCore/_cfg/onboarding-questions.yaml` (v5.0, 3-layer model)
 > - Profile generation against `myDex/.dex/config/profile.yaml.example` template (schema v1.1)
 > - Onboarding routing (v5.0 is DEFAULT, v4.3.1 is legacy/opt-in):
 >   - `*mydex` or `*onboarding` → v5.0 variants (SMART 5q / VOLLSTÄNDIG 12q / MINIMAL 2q)
@@ -200,7 +200,7 @@
     <!-- ONBOARDING EXECUTION RULES (Priority-Based) -->
     <rule priority="CRITICAL" id="R1-routing">
       Two onboarding question sets exist. Choose per user invocation:
-      - Default `*mydex` / `*onboarding` → load .dexCore/_cfg/onboarding-questions-v5.0.yaml
+      - Default `*mydex` / `*onboarding` → load .dexCore/_cfg/onboarding-questions.yaml
         (v5.0 — SMART 5q, VOLLSTÄNDIG 12q, MINIMAL 2q; includes Q43 enterprise gate)
       - Legacy `*mydex-advanced` → load .dexCore/_cfg/onboarding-questions.yaml
         (v4.3.1 — SMART 18q, VOLLSTÄNDIG 42q; deep engagement survey)
@@ -250,9 +250,9 @@
 
       | Loaded YAML                                          | onboarding.variant | onboarding.version | variant_total (denominator for completion_percentage) |
       |------------------------------------------------------|--------------------|--------------------|-------------------------------------------------------|
-      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (SMART) | smart_v5           | v5.0               | 5                                                     |
-      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (VOLL.) | vollstandig_v5     | v5.0               | 12                                                    |
-      | .dexCore/_cfg/onboarding-questions-v5.0.yaml (MIN.)  | minimal_v5         | v5.0               | 2                                                     |
+      | .dexCore/_cfg/onboarding-questions.yaml (SMART) | smart_v5           | v5.0               | 5                                                     |
+      | .dexCore/_cfg/onboarding-questions.yaml (VOLL.) | vollstandig_v5     | v5.0               | 12                                                    |
+      | .dexCore/_cfg/onboarding-questions.yaml (MIN.)  | minimal_v5         | v5.0               | 2                                                     |
       | .dexCore/_cfg/onboarding-questions.yaml (legacy SMART)| smart             | v4.3.1             | 18                                                    |
       | .dexCore/_cfg/onboarding-questions.yaml (legacy VOLL)| vollständig        | v4.3.1             | 42                                                    |
 

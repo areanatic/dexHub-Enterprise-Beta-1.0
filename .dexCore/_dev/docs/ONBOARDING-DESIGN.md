@@ -4,7 +4,7 @@
 **Status:** DESIGN shipped 2026-04-19, implementation (mydex-agent wiring) pending
 **Author:** Claude Opus 4.7 (this session) + pre-work from Opus 4.7 (d4782d0 commit)
 **Supersedes:** none (additive alongside v4.3)
-**Companion file:** `.dexCore/_cfg/onboarding-questions-v5.0.yaml`
+**Companion file:** `.dexCore/_cfg/onboarding-questions.yaml`
 
 ---
 
@@ -87,7 +87,7 @@ Post-SMART batch confirmation. Auto-detect from repo:
 
 UX: "I see you use TypeScript + React + Vitest. Confirm? [Yes / Edit]"
 
-Implementation blocker: needs repo-scanner module. Design in `onboarding-questions-v5.0.yaml` → `inferred_layer_b_candidates`. Target phase: 5.2 when we're building Knowledge Layer L2 Tank (scanner can piggyback).
+Implementation blocker: needs repo-scanner module. Design in `onboarding-questions.yaml` → `inferred_layer_b_candidates`. Target phase: 5.2 when we're building Knowledge Layer L2 Tank (scanner can piggyback).
 
 ### Layer C (designed, deferred to Phase 5.2)
 
@@ -155,7 +155,7 @@ These fix real bugs in the current v4.3 that surfaced during the holistic review
 
 - **Phase 5.1.b (now):** v5.0 YAML shipped as `experimental` in features.yaml. Not yet default. mydex-agent wiring pending.
 - **Phase 5.1.a.2:** Multi-turn claude-runner walkthrough test validates SMART v5 produces profile.yaml end-to-end
-- **Phase 5.1.b.2 (follow-up commit):** mydex-agent `*mydex` command defaults to v5.0 variant selector, routes to `.dexCore/_cfg/onboarding-questions-v5.0.yaml`
+- **Phase 5.1.b.2 (follow-up commit):** mydex-agent `*mydex` command defaults to v5.0 variant selector, routes to `.dexCore/_cfg/onboarding-questions.yaml`
 - **When walkthrough tests pass:** Promote v5.0 to `enabled`, v4.3.1 stays as `enabled` (legacy path), marked `deprecated` in post-1.0 release
 
 ---
@@ -197,7 +197,7 @@ In `.dexCore/_cfg/features.yaml`, this commit registers:
 4. Team-profile support (`roadmap.team_profile_support`): should SMART ask team-size or defer to a team-profile onboarding?
 5. When v5.0 becomes default, should we auto-migrate v4.3 `ai.copilot_enabled = true` users to `company.data_handling_policy = cloud_llm_allowed` silently or ask?
 
-These are tracked in `onboarding-questions-v5.0.yaml` → `open_questions` and in `features.yaml` as `known_issues` on relevant entries.
+These are tracked in `onboarding-questions.yaml` → `open_questions` and in `features.yaml` as `known_issues` on relevant entries.
 
 ---
 
