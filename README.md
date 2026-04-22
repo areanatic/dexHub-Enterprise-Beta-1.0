@@ -56,7 +56,7 @@ Each agent has a name, a role, and domain expertise. They follow defined methodo
 | **Scrum Master** | Arjun | User stories, sprint planning, ceremonies | `@sm` |
 | **Product Owner** | Lisa | Acceptance criteria, backlog management | `@po` |
 | **Test Architect** | Murat | Test strategy, automation, quality gates | `@tea` |
-| **TestArch Pro** | — | Website test automation frameworks | `@testarch-pro` |
+| **Test Automation Architect** | Kalpana | Website test automation frameworks | `@testarch-pro` |
 
 ### Innovation Team
 
@@ -76,7 +76,7 @@ Each agent has a name, a role, and domain expertise. They follow defined methodo
 | **Game Architect** | Marek | Game systems, multiplayer, engine design | `@game-architect` |
 | **Game Designer** | Luna | Mechanics, player psychology, balancing | `@game-designer` |
 | **Game Developer** | Nico | Gameplay programming, performance | `@game-dev` |
-| **Atlas** | — | Knowledge reconstruction across Jira/GitHub/Confluence | `@atlas` |
+| **Knowledge Reconstruction Expert** | Yamuna | Knowledge reconstruction across Jira/GitHub/Confluence | `@atlas` |
 
 ### System & Onboarding Agents
 
