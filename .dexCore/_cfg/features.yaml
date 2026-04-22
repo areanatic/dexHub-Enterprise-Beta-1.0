@@ -80,16 +80,18 @@ core:
       - self-hosting (runs itself)
 
   - id: core.post_write_check_hook
-    name: "Post-write-check hook (G3 enforcement)"
-    description: "Blocks writes to project root"
+    name: "Post-write-check hook (G3 enforcement — Claude-Code-only)"
+    description: "PostToolUse hook that blocks writes to project root after Edit/Write tool calls. Claude-Code-specific mechanism: in enterprise Copilot bundles the .claude/ directory is stripped (build-for-enterprise.sh), and G3 root-forbidden enforcement falls back to prompt-text in copilot-instructions.md (see Guardrails section G3). Hook is the stronger tripwire in Claude Code sessions; prompt-text is the Copilot fallback."
     status: always_on
     phase: 1.0
     enterprise_compliance: ok
-    requires: []
+    requires: [bash, jq]
     depends_on: []
-    docs: .dexCore/_dev/tools/post-write-check.sh
+    docs: .claude/skills/dexhub-testing/scripts/post-write-check.sh
     tests:
       - tests/e2e/00-fresh-install.test.sh
+    known_issues:
+      - "Hook mechanism is Claude-Code-only (PostToolUse in .claude/settings.json). In enterprise Copilot bundles the .claude/ tree is stripped, so G3 is enforced via prompt-text only. Prompt-text enforcement is reliable for well-aligned agents but has weaker tripwire than the hook. Path updated 2026-04-22 session 10 P0-B (was broken: pointed at nonexistent .dexCore/_dev/tools/post-write-check.sh)."
 
 # ─────────────────────────────────────────────────────────────────────────
 # ONBOARDING — user's first 5 minutes with DexHub
