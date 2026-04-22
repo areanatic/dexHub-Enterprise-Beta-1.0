@@ -385,12 +385,26 @@ questions:
     required: false
     variants: [vollstandig_v5]
     max_items: 20
-    placeholder_de: "z.B. 'Verwende TypeScript strict mode'"
-    placeholder_en: "e.g. 'Use TypeScript strict mode'"
+    placeholder_de: |
+      Beispiele (Technik + Persönlichkeit gemischt):
+        • "Verwende TypeScript strict mode"
+        • "Commit-Messages nach Conventional Commits"
+        • "Sprich mit mir auf Schwäbisch" (oder Bayerisch, Sächsisch, jeder Dialekt)
+        • "Nutze Emojis sparsam — max. 1 pro Antwort"
+        • "Code-Kommentare immer auf Englisch, Erklärungen auf Deutsch"
+        • "Beispiele bevorzugt aus der Musik-Domäne"
+    placeholder_en: |
+      Examples (technical + personal mixed):
+        • "Use TypeScript strict mode"
+        • "Follow Conventional Commits for git messages"
+        • "Speak like a Shakespeare character" (or any tone/style preference)
+        • "Keep emoji use minimal — max 1 per response"
+        • "Code comments in English, explanations in German"
+        • "Prefer examples from the music domain"
     profile_path: "custom_instructions.always_do"
     layer: "A"
     inferrable: false
-    reason_for_asking: "Explicit user rules — not inferrable from repo (could conflict with repo conventions)"
+    reason_for_asking: "Explicit user rules — not inferrable from repo. Personal style + tone are as valid here as technical conventions; agents apply both."
 
   - id: 41
     category: custom_instructions
@@ -400,12 +414,23 @@ questions:
     required: false
     variants: [vollstandig_v5]
     max_items: 20
-    placeholder_de: "z.B. 'Verwende kein var keyword'"
-    placeholder_en: "e.g. 'Never use var keyword'"
+    placeholder_de: |
+      Beispiele:
+        • "Verwende kein var keyword"
+        • "Keine Abkürzungen ohne Erklärung beim ersten Vorkommen"
+        • "Nie duzen in offiziellen Dokumenten"
+        • "Keine Emojis in Commit-Messages"
+        • "Keine Fachbegriffe ohne deutsche Übersetzung daneben"
+    placeholder_en: |
+      Examples:
+        • "Never use var keyword"
+        • "No abbreviations without explanation on first use"
+        • "No emojis in commit messages"
+        • "No jargon without a plain-English translation alongside"
     profile_path: "custom_instructions.never_do"
     layer: "A"
     inferrable: false
-    reason_for_asking: "Explicit user rules"
+    reason_for_asking: "Explicit user rules. Same scope as always_do — technical conventions + personal preferences both welcome."
 
 # ─────────────────────────────────────────────────────────────────────────
 # LAYER B — Inferred and confirmed (DEFERRED to Phase 5.2+)
@@ -454,20 +479,60 @@ progressive_disclosure_triggers:
     ask: "Role-detail questions (domain, preferred level of initiative)"
 
 # ─────────────────────────────────────────────────────────────────────────
-# LAYER D — VOLLSTÄNDIG as opt-in engagement survey (LEGACY)
+# COMPLETION SUMMARY + EDIT-HINT (P0-G)
 # ─────────────────────────────────────────────────────────────────────────
-# The full 42-question v4.3 path is preserved. Users can opt into it
-# via *mydex-advanced to do deep personalization (career goals,
-# zeitgeist, vision fields). Framed as "investment" not "requirement".
-# Reference: onboarding-questions.yaml (v4.3, 42 questions, untouched).
+# After the last answered question, mydex-agent MUST:
+#   1. Display a compact summary of collected answers (name, language,
+#      experience, team-context, data-handling-policy, optional custom
+#      instructions)
+#   2. Confirm the target file path: myDex/.dex/config/profile.yaml
+#   3. Tell the user: "Du kannst dein Profil jederzeit ändern:
+#      *mydex-profile zum Editieren, *mydex-advanced für mehr Felder
+#      (Enterprise-Compliance, custom instructions)."
+#   4. Offer: "Willst du jetzt noch was ändern? [ja / nein]" — on 'ja'
+#      re-ask the question the user points to, otherwise write profile.
 
-legacy_opt_in:
-  activation_command: "*mydex-advanced"
-  reference_file: "onboarding-questions.yaml"
-  version: "v4.3"
-  status: "kept as engagement path, not default"
-  questions: [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, "17a", 18, "18a", "18b", 19, 20, 21, 22, 25, 26, "26a", 27, "27a", 28, 29, 30, 31, 35, 36, 37, 38, 39, 42]
-  note: "Q42 (domain_knowledge free text 2000 chars) moves to progressive disclosure when first relevant"
+completion_summary:
+  show_after: "last_variant_question"
+  format: "bilingual per communication_language"
+  required_fields_in_summary:
+    - identity.name (Q0)
+    - identity.communication_language (Q1)
+    - identity.experience_years (Q3)
+    - identity.team_size_context (Q4)
+    - company.data_handling_policy (Q43)
+  optional_fields_if_asked:
+    - company.approved_llm_providers (Q44, vollstandig_v5)
+    - company.available_connectors (Q45, vollstandig_v5)
+    - custom_instructions.always_do (Q40, vollstandig_v5)
+    - custom_instructions.never_do (Q41, vollstandig_v5)
+  edit_hint_de: |
+    Dein Profil ist gespeichert in myDex/.dex/config/profile.yaml.
+
+    Editieren jederzeit via:
+      *mydex-profile      → Felder ändern
+      *mydex-advanced     → auf VOLLSTÄNDIG umsteigen (+ Enterprise-Felder + persönliche Instructions)
+      *mydex-minimal      → auf das MINIMUM reduzieren
+
+    Alles bleibt lokal — nichts wird automatisch synchronisiert.
+  edit_hint_en: |
+    Your profile is saved in myDex/.dex/config/profile.yaml.
+
+    Edit anytime via:
+      *mydex-profile      → change fields
+      *mydex-advanced     → switch to VOLLSTÄNDIG (+ enterprise fields + personal instructions)
+      *mydex-minimal      → downgrade to the minimal set
+
+    Everything stays local — nothing auto-syncs.
+
+# ─────────────────────────────────────────────────────────────────────────
+# LEGACY v4.3 — ARCHIVED (removed 2026-04-22 session 10 P0-I Option A)
+# ─────────────────────────────────────────────────────────────────────────
+# The v4.3 question set (42 questions, smart + vollständig variants) was
+# archived to .dexCore/_archive/onboarding-v4.3-2026-04-22/ with SHA256SUMS
+# and MANIFEST.md. Restore procedure documented in the archive.
+# *mydex-advanced now routes to vollstandig_v5 (12 questions) instead of
+# the old 42-question v4.3 flow.
 
 # ─────────────────────────────────────────────────────────────────────────
 # MIGRATION NOTES (v4.3 → v5.0)
@@ -488,13 +553,12 @@ migration:
   path_for_existing_users:
     - "Existing v4.3 profiles remain valid — schema is additive"
     - "First session after v5.0 activation: DexMaster asks Q43 (data_handling_policy) to enable Enterprise features. Can skip."
-    - "User can opt into VOLLSTÄNDIG v5.0 anytime via *mydex-advanced to fill enterprise fields"
-    - "Legacy *mydex variant command preserves v4.3 behavior (42 questions)"
+    - "User can opt into VOLLSTÄNDIG v5.0 anytime via *mydex-advanced to fill enterprise fields + personal instructions"
 
   deprecation_schedule:
-    - "v4.3 remains supported through 1.1"
-    - "v5.0 becomes default in 1.0 if walkthrough test passes"
-    - "v4.3 deprecation decision deferred to post-1.0"
+    - "v4.3 archived 2026-04-22 session 10 P0-I Option A (see .dexCore/_archive/onboarding-v4.3-2026-04-22/)"
+    - "v5.0 is the only canonical onboarding path in 1.0 (SMART / VOLLSTÄNDIG / MINIMAL variants)"
+    - "v4.3 restore possible from archive if ever needed — procedure in archive MANIFEST.md"
 
 # ─────────────────────────────────────────────────────────────────────────
 # OPEN DESIGN QUESTIONS (for future iteration)
