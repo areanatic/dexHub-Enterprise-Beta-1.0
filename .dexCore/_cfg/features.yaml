@@ -556,8 +556,8 @@ knowledge:
 
   - id: knowledge.l3_chronicle
     name: "L3 Chronicle + CONTEXT.md"
-    description: "Session diaries + state persistence (already exists)"
-    status: enabled
+    description: "Automatic session state persistence (chronicle + CONTEXT.md). Infrastructure layer — never toggled by user, always on when any DexHub agent session is active."
+    status: always_on
     phase: 1.0
     enterprise_compliance: ok
     requires: []
@@ -565,6 +565,8 @@ knowledge:
     docs: .dexCore/_dev/docs/CONTEXT-SCHEMA.md
     tests:
       - .dexCore/_dev/tools/validate.sh (§22)
+    notes:
+      - "Reclassified 2026-04-22 from status=enabled to status=always_on: L3 is plumbing (like G1-G9), not a user-facing feature the user can disable. Previous label 'enabled' misrepresented as togglable."
 
   - id: knowledge.ingest_pipeline
     name: "Ingest pipeline (inbox → chunks → Tank)"
@@ -1346,12 +1348,16 @@ roadmap:
 counts:
   total: 87
   by_status:
-    always_on: 7
-    enabled: 61
+    always_on: 8
+    enabled: 60
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-22 session 10 (Registry-Honesty P0-A):
+  # - knowledge.l3_chronicle reclassified enabled → always_on
+  #   (infrastructure layer — session state persistence never user-toggled).
+  #   always_on 7→8, enabled 61→60. Total unchanged.
   # Updated 2026-04-22 session 8 B (Pattern B Phase 1 Overview):
   # - parser.pattern_b_phase1_overview NEW enabled (5.3.k) —
   #   total 86→87, enabled 60→61. Split from parser.pattern_b_raster_6phase
