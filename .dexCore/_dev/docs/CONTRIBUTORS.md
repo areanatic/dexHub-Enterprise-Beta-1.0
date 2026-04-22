@@ -23,15 +23,26 @@ See **[ADR-008](.dexCore/_dev/docs/adr/ADR-008-colleague-contributor-recognition
 
 ## Contributors (alphabetical)
 
-### kavedagi
+### Kalpana Vedagiri (kavedagi)
 
-**Contribution:** Test Automation Agent
-**Branch:** `azamani1/feature/test_automation_agent` (HEAD `da0b4bc`, 2026-03-03 IST)
-**Nature:** Test automation agent documentation
-**Integration status in current Playground:** **NOT INTEGRATED** as of 2026-04-15 Layer 1 verification (no matching file found under `.dexCore/`). Candidate for forward-merge to Beta in Phase 3 scope.
-**Workstream:** `test-automation-agent-kavedagi` (see `workstreams.csv`)
+**Contribution:** Test Automation Agent (TestArch Pro)
+
+**Branches:**
+- `azamani1/feature/test_automation_agent` (HEAD `da0b4bc`, 2026-03-03 IST) — original test automation agent documentation
+- Clean integration via commit `1f656b3` on 2026-03-14 (authored with explicit attribution in message)
+
+**Nature:** TestArch Pro is the multi-language test-automation agent (Java, Python, JavaScript, C#). 1951-line persona file with CI/CD-ready workflows. Part of the DXM agent family; surfaced to Copilot via `.github/agents/testarch-pro.agent.md`.
+
+**Integration status in Beta:** **INTEGRATED AND VERIFIED** as of 2026-04-21. Confirmed by direct filesystem check:
+- `.dexCore/dxm/agents/testarch-pro.md` — full persona
+- `.github/agents/testarch-pro.agent.md` — Copilot activation stub
+- `agent-manifest.csv` row 43
+
+**Workstream:** `testarch-pro-kalpana-vedagiri` (see `workstreams.csv`, status `INTEGRATED_VERIFIED`)
 **Timezone:** IST (India Standard Time) based on commit timestamps
-**Contact:** pending (not contacted as of 2026-04-15; reaching out deferred to a later session)
+**Contact:** pending (not contacted as of 2026-04-22)
+
+**Note on naming:** In DexHub's persona-based agent model (where agents carry first names — Jana the Analyst, Alex the Architect, Mona the UX-Designer), TestArch Pro is being renamed to **Kalpana** in the v1.0 release to carry proper contributor attribution. The `@testarch-pro` command stays valid as an alias for backward compatibility.
 
 ---
 
