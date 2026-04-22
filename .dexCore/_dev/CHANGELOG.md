@@ -2,6 +2,89 @@
 
 > Development changelog for DexHub Enterprise Beta
 
+## [1.0.0] — 2026-04-22 🎉 First public Beta 1.0 release
+
+Session 10 ships 13 atomic commits closing Phase 1 + Phase 3-7 of the
+pre-release plan. All 274 validate.sh checks green; enterprise bundle
+build + verify green; live-verified EMBED + HYBRID (41 live assertions).
+
+### Added in session 10
+- `.dexCore/_dev/docs/INSTALLATION.md` — step-by-step for Non-Devs (DE)
+- `.dexCore/_dev/docs/FIRST-5-MINUTES.md` — guided first-use tour (DE)
+- `.dexCore/_dev/docs/FAQ.md` — 15+ Non-Dev questions (DE)
+- `.dexCore/_dev/docs/TROUBLESHOOTING.md` — symptom → cause → fix (DE)
+- `.dexCore/_dev/docs/LIVE-VERIFICATION.md` — Tier1/5 status per path
+- `.dexCore/_dev/docs/ROADMAP-1.1.md` — explicit 1.1 backlog with specs
+- `myDex/projects/` skeleton + README.md (pre-1.1 Drop-In prep)
+- validate.sh §28 — Copilot-activation ↔ source-persona drift-check (46 stubs)
+- Registry entry `quality.validate_sh_§28_copilot_drift`
+- Q40/Q41 personal-instruction placeholders (dialect, style, tone examples)
+- Completion summary + edit-hint spec in onboarding-questions.yaml
+- Section: DEPRECATED_PHRASES in validate.sh §21 extended with
+  "100% Local-First" + "100% local, no cloud APIs" (future drift guard)
+
+### Changed in session 10
+- **Messaging (P0-H):** "100% Local-First" → "Data-Local, LLM-of-Your-Choice"
+  across SHARED.md + regenerated CLAUDE.md + copilot-instructions.md +
+  2 skill files + dex-master + mydex-agent + myDex/README. Honest framing:
+  working data stays local; LLM engine is user's choice; connectors are
+  opt-in per Enterprise Compliance Matrix.
+- **l3_chronicle (P0-A):** enabled → always_on (infrastructure, not toggleable).
+  counts_block + README Feature Matrix synced.
+- **post_write_check_hook (P0-B):** docs-path fixed to actual location
+  (.claude/skills/dexhub-testing/scripts/), Claude-Code-only note added,
+  Copilot fallback to prompt-text documented.
+- **Agent renames (E3+E4):** TestArch Pro → Kalpana (Test Automation
+  Architect), Atlas → Yamuna (Knowledge Reconstruction Expert). Technical
+  commands @testarch-pro / @atlas preserved for backward-compat. Attribution
+  to Kalpana Vedagiri (commit 1f656b3) + Yamuna Boopathi (commit 05c2091)
+  in persona files + CONTRIBUTORS.md. agent-manifest.csv displayNames
+  updated (matches Mona pattern).
+- **README:** count-disambiguation note (46 Copilot activations vs 43
+  source personas vs 14 dxm agents — all correct, each in its scope);
+  install-URL typo fixed (dexhub-ea-beta → dexHub-Enterprise-Beta-1.0);
+  Getting-Started-Docs block linking the 4 new Non-Dev docs.
+- **CONTRIBUTORS.md:** Kalpana Vedagiri full section (was placeholder)
+  with INTEGRATED_VERIFIED status + forward-looking rename note.
+
+### Removed in session 10 (P0-I Option A — Onboarding Consolidation)
+- `onboarding.smart_v4_3_1` (enabled → removed, referenced archived YAML)
+- `onboarding.vollstandig_v4_3` (enabled → removed)
+- `onboarding.legacy_path_preserved` (enabled → removed, depended on above)
+- `.dexCore/_cfg/onboarding-questions.yaml` v4.3 content archived to
+  `.dexCore/_archive/onboarding-v4.3-2026-04-22/` with SHA256SUMS +
+  MANIFEST.md + restore procedure
+- `.dexCore/_cfg/onboarding-questions-v5.0.yaml` renamed to canonical
+  `.dexCore/_cfg/onboarding-questions.yaml`
+- `.dexCore/_dev/docs/ONBOARDING-V5-DESIGN.md` renamed to
+  `.dexCore/_dev/docs/ONBOARDING-DESIGN.md`
+- Enterprise bundle strip-list extended: `.dexCore/_dev/portfolio/` +
+  `.dexCore/_dev/docs/adr/` no longer ship with the enterprise bundle
+
+### Live-verified in session 10 (DF3, partial — 2 of 7 paths)
+- CLAUDE_E2E_LIVE_EMBED=1 on test 17 → 21/21 PASS
+  Real 768-dim vectors from nomic-embed-text, idempotent, require-backend
+- CLAUDE_E2E_LIVE_EMBED=1 on test 18 → 20/20 PASS
+  Semantic match proven: "how do users log in" → "Authentication"
+- Status of other 5 paths (KREUZBERG / VLM / PATTERN_A / WALKTHROUGH /
+  INBOX_SETUP) documented in LIVE-VERIFICATION.md
+
+### Deferred to 1.1 (with explicit specs in ROADMAP-1.1.md)
+- G1 Guided-Install Wizard (interactive install helper)
+- O1 Copilot Token Quick-Win (SHARED.md compression + skills extraction)
+- F1-F4 Project Migration Agents (Drop-In, Pull-Repo, Push-Repo, Per-
+  Project-Chronicle)
+- Living-Docs Pattern (automated drift-detection code ↔ docs)
+- O2/O3/O4/DF1/DF2/DF4/DF5 polish items
+
+### Registry state at 1.0 release
+- **85 features total** (8 always_on + 58 enabled + 19 deferred + 0 broken + 0 experimental)
+- **43 source agent personas** · **46 Copilot activations** · **46 workflows** · **12 skills**
+- **28 validate.sh sections** (27 + new §28 Copilot drift-check)
+- **274 validate.sh checks PASS** · **0 FAIL** · **0 WARN**
+
+---
+
 ## [Unreleased] — post-EB-1.0 hardening (2026-04-02 → 2026-04-21)
 
 ### Added — L2 Knowledge Tank (closed 2026-04-21 session 5)
