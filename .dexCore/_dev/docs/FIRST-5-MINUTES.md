@@ -21,10 +21,10 @@ Du wirst durch **SMART v5** geführt — **5 Fragen, ca. 60–90 Sekunden**:
 4. **Teamgröße + Kontext?** (Solo / Start-up / Enterprise — beeinflusst Empfehlungen)
 5. **Data-Handling-Policy?** (Enterprise-Gate: welche LLMs / Connectors darfst du nutzen?)
 
-Deine Antworten landen in `myDex/.dex/config/profile.yaml`. Nur lokal auf deinem Rechner. Kannst du später jederzeit ändern: `@mydex *mydex-profile`.
+Deine Antworten landen in `myDex/.dex/config/profile.yaml`. Nur lokal auf deinem Rechner. Kannst du später jederzeit ändern: `@mydex` → Menüpunkt `*mydex-profile`.
 
-> **Du willst tiefer?** `@mydex-advanced` → VOLLSTÄNDIG v5 (12 Fragen, ~3 Min) mit zusätzlichen Enterprise-Compliance-Feldern + Custom-Instructions.
-> **Du willst schneller?** `@mydex-minimal` → MINIMAL v5 (2 Fragen, 30 Sek) — nur Sprache + Data-Handling.
+> **Du willst tiefer?** `@mydex` → Menüpunkt `*mydex-advanced` → VOLLSTÄNDIG v5 (12 Fragen, ~3 Min) mit zusätzlichen Enterprise-Compliance-Feldern + Custom-Instructions.
+> **Du willst schneller?** `@mydex` → Menüpunkt `*mydex-minimal` → MINIMAL v5 (2 Fragen, 30 Sek) — nur Sprache + Data-Handling.
 
 ---
 
@@ -94,13 +94,14 @@ Siehe `@dex-master *list-workflows`.
 
 ## Minute 5: Ein Projekt anlegen
 
-Bisher lagen deine Outputs in `myDex/drafts/`. Sobald du ernst wirst:
+Bisher lagen deine Outputs in `myDex/drafts/` (oder `docs/` je nach Workflow — siehe `dxm/config.yaml`). Sobald du ernst wirst:
 
 ```
-@mydex create-project
+@mydex
+*projects
 ```
 
-Du bekommst ein **strukturiertes Projekt-Workspace**:
+Im Projekt-Management-Menü wählst du **1. Neues Projekt erstellen**. Du bekommst ein **strukturiertes Projekt-Workspace**:
 ```
 myDex/projects/dein-projekt/
 ├── src/               ← dein Code
@@ -117,7 +118,11 @@ myDex/projects/dein-projekt/
 
 Von jetzt ab routen alle Workflow-Outputs automatisch in diesen Projekt-Ordner. Jeder Agent, den du mit `@...` aufrufst, nutzt den Kontext des aktiven Projekts.
 
-Aktuelles Projekt wechseln: `@mydex switch-project` oder `@mydex status`.
+Im selben `@mydex` → `*projects` Menü:
+- **2. Projekt wechseln** (zwischen mehreren Projekten)
+- **3. Projekt-Info anzeigen** (aktueller Status)
+- **4. Projekt nachrüsten** (existierenden Code-Ordner um `.dex/` erweitern)
+- **5. Migrations-Hilfe** (alte Projekt-Strukturen aktualisieren)
 
 ---
 
@@ -147,7 +152,7 @@ Mehr in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ```
 @dex-master hi           ← Wegweiser, Menü, zurück-zur-Basis
-@mydex hi                ← Profil verwalten, Projekte verwalten
+@mydex                   ← Profil verwalten, Projekte verwalten (Menü)
 *list-agents             ← alle verfügbaren Fach-Kollegen
 ```
 
