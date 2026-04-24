@@ -152,7 +152,7 @@ DexHub selber macht **kein automatisches Backup oder Sync**. Deine Arbeit liegt 
 ## Was ist wenn ich bei einer Frage / Entscheidung feststecke?
 
 1. **Forensik:** `@dex-master *features` zeigt dir welche Features in welchem Status sind
-2. **Wissen:** `@dex-master *list-skills` — eines davon könnte passen
+2. **Wissen:** 12 Skills liegen in `.github/skills/` — auto-geladen von Copilot/Claude bei passendem Kontext (explizites `*list-skills` Menü kommt 1.1)
 3. **Dokus:** [INSTALLATION.md](INSTALLATION.md), [FIRST-5-MINUTES.md](FIRST-5-MINUTES.md), [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 4. **Community / Issue:** Auf GitHub im Repo ein Issue aufmachen (für ITS / DHL-interne Nutzer: nimm Kontakt zu Arash Zamani auf)
 

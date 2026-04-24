@@ -38,8 +38,10 @@ Du siehst das **DexMaster-Menü**. DexMaster ist nicht selber ein Agent-Arbeiter
 
 - Welche **Agenten** verfügbar sind (`*list-agents`)
 - Welche **Workflows** es gibt (`*list-workflows`)
-- Welche **Skills** (Wissenspakete) geladen werden können (`*list-skills`)
 - Welche **Feature-Flags** aktiv sind (`*features`)
+- Welche **Agent-Packs** togglebar sind (`*packs`)
+
+> **Skills** (12 Wissenspakete in `.github/skills/`) werden automatisch von Copilot/Claude geladen wenn sie zum Kontext passen. Ein explizites `*list-skills` Menü-Kommando kommt in 1.1.
 
 Probier's: `@dex-master *list-agents`. Du siehst eine strukturierte Liste mit menschlichen Namen (Mona, Jana, Kalpana, Yamuna etc.) + technischen Commands (`@ux`, `@analyst`, `@testarch-pro`, `@atlas`).
 
@@ -130,7 +132,7 @@ Im selben `@mydex` → `*projects` Menü:
 
 - **Dokumenten-Parser aktivieren:** Du hast Kreuzberg + Ollama installiert? `@dex-master *inbox` zieht PDFs, Word-Dokumente, Screenshots etc. in dein Wissen-Tank.
 - **Jira / Confluence verbinden:** `@atlassian-onboarding hi` (braucht deine Firma-URL + Token)
-- **Skills entdecken:** `@dex-master *list-skills` — 12 Wissenspakete für spezielle Themen (Guardrails, Chronicle, DHL DS, etc.)
+- **Skills entdecken:** Die 12 Wissenspakete liegen in `.github/skills/`. Sie werden auto-geladen von Copilot/Claude wenn passend (Guardrails, Chronicle, DHL DS, etc.). Explizites `*list-skills` Menü kommt in 1.1.
 - **Agent-Packs togglen:** `@dex-master *packs` → aktiviere/deaktiviere Agent-Pakete je nach Arbeitsmodus (z.B. Meta-Agents nur bei Brownfield-Arbeit)
 
 ---
