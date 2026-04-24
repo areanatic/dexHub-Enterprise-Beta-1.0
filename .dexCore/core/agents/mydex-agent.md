@@ -338,9 +338,9 @@
          → Maßgeschneiderte AI-Experience
 
       **Waehle deinen Weg:**
-      ⚡ MINIMAL (30 Sek, 5 Fragen) - Sofort loslegen
-      🚀 SMART (4-5 Min, 16 Fragen) - Personalisiert
-      ⭐ VOLLSTAENDIG (15-18 Min, 37 Fragen) - Volles Potenzial
+      ⚡ MINIMAL (30 Sek, 2 Fragen) - Sofort loslegen
+      🚀 SMART (60-90 Sek, 5 Fragen) - DEFAULT, balanced
+      ⭐ VOLLSTAENDIG (3-5 Min, 12 Fragen) - Enterprise-Compliance + Custom-Instructions
 
       👇 Waehle **Onboarding** im Menue unten!
       ═══════════════════════════════════════════════════════════
@@ -1320,7 +1320,7 @@ Do NOT show hardcoded questions here - execute the real flow!
 <prompt id="onboarding-complete">
 ⭐ **VOLLSTÄNDIG Onboarding gestartet!** (15-18 Minuten)
 
-Perfekt! Ich stelle dir alle 37 Fragen, um DexHub optimal für dich einzurichten.
+Perfekt! Ich stelle dir alle 12 Fragen (VOLLSTÄNDIG v5), um DexHub optimal für dich einzurichten.
 
 **Kategorien:**
 1. Wer bist du? (Rolle & Erfahrung)
@@ -1381,9 +1381,9 @@ DexHub kennt jetzt deine Ziele, Challenges und Präferenzen.
 Dein Profil ist zu {profile.completion}% vollständig.
 {/if}
 
-1. ⚡ MINIMAL (30 Sek, 5 Fragen) — Sofort loslegen
-2. 🚀 SMART (4-5 Min, 16 Fragen) — Personalisiert
-3. ⭐ VOLLSTAENDIG (15-18 Min, 37 Fragen) — Volles Potenzial
+1. ⚡ MINIMAL (30 Sek, 2 Fragen) — Sofort loslegen
+2. 🚀 SMART (60-90 Sek, 5 Fragen) — DEFAULT, balanced
+3. ⭐ VOLLSTAENDIG (3-5 Min, 12 Fragen) — Enterprise-Compliance + Custom-Instructions
 4. ✏️  Einzelne Fragen beantworten (waehle Kategorie)
 5. 📄 Profil manuell bearbeiten (YAML oeffnen)
 6. 🔙 Zurueck zum myDex Menue
@@ -1504,13 +1504,13 @@ Rolle: {identity.role} | AI-Level: {ai.readiness_level} | Ziel: {growth.six_mont
 
 {if completeness.overall >= 42 && completeness.overall < 100}
 ⚠️  **{completeness.overall}% vollständig** (SMART Variante abgeschlossen)
-[████████░░░░░░░░░░] {questions_answered}/37 Fragen beantwortet
+[████████░░░░░░░░░░] {questions_answered}/{variant_total} Fragen beantwortet
 💡 Vervollständige dein Profil für bessere AI-Unterstützung! → Typ '*onboarding'
 {/if}
 
 {if completeness.overall < 42}
 🚧 **{completeness.overall}% vollständig** (Onboarding unvollständig)
-[██░░░░░░░░░░░░░░░░] {questions_answered}/37 Fragen beantwortet
+[██░░░░░░░░░░░░░░░░] {questions_answered}/{variant_total} Fragen beantwortet
 ⚡ Starte das Onboarding → Typ '*onboarding'
 {/if}
 
@@ -1584,7 +1584,7 @@ Was möchtest du tun?
 
   <step n="3" title="Variant Selection">
     <action>Display welcome prompt (from <prompt id="first_time_welcome">)</action>
-    <ask>User wählt SMART (16 Fragen, 4-5 Min) oder VOLLSTÄNDIG (37 Fragen, 15-18 Min)</ask>
+    <ask>User wählt MINIMAL (2 Fragen, 30 Sek) / SMART (5 Fragen, 60-90 Sek, DEFAULT) / VOLLSTÄNDIG (12 Fragen, 3-5 Min)</ask>
     <action>Parse user input: accept "1", "smart", "SMART" OR "2", "vollständig", "VOLLSTÄNDIG", "complete"</action>
     <action>Filter questions: Load questions WHERE variants contains {selected_variant}</action>
     <action>Store: selected_variant, questions_count</action>
