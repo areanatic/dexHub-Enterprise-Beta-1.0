@@ -9,7 +9,7 @@ description: "DexHub platform overview, mission, and capabilities. Use when user
 
 ## What is DexHub?
 
-**DEX** (Developer Experience) = AI agents as colleagues, not just tools.
+**DEX** = Knowledge Meta-Layer that sits on top of repos, carrying extracted knowledge and institutional intelligence. AI agents act as colleagues, not just tools.
 
 - **40+ Agents** across 5 modules (type `*list-agents` for full directory)
 - **40+ Workflows** from brainstorming to production (type `*list-workflows`)

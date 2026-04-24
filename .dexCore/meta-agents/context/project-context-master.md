@@ -135,7 +135,7 @@ Always project-specific:
 
 Please specify:
 [W] WDA - Workflow Discovery Agent
-[D] DexHub - Developer Experience Hub
+[D] DexHub - Knowledge Meta-Layer Hub (DEX = Knowledge Meta-Layer)
 [R] Repo-wide (no specific project)
 ```
 

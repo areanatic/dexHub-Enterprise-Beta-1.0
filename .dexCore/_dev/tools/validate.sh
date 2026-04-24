@@ -840,6 +840,8 @@ DEPRECATED_PHRASES=(
   "always_load_on:|Old always-active load semantic (pre-D1); use load_on: instead"
   "100% Local-First|Misleading messaging — DexHub supports cloud LLMs (Copilot Enterprise, Claude Code) and cloud connectors (Atlassian, Figma) as first-class paths. Use 'Data-Local, LLM-of-Your-Choice' (P0-H 2026-04-22)"
   "100% local, no cloud APIs|Same misleading framing — cloud LLMs and connectors are first-class opt-in paths (P0-H 2026-04-22)"
+  "DEX.*Developer Experience|Old DEX definition (pre-2026-03). Correct: DEX = Knowledge Meta-Layer per SHARED.md and feedback_dex_definition_correction.md"
+  "Developer Experience Hub|Same — DexHub is a Knowledge Meta-Layer Hub, not a Developer Experience Hub"
 )
 
 CONSISTENCY_ISSUES=0
