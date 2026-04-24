@@ -341,16 +341,19 @@ The framework follows a distributed model: teams build their own agents and work
 DexHub runs two complementary quality gates — one structural, one behavioural:
 
 ```bash
-# Structural: 260 invariant checks across 22 sections (file existence, hash integrity,
-# SSOT drift detection, cross-platform source alignment, manifest consistency)
+# Structural: 274 invariant checks across 28 sections (file existence, hash integrity,
+# SSOT drift detection, cross-platform source alignment, manifest consistency,
+# Copilot-activation ↔ source-persona drift)
 bash .dexCore/_dev/tools/validate.sh
 
 # Profile schema validation
 python .dexCore/_dev/tools/validate_profile_schema.py myDex/.dex/config/profile.yaml
 
-# Behavioural: E2E test harness (structural 51/51 default, +4 live assertions with --live)
+# Behavioural: E2E test harness (~703 assertions; 5 known-flaky in 01-onboarding,
+# 20-parser-router, 26-parser-inbox auto-parse — see .dexCore/_dev/docs/LIVE-VERIFICATION.md
+# for live-verify env-flags: CLAUDE_E2E_LIVE_EMBED, CLAUDE_E2E_LIVE_KREUZBERG, etc.)
 bash tests/e2e/run-all.sh          # fast, no API cost
-bash tests/e2e/run-all.sh --live   # invokes headless LLM CLI, costs API tokens
+CLAUDE_E2E_LIVE_EMBED=1 bash tests/e2e/run-all.sh   # opt-in live assertions, costs API tokens
 ```
 
 **Gate discipline:** every user-facing feature must have an E2E test entry. "Exists ≠ works" — structural green is not behavioural green. See [tests/e2e/README.md](tests/e2e/README.md).
