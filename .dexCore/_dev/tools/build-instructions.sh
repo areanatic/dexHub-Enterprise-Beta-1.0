@@ -289,10 +289,35 @@ case "$MODE" in
   build)
     validate_inputs
     echo "=== Build Instructions ==="
-    build_copilot "$COPILOT_OUT"
-    echo "OK: $COPILOT_OUT ($(wc -l < "$COPILOT_OUT") lines)"
-    build_claude_concat "$CLAUDE_OUT"
-    echo "OK: $CLAUDE_OUT ($(wc -l < "$CLAUDE_OUT") lines)"
+
+    # Idempotency (added 2026-04-25 — fixes Codex-noted timestamp-drift):
+    # Build to a tmp file, hash-strip Generated: line, compare with existing
+    # file's hash-stripped content. Only overwrite if content actually changed.
+    # This prevents the "every build dirties .claude/CLAUDE.md timestamp"
+    # behavior that confused users (Codex Befund 1 / B3 demoted to NTH).
+
+    TMP_COPILOT=$(mktemp -t copilot-build.XXXXXX)
+    build_copilot "$TMP_COPILOT"
+    if [ -f "$COPILOT_OUT" ] && [ "$(content_hash "$TMP_COPILOT")" = "$(content_hash "$COPILOT_OUT")" ]; then
+      echo "UNCHANGED: $COPILOT_OUT (content identical, timestamp not refreshed)"
+    else
+      mv "$TMP_COPILOT" "$COPILOT_OUT"
+      echo "OK: $COPILOT_OUT ($(wc -l < "$COPILOT_OUT") lines)"
+      TMP_COPILOT=""
+    fi
+    [ -n "$TMP_COPILOT" ] && rm -f "$TMP_COPILOT"
+
+    TMP_CLAUDE=$(mktemp -t claude-build.XXXXXX)
+    build_claude_concat "$TMP_CLAUDE"
+    if [ -f "$CLAUDE_OUT" ] && [ "$(content_hash "$TMP_CLAUDE")" = "$(content_hash "$CLAUDE_OUT")" ]; then
+      echo "UNCHANGED: $CLAUDE_OUT (content identical, timestamp not refreshed)"
+    else
+      mv "$TMP_CLAUDE" "$CLAUDE_OUT"
+      echo "OK: $CLAUDE_OUT ($(wc -l < "$CLAUDE_OUT") lines)"
+      TMP_CLAUDE=""
+    fi
+    [ -n "$TMP_CLAUDE" ] && rm -f "$TMP_CLAUDE"
+
     echo ""
     echo "Note: Claude uses concatenation (safe default). Switch to @import-based"
     echo "      build only after the A/B @import test passes (see A_B_TEST_IMPORT_PROCEDURE)."
