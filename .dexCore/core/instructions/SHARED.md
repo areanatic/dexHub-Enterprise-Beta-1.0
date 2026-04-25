@@ -275,7 +275,10 @@ Layer 1 (truth-manifest + files it promotes) always overrides Layer 2 (indexed k
 - `.dexCore/` (development silo)
 - `.github/` (GitHub config)
 - `myDex/` (user workspace)
+- `tests/` (E2E test harness — required by features.yaml refs + validate.sh §27)
 - `CONTRIBUTING.md`, `LICENSE`, `NOTICE`, `README.md`
+- `.dexcore-session-anchor` (worktree-identity guard, validate.sh §24)
+- `.gitignore`, `.version` (standard project metadata)
 
 **ALL other files MUST go into structured locations:**
 
