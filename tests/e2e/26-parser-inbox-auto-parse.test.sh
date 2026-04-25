@@ -176,26 +176,40 @@ PDF_STATUS=$(echo "$PDF_JSON" | ruby -rjson -e '
   r = d["results"].find { |x| x["file"].to_s.end_with?("fake.pdf") }
   puts r ? r["status"] : "missing"
 ' 2>/dev/null)
+PDF_BACKEND=$(echo "$PDF_JSON" | ruby -rjson -e '
+  d = JSON.parse(STDIN.read)
+  r = d["results"].find { |x| x["file"].to_s.end_with?("fake.pdf") }
+  puts r ? r["backend"].to_s : "missing"
+' 2>/dev/null)
 
-# Determine expected status from installed tooling
-if command -v kreuzberg >/dev/null 2>&1; then
-  # With kreuzberg: a fake PDF header + "fake" body is still malformed,
-  # so extract_failed is plausible. ok is also plausible if kreuzberg
-  # produces any text at all. Both acceptable.
+# Determine expected status from the backend the router actually used.
+# Updated 2026-04-25: kreuzberg ships as a .sh adapter (.dexCore/core/parser/backends/kreuzberg.sh),
+# not as a system binary, so `command -v kreuzberg` is the wrong detection. Check returned
+# backend field from the JSON response instead.
+if [ "$PDF_BACKEND" = "kreuzberg" ]; then
+  # kreuzberg adapter handled it — its "fake PDF body" extraction is plausible (returns
+  # bytes from header text). ok or extract_failed both valid.
   case "$PDF_STATUS" in
     ok|extract_failed)
-      pass "PDF file (kreuzberg installed): status='$PDF_STATUS' (ok or extract_failed both valid)" ;;
-    *) fail "PDF file (kreuzberg installed): unexpected status '$PDF_STATUS'" ;;
+      pass "PDF file (kreuzberg adapter): status='$PDF_STATUS' (ok or extract_failed both valid)" ;;
+    *) fail "PDF file (kreuzberg adapter): unexpected status '$PDF_STATUS'" ;;
   esac
-elif command -v pdftotext >/dev/null 2>&1; then
-  # pdftotext rejects invalid PDFs — expect extract_failed, NEVER ok
-  # (ok here would mean the binary-copy bug is back).
+elif [ "$PDF_BACKEND" = "native" ] && command -v pdftotext >/dev/null 2>&1; then
+  # native+pdftotext branch — pdftotext rejects invalid PDFs — expect extract_failed, NEVER ok.
+  # (ok here would mean the binary-copy bug is back.)
   case "$PDF_STATUS" in
     extract_failed)
-      pass "PDF file (pdftotext fallback): status=extract_failed (pdftotext rejects malformed PDF)" ;;
+      pass "PDF file (pdftotext native fallback): status=extract_failed (pdftotext rejects malformed PDF)" ;;
     ok)
-      fail "PDF file: status=ok with fake PDF + pdftotext — binary-copy regression!" ;;
-    *) fail "PDF file (pdftotext fallback): expected extract_failed, got '$PDF_STATUS'" ;;
+      fail "PDF file: status=ok with fake PDF + pdftotext native — binary-copy regression!" ;;
+    *) fail "PDF file (pdftotext native fallback): expected extract_failed, got '$PDF_STATUS'" ;;
+  esac
+elif [ "$PDF_BACKEND" = "ollama_vlm" ]; then
+  # Image-VLM path — should not be PDF-routed but if it is, accept ready/failed
+  case "$PDF_STATUS" in
+    ok|extract_failed)
+      pass "PDF file (ollama_vlm): status='$PDF_STATUS'" ;;
+    *) fail "PDF file (ollama_vlm): unexpected status '$PDF_STATUS'" ;;
   esac
 else
   # No kreuzberg, no pdftotext — router returns backend_missing

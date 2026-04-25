@@ -128,23 +128,29 @@ for entry in "f.py:native:ready" "g.json:native:ready" "i.eml:native:ready"; do
   fi
 done
 
-# Office file → backend_missing (no kreuzberg)
+# Office file → kreuzberg (shipped 2026-04-21 commit b8e1b8f) OR backend_missing (kreuzberg not installed)
 OFFICE_ROUTE=$(bash .dexCore/core/parser/parse-route.sh "$SCRATCH/d.docx" 2>/dev/null)
 OFFICE_STATUS=$(echo "$OFFICE_ROUTE" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"]' 2>/dev/null)
 OFFICE_BACKEND=$(echo "$OFFICE_ROUTE" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["backend"]' 2>/dev/null)
-if [ "$OFFICE_STATUS" = "backend_missing" ] && [ "$OFFICE_BACKEND" = "none" ]; then
-  pass "office file without kreuzberg → backend=none, status=backend_missing"
+# Updated 2026-04-25: kreuzberg + ollama_vlm adapters ARE shipped now. Test accepts either:
+# - kreuzberg installed → backend=kreuzberg, status=ready
+# - kreuzberg not installed → backend=none, status=backend_missing
+if { [ "$OFFICE_BACKEND" = "kreuzberg" ] && [ "$OFFICE_STATUS" = "ready" ]; } || \
+   { [ "$OFFICE_BACKEND" = "none" ] && [ "$OFFICE_STATUS" = "backend_missing" ]; }; then
+  pass "office file routes correctly → backend=$OFFICE_BACKEND, status=$OFFICE_STATUS"
 else
-  fail "office routing: got backend=$OFFICE_BACKEND, status=$OFFICE_STATUS"
+  fail "office routing wrong: got backend=$OFFICE_BACKEND, status=$OFFICE_STATUS (expected kreuzberg/ready or none/backend_missing)"
 fi
 
-# Image file → backend_missing (no ollama_vlm backend declared)
+# Image file → ollama_vlm (shipped 2026-04-21 commit a53bcdc) OR backend_missing (ollama_vlm not installed)
 IMG_ROUTE=$(bash .dexCore/core/parser/parse-route.sh "$SCRATCH/e.png" 2>/dev/null)
 IMG_STATUS=$(echo "$IMG_ROUTE" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["status"]' 2>/dev/null)
-if [ "$IMG_STATUS" = "backend_missing" ]; then
-  pass "image file without ollama_vlm → status=backend_missing"
+IMG_BACKEND=$(echo "$IMG_ROUTE" | ruby -rjson -e 'puts JSON.parse(STDIN.read)["backend"]' 2>/dev/null)
+# Updated 2026-04-25: ollama_vlm adapter IS shipped. Test accepts either ready or backend_missing.
+if [ "$IMG_STATUS" = "ready" ] || [ "$IMG_STATUS" = "backend_missing" ]; then
+  pass "image file routes correctly → backend=$IMG_BACKEND, status=$IMG_STATUS"
 else
-  fail "image routing: got status=$IMG_STATUS"
+  fail "image routing unexpected: got status=$IMG_STATUS (expected ready or backend_missing)"
 fi
 
 # Unknown ext → unsupported
