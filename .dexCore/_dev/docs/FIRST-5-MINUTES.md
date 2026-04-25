@@ -23,8 +23,7 @@ Du wirst durch **SMART v5** geführt — **5 kurze Fragen** (ein Augenblick):
 
 Deine Antworten landen in `myDex/.dex/config/profile.yaml`. Nur lokal auf deinem Rechner. Kannst du später jederzeit ändern: `@mydex` → Menüpunkt `*mydex-profile`.
 
-> **Du willst tiefer?** `@mydex` → Menüpunkt `*mydex-advanced` → VOLLSTÄNDIG v5 (12 Fragen) mit zusätzlichen Enterprise-Compliance-Feldern + Custom-Instructions.
-> **Du willst schneller?** `@mydex` → Menüpunkt `*mydex-minimal` → MINIMAL v5 (2 Fragen) — nur Sprache + Data-Handling.
+> **Profil erweitern?** Per `*profile` editing erreichst du zusätzliche Felder (Enterprise-Compliance Q44-Q49, Custom-Instructions Q40-Q41) — die sind nicht Teil des Onboardings, sondern als optionale Felder verfügbar.
 
 ---
 

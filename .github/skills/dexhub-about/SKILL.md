@@ -36,7 +36,7 @@ description: "DexHub platform overview, mission, and capabilities. Use when user
 ## Key Features
 
 - **Model Routing** — GPT-4o (free) for navigation, premium models for analysis
-- **3 Onboarding Variants** — MINIMAL (30s), SMART (5min), VOLLSTAENDIG (15min)
+- **Single Onboarding** — 5 kurze Fragen (~ein Augenblick); Q43 = P0 Enterprise-Compliance-Gate
 - **DexMemory** — Session persistence via CONTEXT.md + decision capture
 - **Chronicle System** — 3-tier documentation (CHANGELOG → Daily Logs → INDEX)
 - **Smart Routing** — Files automatically placed in correct project structure

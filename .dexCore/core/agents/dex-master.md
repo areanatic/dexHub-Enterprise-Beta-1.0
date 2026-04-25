@@ -319,7 +319,7 @@ What would you like to do?
       - Git-native workspace architecture
       - Data-local privacy (working data on disk; engine + connectors opt-in per config)
       - GitHub Copilot native with model routing
-      - myDex personal workspace with 3 onboarding variants
+      - myDex personal workspace with single 5-question onboarding (extend later via *profile)
 
       **Coming in Future Versions:**
       - Team.dex: Shared knowledge layer for organizations

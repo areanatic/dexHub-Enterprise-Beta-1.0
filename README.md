@@ -120,7 +120,7 @@ DexHub tracks every capability as an individually toggleable feature in [`.dexCo
 **Honest label for Beta 1.0 scope:**
 
 **Shipped today:**
-- **Core framework** — SSOT compile, agent boundary state model, onboarding variants (MINIMAL/SMART/VOLLSTÄNDIG), 9 guardrails (G1-G9), 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh 28-section quality gate.
+- **Core framework** — SSOT compile, agent boundary state model, single 5-question onboarding, 9 guardrails (G1-G9), 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh 28-section quality gate.
 - **L2 Knowledge Tank** — SQLite-backed, hybrid keyword + semantic search via optional Ollama, enterprise-compliance gate.
 - **Document Parser arc** — router + kreuzberg / ollama-vlm / pattern-a-vector-text / pattern-b-phase1-overview backends + capabilities probe + inbox auto-parse + inbox watcher (foreground) + Desktop-shortcut setup — end-to-end usable for text / PDF / Office / image via `*inbox`.
 

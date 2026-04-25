@@ -29,14 +29,11 @@ myDex is powered by **2 specialized agents** that work together:
 - **Profile management** - View, edit, complete your profile
 - **Personalization** - Name, language, role, AI-journey, goals
 
-**Two Onboarding Variants:**
-1. **SMART** (4-5 min, 16 questions, 42% complete)
-   → Quick setup, functional experience
-   → Complete rest later
-
-2. **VOLLSTÄNDIG** (15-18 min, 37 questions, 100% complete)
-   → Deep personalization, role-specific agents
-   → Full DexHub potential
+**Onboarding (single canonical flow per 2026-04-25 D4):**
+- **5 questions, ~ein Augenblick**
+  → Name, language, experience, team size, data-handling policy
+  → Q43 data-handling is the P0 enterprise gate
+- Optional: extend profile later via `*profile` editing (former VOLLSTÄNDIG-only fields Q40-41 + Q44-49 are reachable post-onboarding)
 
 **Bilingual Support:** Deutsch / English
 
@@ -132,7 +129,7 @@ myDex/projects/ai-powerpoint/
 
 1. Open DexHub (start dex-master)
 2. Type `*mydex` or select "myDex" from menu
-3. Choose your onboarding variant (SMART or VOLLSTÄNDIG)
+3. Start onboarding (5 questions, ~ein Augenblick)
 4. Answer questions (type "cancel" anytime to stop)
 5. Your profile is saved to `.dex/config/profile.yaml`
 
@@ -142,13 +139,10 @@ myDex/projects/ai-powerpoint/
 
 Dies ist dein persönlicher Workspace in DexHub. Lass uns ihn einrichten!
 
-Wähle deinen Weg:
+Onboarding starten:
+🚀 5 kurze Fragen — direkt loslegen
 
-1. 🚀 SMART (4-5 Minuten, 16 Fragen)
-2. ⭐ VOLLSTÄNDIG (15-18 Minuten, 37 Fragen)
-3. ⏭️  Später (Skip for now)
-
-Deine Wahl: [1/2/3]
+(Optional: Profil später erweitern via *profile)
 ```
 
 ---
@@ -283,7 +277,7 @@ vim .dex/config/profile.yaml
 ### Restart Onboarding
 1. Type `*mydex` in dex-master
 2. Select "Onboarding starten/fortsetzen"
-3. Choose variant (SMART/VOLLSTÄNDIG)
+3. Onboarding restarts (5 questions, single canonical flow)
 4. Existing profile is backed up automatically
 
 ### Delete Profile
@@ -297,22 +291,16 @@ Next `*mydex` will trigger onboarding again.
 
 ## 📊 Profile Completion
 
-**SMART Variant** (16 questions):
-- 42% profile completion
-- Core questions only (identity, AI, workflow)
-- Fast setup, functional experience
-- Complete rest anytime
+**Single canonical Onboarding** (5 questions per 2026-04-25 D4):
+- Q0 Name
+- Q1 Language (de / en / bilingual)
+- Q3 Experience level (0-2 / 3-7 / 8-15 / 15+ years)
+- Q4 Team size (solo / small / medium / large)
+- Q43 Data-handling policy (the P0 enterprise gate: local_only / lan_only / cloud_llm_allowed / hybrid)
 
-**VOLLSTÄNDIG Variant** (37 questions):
-- 100% profile completion
-- Deep personalization (company, tech stack, growth, vision)
-- Role-specific agent behavior
-- Full DexHub potential
-
-**Progressive Enhancement:**
-- Start with SMART (16q)
-- Complete later via `*onboarding`
-- Profile percentage grows as you answer more
+**Progressive Enhancement (post-onboarding):**
+- Extend profile via `*profile` editing — fields formerly part of VOLLSTÄNDIG variant (Q40-41 + Q44-49) remain reachable
+- Profile percentage grows as you fill more fields manually
 
 ---
 
