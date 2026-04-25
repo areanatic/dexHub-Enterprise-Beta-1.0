@@ -1,10 +1,12 @@
-# Onboarding v5.0 Design Document
+# Onboarding Design Document
 
-**Phase:** 5.1.b
-**Status:** DESIGN shipped 2026-04-19, implementation (mydex-agent wiring) pending
-**Author:** Claude Opus 4.7 (this session) + pre-work from Opus 4.7 (d4782d0 commit)
-**Supersedes:** none (additive alongside v4.3)
+**Status:** Updated 2026-04-25 (D4) — single canonical onboarding (5 questions). Original v5.0 3-variant design (MINIMAL/SMART/VOLLSTÄNDIG) collapsed per user direktive "Es gibt nur ein Onboarding".
+**Phase:** 5.1.b (originally) / D4 consolidation (2026-04-25)
+**Author:** Claude Opus 4.7 (original) + Opus 4.7 (D4 consolidation)
+**Supersedes:** v4.3 (3-variant) and v5.0-experimental (also 3-variant). The single-onboarding design described here IS the canonical 1.0+ flow.
 **Companion file:** `.dexCore/_cfg/onboarding-questions.yaml`
+
+> **D4 NOTE (2026-04-25):** This doc historically described a 3-variant model (MINIMAL/SMART/VOLLSTÄNDIG) plus a 4-layer information architecture (Layer A/B/C/D). The current canonical onboarding is just **Layer A (5 questions)**. Layers B/C remain deferred to Phase 5.2+ as documented. Layer D (VOLLSTÄNDIG opt-in survey) was retired — its question set (Q40-41 + Q44-49) moved to *profile editing post-onboarding. Sections below that describe the variant model are kept as historical context for ADR-trail purposes; the canonical truth is in `metadata.onboarding` of `onboarding-questions.yaml`.
 
 ---
 

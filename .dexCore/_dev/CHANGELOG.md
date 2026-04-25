@@ -2,6 +2,33 @@
 
 > Development changelog for DexHub Enterprise Beta
 
+## [Unreleased] — 2026-04-25 (Session 11 D4 — Onboarding Consolidation)
+
+### Removed (3-variant onboarding model)
+- `onboarding.minimal_v5` (was enabled — 2 questions: language + data-handling)
+- `onboarding.vollstandig_v5` (was enabled — 12 questions: SMART + 7 enterprise + 2 custom-instruction)
+- `*mydex-minimal` and `*mydex-advanced` deprecated aliases (still routed by mydex-agent.md handlers, redirect to single onboarding with deprecation note)
+
+### Renamed
+- `onboarding.smart_v5` → `onboarding.standard` (in features.yaml + ENTERPRISE-COMPLIANCE.md + PLATFORM-POLICY.md + 4 quality.walkthrough_* depends_on chains)
+
+### Changed
+- `onboarding-questions.yaml` metadata: `variants` block (3 variants) → `onboarding` block (single canonical: `question_count: 5, questions: [0, 1, 3, 4, 43]`). Plus new `post_onboarding` block listing Q40-41 + Q44-49 as fields reachable via *profile editing.
+- `mydex-agent.md`: 3 prompt blocks (`onboarding-minimal/smart/complete`) → 1 canonical `<prompt id="onboarding">`. Legacy IDs preserved as redirect-stubs that inform user "MINIMAL/SMART/VOLLSTÄNDIG sind weg" + execute the canonical onboarding.
+- `mydex-agent.md` `show-onboarding-menu`: 6-item variant-choice menu → 4-item simple menu (Onboarding starten / Einzelne Fragen Coming-V1.1.3 / YAML edit / Back).
+- `mydex-agent.md` `<onboarding_execution>` Step 3: "Variant Selection" → "Start Onboarding" (loads `metadata.onboarding.questions` from YAML, no variant filter).
+- `validate.sh` §16: 3 hardcoded greps for variant prompt-IDs → 1 grep matching `prompt id="onboarding[-"]` (tolerates canonical + legacy IDs).
+- `tests/e2e/01-onboarding-smart.test.sh`: banner + assertions adapted to single-onboarding YAML structure (resolves prior YAML-navigation breakage that caused this test to be one of the 5 failing E2E).
+- Public docs (README, myDex/README, FIRST-5-MIN, dex-master `*about`, SKILL.md): all variant-choice references replaced with single-onboarding language.
+- Internal docs (ONBOARDING-DESIGN, PLATFORM-POLICY): updated to reference single canonical flow; ONBOARDING-DESIGN preserves variant model as historical context with explicit superseded-banner.
+- features.yaml `counts:` block: total 85 → 83, enabled 58 → 56 (-2 enabled features removed).
+
+### Migration (existing profiles)
+- Existing profiles with `onboarding.variant: "smart_v5"` (or `"minimal_v5"` / `"vollstandig_v5"`) remain valid — schema does not enum-restrict the variant field. Future profile writes use `"standard"`.
+
+### Why
+User direktive 2026-04-25: *"Es gibt nur ein Onboarding, keine minimale oder große. Mach es und dann bist du angeboardet."* Mandatory-onboarding gate is a planned 1.0.1+ feature.
+
 ## [1.0.0] — 2026-04-22 🎉 First public Beta 1.0 release
 
 Session 10 ships 13 atomic commits closing Phase 1 + Phase 3-7 of the

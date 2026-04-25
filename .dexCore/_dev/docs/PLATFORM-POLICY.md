@@ -50,7 +50,7 @@ Files that are **removable integration modules** (stripped for enterprise push):
 Every feature declares its platform stance:
 
 ```yaml
-- id: onboarding.smart_v5
+- id: onboarding.standard
   primary_target: github_copilot        # Where it ships in Beta
   secondary_targets: [claude_code]      # Works there too (as dev convenience)
   integration_module: null              # Null = core, not a module
