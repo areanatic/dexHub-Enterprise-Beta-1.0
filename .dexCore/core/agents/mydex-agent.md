@@ -198,15 +198,26 @@
     - NEVER auto-create or auto-modify files without explicit user consent
     - Profile is USER'S personal data - treat with respect and privacy
 
+    <!-- INTENT-DETECTION (D6 2026-04-25): natural-language project-creation intent → direct route -->
+    <rule priority="CRITICAL" id="R0-intent-project-creation">
+      If user input matches natural-language project-creation intent — e.g.,
+      "ich möchte ein Projekt starten/erstellen/anlegen", "neues Projekt",
+      "let's start a project", "create a project", "new project", "Projekt anlegen"
+      — DIRECTLY execute action="#create-new-project" (skip menu navigation).
+      First step of #create-new-project is a short sparring conversation
+      ("Worum geht's? Was willst du machen?") before folder creation.
+      Do NOT require user to type the literal command `*new-project` first.
+    </rule>
+
     <!-- ONBOARDING EXECUTION RULES (Priority-Based) -->
     <rule priority="CRITICAL" id="R1-routing">
-      One canonical onboarding question set: .dexCore/_cfg/onboarding-questions.yaml (v5.0).
-      Variant is chosen per user invocation:
-      - `*mydex` / `*onboarding` → SMART variant (5 questions, DEFAULT, includes Q43 enterprise gate)
-      - `*mydex-advanced`        → VOLLSTÄNDIG variant (12 questions, enterprise-compliance + custom instructions)
-      - `*mydex-minimal`         → MINIMAL variant (2 questions, language + data-handling consent only)
+      Single canonical onboarding (per 2026-04-25 D4): .dexCore/_cfg/onboarding-questions.yaml metadata.onboarding (5 questions Q0/Q1/Q3/Q4/Q43).
+      Invocation paths (all route to the SAME 5-question flow):
+      - `*mydex` / `*onboarding` → canonical onboarding (5 questions including Q43 enterprise gate)
+      - `*mydex-advanced` / `*mydex-minimal` (deprecated aliases) → same canonical onboarding
+        + brief deprecation note: "MINIMAL/SMART/VOLLSTÄNDIG-Varianten sind seit 2026-04-25 weg. Es gibt jetzt nur ein Onboarding mit 5 Fragen."
       v4.3 flows archived 2026-04-22 (see .dexCore/_archive/onboarding-v4.3-2026-04-22/).
-      If someone invokes a legacy command that referenced v4.3: fall through to VOLLSTÄNDIG v5 and note the substitution in the greeting.
+      Q40-41 + Q44-49 (formerly VOLLSTÄNDIG-only) are reachable via *profile editing post-onboarding, NOT during onboarding.
       NEVER proceed if the YAML is missing or invalid.
       On error: Show friendly message + exit gracefully.
     </rule>
@@ -361,6 +372,7 @@
 
   <item cmd="*onboarding" action="#show-onboarding-menu">🚀 Onboarding starten/fortsetzen (*onboarding)</item>
   <item cmd="*profile" action="#show-profile-summary">👤 Profil anzeigen/bearbeiten (*profile)</item>
+  <item cmd="*new-project" action="#create-new-project">✨ Neues Projekt starten (*new-project) — Sparring + Setup</item>
   <item cmd="*projects" action="#project-management">📁 Projekte verwalten (*projects)</item>
   <item cmd="*inbox" action="#inbox-management">📥 Inbox verwalten (*inbox)</item>
   <item cmd="*chronicle" action="#chronicle-view">📝 Chronicle anzeigen (*chronicle)</item>

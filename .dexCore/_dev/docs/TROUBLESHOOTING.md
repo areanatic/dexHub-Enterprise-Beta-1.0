@@ -114,14 +114,21 @@ Funktioniert's immer noch nicht? Sag dem Agent direkt: "Bitte auf Deutsch antwor
 
 ---
 
-### `@mydex create-project` → "Kein Projekt erstellt"
+### "Ich möchte ein Projekt starten" → wo finde ich das?
 
-**Ursachen:**
+`@mydex create-project` als Direkt-Befehl existiert nicht (das war ein Doku-Drift). Der reale Pfad heute ist über das Menü:
+
+1. `@mydex` aktivieren → myDex-Agent zeigt sein Menü
+2. Wähle Menüpunkt **🚀 Neues Projekt** (Sub-Menu öffnet sich) — oder direkt natürlich-sprachlich sagen "Ich möchte ein Projekt starten"
+3. Agent fragt nach Project-Name + kurzem Sparring (Worum geht's? Was willst du machen?)
+4. Agent erstellt `myDex/projects/{name}/.dex/` Skeleton + initialen Draft
+
+**Wenn nichts passiert:**
 1. `myDex/projects/` existiert nicht als Ordner → (seit Beta 1.0 existiert das Skeleton; falls nicht: `mkdir myDex/projects/`)
 2. Agent hat Schreib-Permission-Problem → prüfe ob du `.gitignore`-Exception für dein neues Projekt brauchst
 3. Consent-Gate noch nicht durchlaufen — Agent fragt vor dem Schreiben um Bestätigung (G5)
 
-**Fix:** `@dex-master *features` → prüfe ob `mydex.project_management` enabled ist.
+**Geplant für 1.0.1+:** DexMaster Intent-Detection — du tippst "ich möchte ein Projekt starten" auf DexMaster-Ebene, und DexMaster routet dich direkt zu `#create-new-project` ohne Menü-Klicks.
 
 ---
 
