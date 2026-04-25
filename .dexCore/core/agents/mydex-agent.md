@@ -338,9 +338,9 @@
          → Maßgeschneiderte AI-Experience
 
       **Waehle deinen Weg:**
-      ⚡ MINIMAL (30 Sek, 2 Fragen) - Sofort loslegen
-      🚀 SMART (60-90 Sek, 5 Fragen) - DEFAULT, balanced
-      ⭐ VOLLSTAENDIG (3-5 Min, 12 Fragen) - Enterprise-Compliance + Custom-Instructions
+      ⚡ MINIMAL (kurz, 2 Fragen) - Sofort loslegen
+      🚀 SMART (5 Fragen) - DEFAULT, balanced
+      ⭐ VOLLSTAENDIG (12 Fragen, etwas länger) - Enterprise-Compliance + Custom-Instructions
 
       👇 Waehle **Onboarding** im Menue unten!
       ═══════════════════════════════════════════════════════════
@@ -1381,9 +1381,9 @@ DexHub kennt jetzt deine Ziele, Challenges und Präferenzen.
 Dein Profil ist zu {profile.completion}% vollständig.
 {/if}
 
-1. ⚡ MINIMAL (30 Sek, 2 Fragen) — Sofort loslegen
-2. 🚀 SMART (60-90 Sek, 5 Fragen) — DEFAULT, balanced
-3. ⭐ VOLLSTAENDIG (3-5 Min, 12 Fragen) — Enterprise-Compliance + Custom-Instructions
+1. ⚡ MINIMAL (kurz, 2 Fragen) — Sofort loslegen
+2. 🚀 SMART (5 Fragen) — DEFAULT, balanced
+3. ⭐ VOLLSTAENDIG (12 Fragen, etwas länger) — Enterprise-Compliance + Custom-Instructions
 4. ✏️  Einzelne Fragen beantworten (waehle Kategorie)
 5. 📄 Profil manuell bearbeiten (YAML oeffnen)
 6. 🔙 Zurueck zum myDex Menue
@@ -1584,7 +1584,7 @@ Was möchtest du tun?
 
   <step n="3" title="Variant Selection">
     <action>Display welcome prompt (from <prompt id="first_time_welcome">)</action>
-    <ask>User wählt MINIMAL (2 Fragen, 30 Sek) / SMART (5 Fragen, 60-90 Sek, DEFAULT) / VOLLSTÄNDIG (12 Fragen, 3-5 Min)</ask>
+    <ask>User wählt MINIMAL (2 Fragen, kurz) / SMART (5 Fragen, DEFAULT) / VOLLSTÄNDIG (12 Fragen, etwas länger)</ask>
     <action>Parse user input: accept "1", "smart", "SMART" OR "2", "vollständig", "VOLLSTÄNDIG", "complete"</action>
     <action>Filter questions: Load questions WHERE variants contains {selected_variant}</action>
     <action>Store: selected_variant, questions_count</action>
