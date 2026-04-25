@@ -1,7 +1,10 @@
 # DexHub Developer Profile
-# Generated from myDex Onboarding (v4.3.1 SMART | v5.0 SMART/VOLLSTÄNDIG)
+# Generated from myDex Onboarding (single canonical 5-question flow per 2026-04-25 D4)
 # Schema: profile-schema-v1.0.yaml (current active version: 1.2 as of 2026-04-20)
 # Copy this to profile.yaml after running onboarding
+# Fields commented "optional via *profile" are not asked during the canonical
+# 5-question onboarding (Q0/Q1/Q3/Q4/Q43); they remain in the schema and are
+# reachable via *profile editing post-onboarding (former optional via *profile-only fields).
 
 # TOP-LEVEL METADATA
 version: "1.2"
@@ -22,7 +25,7 @@ technical:
 
 # CATEGORY 2: Tech Stack (Q22)
 tech:
-  primary_stack:                     # Q22 - VOLLSTÄNDIG only, max 3
+  primary_stack:                     # Q22 - optional via *profile, max 3
     - typescript
     - react
     - python
@@ -41,11 +44,11 @@ ai:
   tools_used:                        # Q15 - Multiple selections allowed
     - chatgpt
     - github_copilot
-  concerns:                          # Q16 - VOLLSTÄNDIG only, max 3
+  concerns:                          # Q16 - optional via *profile, max 3
     - quality_trust
     - productivity_pressure
-  skill_goal: "prompt_engineering"   # Q17 - VOLLSTÄNDIG only
-  transformation_expectation: "automated_routine"  # Q17a - VOLLSTÄNDIG only
+  skill_goal: "prompt_engineering"   # Q17 - optional via *profile
+  transformation_expectation: "automated_routine"  # Q17a - optional via *profile
 
 # CATEGORY 4: Communication (NEW in EA-1.0 - Aliases + formality)
 communication:
@@ -60,7 +63,7 @@ identity:
   team_size: "small"                 # Q4 - solo|small|medium|large
 
 # CATEGORY 6: Company & Team
-# v1.0 fields (Q5-Q13 from v4.3.1 VOLLSTÄNDIG)
+# v1.0 fields (Q5-Q13 from v4.3.1 optional via *profile)
 # v1.1 fields (Q43-Q49 from v5.0 — enterprise compliance)
 company:
   # v1.0 culture/team context (legacy, v4.3.1 opt-in)
@@ -69,51 +72,51 @@ company:
     - knowledge_not_documented
     - too_many_meetings
   ai_culture: "supported"            # Q7 - championed|supported|neutral|skeptical|blocked
-  time_wasted_on:                    # Q8 - VOLLSTÄNDIG only, max 3
+  time_wasted_on:                    # Q8 - optional via *profile, max 3
     - meetings
     - legacy_code
     - unclear_requirements
-  productivity_use:                  # Q9 - VOLLSTÄNDIG only, max 2
+  productivity_use:                  # Q9 - optional via *profile, max 2
     - improve_quality
     - work_life_balance
-  skill_gaps:                        # Q10 - VOLLSTÄNDIG only, max 2
+  skill_gaps:                        # Q10 - optional via *profile, max 2
     - ai_tool_competence
     - critical_thinking
-  ai_adoption_driver: "bottom_up"    # Q11 - VOLLSTÄNDIG only
-  ai_breakthrough_needs:             # Q12 - VOLLSTÄNDIG only, max 2
+  ai_adoption_driver: "bottom_up"    # Q11 - optional via *profile
+  ai_breakthrough_needs:             # Q12 - optional via *profile, max 2
     - training
     - time
-  onboarding_duration: "1-2_months"  # Q13 - VOLLSTÄNDIG only
+  onboarding_duration: "1-2_months"  # Q13 - optional via *profile
 
   # v1.1 enterprise compliance (Q43-Q49, populated by onboarding v5.0)
   data_handling_policy: "cloud_llm_allowed"   # Q43 SMART - local_only|lan_only|cloud_llm_allowed|hybrid (P0 GATE)
-  approved_llm_providers:                      # Q44 VOLLSTÄNDIG - multi-select
+  approved_llm_providers:                      # Q44 optional via *profile - multi-select
     - ollama_local
     - copilot_enterprise
-  available_connectors:                        # Q45 VOLLSTÄNDIG - multi-select
+  available_connectors:                        # Q45 optional via *profile - multi-select
     - github_enterprise
     - atlassian_cloud
-  audit_requirements: "not_required"           # Q46 VOLLSTÄNDIG - enum
-  network_topology: "direct_internet"          # Q47 VOLLSTÄNDIG - enum
-  compliance_certifications:                   # Q48 VOLLSTÄNDIG - multi-select
+  audit_requirements: "not_required"           # Q46 optional via *profile - enum
+  network_topology: "direct_internet"          # Q47 optional via *profile - enum
+  compliance_certifications:                   # Q48 optional via *profile - multi-select
     - none
-  forbidden_git_targets: []                    # Q49 VOLLSTÄNDIG - list of URLs/patterns that must not be pushed to
+  forbidden_git_targets: []                    # Q49 optional via *profile - list of URLs/patterns that must not be pushed to
 
 # CATEGORY 7: Workflow (Q18-Q21)
 workflow:
-  time_spent_on:                     # Q18 - VOLLSTÄNDIG only, max 3
+  time_spent_on:                     # Q18 - optional via *profile, max 3
     - writing_code
     - debugging
     - meetings
   current_project_count: "2-3"       # Q18a - 1|2-3|4-6|7+|varies|no_fixed
-  ideal_work_mode: "deep_work"       # Q18b - VOLLSTÄNDIG only
-  biggest_frustration: "understanding_legacy_code"  # Q19 - VOLLSTÄNDIG only (role-based options)
+  ideal_work_mode: "deep_work"       # Q18b - optional via *profile
+  biggest_frustration: "understanding_legacy_code"  # Q19 - optional via *profile (role-based options)
   time_lost_weekly: "5-10_hours"     # Q20 - <2|2-5|5-10|10-20|20+
   extra_time_use:                    # Q21 - Max 2 selections
     - learn_new_skills
     - improve_quality
 
-# CATEGORY 8: Growth (Q25-Q26a - VOLLSTÄNDIG only)
+# CATEGORY 8: Growth (Q25-Q26a - optional via *profile)
 growth:
   learning_style:                    # Q25 - Max 2
     - interactive_sandboxes
@@ -121,13 +124,13 @@ growth:
   six_month_goal: "master_system_design"  # Q26 - Role-based options
   future_critical_skill: "creative_thinking"  # Q26a
 
-# CATEGORY 9: Zeitgeist (Q27-Q28 - VOLLSTÄNDIG only)
+# CATEGORY 9: Zeitgeist (Q27-Q28 - optional via *profile)
 zeitgeist:
   career_sentiment: "moderately_hopeful"  # Q27
   future_emotion: "optimistic"       # Q27a
   future_vision: "ai_augmented"      # Q28
 
-# CATEGORY 10: Vision (Q29-Q31 - VOLLSTÄNDIG only)
+# CATEGORY 10: Vision (Q29-Q31 - optional via *profile)
 vision:
   ai_transformation_wish: |          # Q29 - Free text
     "Legacy code is my biggest time sink. AI could help with automated refactoring suggestions and better documentation generation."
@@ -155,34 +158,30 @@ custom_instructions:
     - "Use var keyword"
     - "Commit secrets to git"
     - "Skip code reviews"
-  domain_knowledge: |                # Q42 - Max 2000 characters (VOLLSTÄNDIG only)
+  domain_knowledge: |                # Q42 - Max 2000 characters (optional via *profile)
     E-Commerce Platform for Acme Corp
     Payment processing with Stripe and PayPal
     Microservices architecture with Node.js and React
     Kubernetes deployment on AWS EKS
 
 # METADATA
-# Variant labels MUST match the loaded questions-YAML. Agent writes the
-# variant/version/question-count that corresponds to the file it walked
-# through (see mydex-agent R5-metadata rule). Valid combinations:
+# Per 2026-04-25 D4: single canonical onboarding (no variants). Agent writes:
+#   variant: "standard" (canonical 5-question flow per metadata.onboarding in YAML SOT)
+#   version: "v5.0" (semantic version of the onboarding question definition)
+#   total_questions: 5
 #
-#   Loaded file                                      | variant          | version  | total-questions
-#   -------------------------------------------------|------------------|----------|----------------
-#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | smart_v5         | v5.0     | 5
-#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | vollstandig_v5   | v5.0     | 12
-#   .dexCore/_cfg/onboarding-questions-v5.0.yaml     | minimal_v5       | v5.0     | 2
-#   .dexCore/_cfg/onboarding-questions.yaml (legacy) | smart            | v4.3.1   | 18
-#   .dexCore/_cfg/onboarding-questions.yaml (legacy) | vollständig      | v4.3.1   | 42
+# Existing profiles with variant: "smart_v5" / "minimal_v5" / "vollstandig_v5" remain valid
+# (schema does not enum-restrict the variant field). Future writes use "standard".
 #
-# completion_percentage = (questions_answered / total_for_variant) * 100.
+# completion_percentage = (questions_answered / 5) * 100.
 onboarding:
-  variant: "smart_v5"                # See table above — default path is v5.0 SMART
+  variant: "standard"                # Single canonical flow (per 2026-04-25 D4)
   started_at: "2025-11-16T10:30:00Z"  # When onboarding began
   completed_at: "2025-11-16T10:45:00Z"  # null if not finished
-  questions_answered: 5              # Count against the VARIANT's total, not a shared scale
+  questions_answered: 5              # Out of 5 canonical (Q0/Q1/Q3/Q4/Q43)
   questions_skipped: 0
-  completion_percentage: 100.0       # (answered / variant_total) × 100
-  version: "v5.0"                    # Default v5.0; legacy v4.3.1 when *mydex-advanced
+  completion_percentage: 100.0       # (answered / 5) × 100
+  version: "v5.0"                    # Onboarding-questions YAML semantic version
 
 # CATEGORY 13: Saved Consents (v1.2, added 2026-04-20)
 # Records which cloud features / connectors the user has explicitly granted consent for.
