@@ -14,7 +14,7 @@ v4.3 asks 42 questions cold (~18 minutes). Every competitor (Cursor, Copilot, Co
 
 v5.0 redesigns around a **3-layer information model**:
 
-- **Layer A — Asked (5 questions, SMART core, 60-90 seconds):** things that cannot be inferred from repo
+- **Layer A — Asked (5 questions, SMART core):** things that cannot be inferred from repo
 - **Layer B — Inferred-and-confirmed (~15-20 items):** auto-detect from repo, batch-confirm
 - **Layer C — Progressive disclosure:** ask only when the user first triggers the gating feature
 - **Layer D — VOLLSTÄNDIG as opt-in survey:** the 42-question path preserved as `*mydex-advanced`
