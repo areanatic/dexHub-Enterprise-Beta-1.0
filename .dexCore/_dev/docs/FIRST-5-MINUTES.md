@@ -1,160 +1,126 @@
-# Die ersten 5 Minuten mit DexHub
+# First 5 Minutes with DexHub
 
-**Voraussetzung:** Du hast die [Installation](INSTALLATION.md) durchgezogen (IDE + Git + Clone + `@dex-master hi` antwortet).
+> **🌐 Language:** **EN** (this file) · [🇩🇪 DE](de/FIRST-5-MINUTES.md)
 
-Jetzt lernst du DexHub in 5 Minuten real kennen — am echten Beispiel.
+**Prerequisite:** You completed [Installation](INSTALLATION.md) (IDE + Git + Clone + `@dex-master hi` responds).
 
----
-
-## Minute 1: Dein Profil anlegen (SMART Onboarding)
-
-In deinem IDE-Chat:
-```
-@mydex hi
-```
-
-Du wirst durch **SMART v5** geführt — **5 kurze Fragen** (ein Augenblick):
-
-1. **Wie möchtest du angesprochen werden?** (dein Name)
-2. **Bevorzugte Sprache?** (Deutsch / English / Bilingual)
-3. **Wie viele Jahre Erfahrung?** (beeinflusst die Agent-Kommunikation)
-4. **Teamgröße + Kontext?** (Solo / Start-up / Enterprise — beeinflusst Empfehlungen)
-5. **Data-Handling-Policy?** (Enterprise-Gate: welche LLMs / Connectors darfst du nutzen?)
-
-Deine Antworten landen in `myDex/.dex/config/profile.yaml`. Nur lokal auf deinem Rechner. Kannst du später jederzeit ändern: `@mydex` → Menüpunkt `*mydex-profile`.
-
-> **Profil erweitern?** Per `*profile` editing erreichst du zusätzliche Felder (Enterprise-Compliance Q44-Q49, Custom-Instructions Q40-Q41) — die sind nicht Teil des Onboardings, sondern als optionale Felder verfügbar.
+Now let's get to know DexHub in 5 minutes — through real examples.
 
 ---
 
-## Minute 2: Den Hub kennenlernen
-
-```
-@dex-master hi
-```
-
-Du siehst das **DexMaster-Menü**. DexMaster ist nicht selber ein Agent-Arbeiter — er ist der **Wegweiser**. Er zeigt dir:
-
-- Welche **Agenten** verfügbar sind (`*list-agents`)
-- Welche **Workflows** es gibt (`*list-workflows`)
-- Welche **Feature-Flags** aktiv sind (`*features`)
-- Welche **Agent-Packs** togglebar sind (`*packs`)
-
-> **Skills** (12 Wissenspakete in `.github/skills/`) werden automatisch von Copilot/Claude geladen wenn sie zum Kontext passen. Strukturierte Übersicht via `@dex-master *list-skills`.
-
-Probier's: `@dex-master *list-agents`. Du siehst eine strukturierte Liste mit menschlichen Namen (Mona, Jana, Kalpana, Yamuna etc.) + technischen Commands (`@ux`, `@analyst`, `@testarch-pro`, `@atlas`).
-
----
-
-## Minute 3: Einen Agenten direkt sprechen
-
-Agenten sind wie Fach-Kolleginnen und -Kollegen mit Persona + Expertise. Beispiel:
-
-```
-@analyst hi
-```
-
-Du triffst **Jana**, die Business Analyst. Sie stellt sich vor, fragt dich was du brauchst. Ihre Antworten sind **strukturiert** (Liste, Tabelle), **spezialisiert** (BA-Vokabular, Framework-Denken), und **aktionsorientiert** (sie schlägt Workflows vor).
-
-Weitere Personas zum Ausprobieren:
-
-| Command | Name | Rolle |
-|---|---|---|
-| `@pm` | Martin | Product Manager |
-| `@ux` | Mona | UX Designer |
-| `@architect` | Alex | Software Architect |
-| `@dev` | Steffi | Developer |
-| `@sm` | Arjun | Scrum Master |
-| `@testarch-pro` | Kalpana | Test Automation Architect |
-| `@atlas` | Yamuna | Knowledge Reconstruction Expert |
-
-**Tipp:** Jeder Agent bleibt in seiner Rolle bis du `*exit` sagst oder einen anderen Agent lädst. DexMaster führt dich zurück mit `@dex-master hi`.
-
----
-
-## Minute 4: Einen Workflow laufen lassen
-
-Workflows sind **geführte Abläufe** (PRD schreiben, Architektur-Analyse, Code-Review-Session etc.). Beispiel:
-
-```
-@analyst *product-brief
-```
-
-Jana führt dich durch den **Product Brief Workflow**: Fragen zum Zielmarkt, Problem-Statement, User-Persona, Success Metrics. Am Ende hast du ein strukturiertes Markdown-Dokument, das in `myDex/drafts/` oder (wenn du ein Projekt angelegt hast) direkt in `myDex/projects/{dein-projekt}/.dex/1-analysis/` landet.
-
-DexHub hat **46 Workflows** über 5 Phasen:
-- **1-Analysis:** Product-Brief, Brainstorm, Research, Market-Analysis, …
-- **2-Planning:** PRD, Epic-Breakdown, Tech-Spec, Sprint-Planning, …
-- **3-Solutioning:** Architecture, UX-Design, Solutioning-Gate, …
-- **4-Testing:** Test-Strategy, Framework-Generation, Quality-Gates, …
-- **5-Implementation:** Create-Story, Dev-Story, Code-Review, …
-
-Siehe `@dex-master *list-workflows`.
-
----
-
-## Minute 5: Ein Projekt anlegen
-
-Bisher lagen deine Outputs in `myDex/drafts/` (oder `docs/` je nach Workflow — siehe `dxm/config.yaml`). Sobald du ernst wirst:
+## Minute 1: Set up your profile (Onboarding)
 
 ```
 @mydex
-*projects
 ```
 
-Im Projekt-Management-Menü wählst du **1. Neues Projekt erstellen**. Du bekommst ein **strukturiertes Projekt-Workspace**:
-```
-myDex/projects/dein-projekt/
-├── src/               ← dein Code
-└── .dex/              ← alle Projekt-Metadaten
-    ├── inputs/
-    ├── 1-analysis/
-    ├── 2-planning/
-    ├── 3-solutioning/
-    ├── 4-implementation/
-    ├── chronicle/     ← tägliche Session-Logs
-    ├── decisions/     ← ADRs
-    └── INDEX.md
-```
+DexHub's myDex agent activates and offers the canonical onboarding (5 short questions):
 
-Von jetzt ab routen alle Workflow-Outputs automatisch in diesen Projekt-Ordner. Jeder Agent, den du mit `@...` aufrufst, nutzt den Kontext des aktiven Projekts.
+1. **Name** — How should we call you?
+2. **Language** — DE / EN / Bilingual
+3. **Experience** — Your years in your field
+4. **Team Size** — Solo / Small / Medium / Large
+5. **Data-Handling Policy** — The Enterprise Compliance gate (which LLMs / connectors can you use?)
 
-Im selben `@mydex` → `*projects` Menü:
-- **2. Projekt wechseln** (zwischen mehreren Projekten)
-- **3. Projekt-Info anzeigen** (aktueller Status)
-- **4. Projekt nachrüsten** (existierenden Code-Ordner um `.dex/` erweitern)
-- **5. Migrations-Hilfe** (alte Projekt-Strukturen aktualisieren)
+Your answers go into `myDex/.dex/config/profile.yaml`. Local on your machine only. You can change anytime: `@mydex` → menu item `*profile`.
+
+> **Want to extend your profile?** Via `*profile` editing you reach additional fields (Enterprise Compliance Q44–Q49, Custom Instructions Q40–Q41) — those aren't part of onboarding but available as optional fields.
 
 ---
 
-## Was als nächstes?
+## Minute 2: Meet the hub
 
-- **Dokumenten-Parser aktivieren:** Du hast Kreuzberg + Ollama installiert? `@dex-master *inbox` zieht PDFs, Word-Dokumente, Screenshots etc. in dein Wissen-Tank.
-- **Jira / Confluence verbinden:** `@atlassian-onboarding hi` (braucht deine Firma-URL + Token)
-- **Skills entdecken:** Die 12 Wissenspakete liegen in `.github/skills/`. Sie werden auto-geladen von Copilot/Claude wenn passend (Guardrails, Chronicle, DHL DS, etc.). Strukturierte Übersicht via `@dex-master *list-skills`.
-- **Agent-Packs togglen:** `@dex-master *packs` → aktiviere/deaktiviere Agent-Pakete je nach Arbeitsmodus (z.B. Meta-Agents nur bei Brownfield-Arbeit)
+```
+@dex-master *help
+```
+
+You see DexMaster's full menu. The structure:
+
+- **`*mydex`** — your personal workspace
+- **`*list-agents`** — the 46 specialized AI agents (filterable by enabled packs)
+- **`*list-workflows`** — 46 structured workflows (Analysis → Planning → Solutioning → Implementation)
+- **`*list-skills`** — the 12 lazy-loaded knowledge packs
+- **`*features`** — feature registry (what's enabled / deferred / known-broken)
+- **`*packs`** — toggle agent groups on/off
+- **`*inbox`** — auto-process files dropped into `myDex/inbox/`
+- **`*council-mode`** — multi-agent collaboration
+- **`*about`** — what is DexHub
+
+> **Tip:** Skills (12 knowledge packs in `.github/skills/`) are auto-loaded by Copilot/Claude when contextually relevant. Structured overview via `@dex-master *list-skills`.
 
 ---
 
-## Stolperfallen in den ersten 5 Minuten
+## Minute 3: Run a workflow
 
-| Problem | Fix |
-|---|---|
-| `@dex-master hi` zeigt kein Menü | Du bist in Code-Modus — sag einfach "hi" oder "hallo" nochmal |
-| Agent antwortet in falscher Sprache | `@mydex *mydex-profile` → Sprache anpassen, neu laden |
-| Workflow läuft nicht | Prüfe: bist du in einem Projekt? `@mydex status` |
-| `myDex/projects/` ist leer | Normal bei Erstinstallation — leg ein Projekt an (siehe Minute 5) |
+```
+@analyst
+```
 
-Mehr in [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+The Business Analyst (Jana) activates. She offers her menu — pick a workflow like "Brainstorm Project" or "Create PRD". Each workflow walks you step-by-step through structured output generation (templates + validation).
+
+Output lands in `myDex/drafts/` by default. Once you're happy with a draft, promote it to a project via `@mydex *projects`.
 
 ---
 
-## Merke dir diese 3 Commands
+## Minute 4: Start a real project
+
+Two paths:
+
+**A) Natural language:**
+```
+@mydex
+ich möchte ein Projekt starten
+```
+(or in EN: "I want to start a project")
+
+myDex catches the intent, opens a sparring conversation ("What's it about? What do you want to build?"), then creates the project structure.
+
+**B) Menu:**
+```
+@mydex
+*new-project
+```
+
+Either way you end up with `myDex/projects/{name}/.dex/` containing the structured 12-folder skeleton (analysis / planning / solutioning / implementation / chronicle / etc.).
+
+---
+
+## Minute 5: See what's there + what's coming
 
 ```
-@dex-master hi           ← Wegweiser, Menü, zurück-zur-Basis
-@mydex                   ← Profil verwalten, Projekte verwalten (Menü)
-*list-agents             ← alle verfügbaren Fach-Kollegen
+@dex-master *features
 ```
 
-Alles andere ergibt sich. Viel Spaß mit deinem KI-Team.
+Honest view of every capability — what's `enabled` and tested today, what's `deferred` to 1.1+, what's known-broken with workarounds.
+
+Want to inspect a specific feature deeper? See `.dexCore/_cfg/features.yaml`.
+
+```
+@dex-master *list-workflows
+```
+
+Shows all 46 workflows organized by phase. Pick one and the related agent will guide you.
+
+```
+@dex-master *list-skills
+```
+
+Shows the 12 knowledge packs grouped by category (DexHub Core / Operations / DHL Design System).
+
+---
+
+## Where to go next
+
+- **Build your first custom agent:** `@dex-builder` (DexBuilder — agent-creation workflow)
+- **Multi-agent expert collaboration:** `*council-mode`
+- **Process documents end-to-end:** drop files into `myDex/inbox/`, then `*inbox` (router + extract + ingest)
+- **Set up Atlassian / GitHub / Figma connectors:** see `*packs` → `onboarding_pack`
+
+For deeper documentation:
+- [FAQ](FAQ.md) — frequently asked questions
+- [Troubleshooting](TROUBLESHOOTING.md) — symptom → cause → fix
+- [Enterprise Compliance Matrix](ENTERPRISE-COMPLIANCE.md) — per-feature compliance stance
+
+---
+
+**Want the full German version with extended examples?** See [`de/FIRST-5-MINUTES.md`](de/FIRST-5-MINUTES.md).

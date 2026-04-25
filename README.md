@@ -38,12 +38,14 @@ Open in VS Code with GitHub Copilot Enterprise. Type `@dex-master hi`. Done.
 
 Works with any AI-capable IDE (Copilot, Cursor, Windsurf, Anthropic CLI, JetBrains, etc.).
 
-### Getting-Started Docs (für Non-Devs)
+### Getting-Started Docs
 
-- 📦 **[INSTALLATION.md](.dexCore/_dev/docs/INSTALLATION.md)** — Schritt-für-Schritt für Non-Devs (IDE-Wahl, Git, optionale Parser + lokale KI, Disk-Budget)
-- 🚀 **[FIRST-5-MINUTES.md](.dexCore/_dev/docs/FIRST-5-MINUTES.md)** — Die ersten 5 Minuten nach der Installation (Profil, Agenten treffen, Workflow laufen lassen, Projekt anlegen)
-- ❓ **[FAQ.md](.dexCore/_dev/docs/FAQ.md)** — "Was heißt Data-Local?", "Welches LLM?", "Wie viel Platz?", "Eigene Agenten?"
-- 🔧 **[TROUBLESHOOTING.md](.dexCore/_dev/docs/TROUBLESHOOTING.md)** — "@dex-master antwortet nicht", "Ollama Port 11434 belegt", Validate-FAILs erklärt, Git-Push-rejected
+> **🌐 Language:** Primary docs are in **English**. German companion versions are linked at the top of each EN doc.
+
+- 📦 **[INSTALLATION.md](.dexCore/_dev/docs/INSTALLATION.md)** ([🇩🇪 DE](.dexCore/_dev/docs/de/INSTALLATION.md)) — Step-by-step for Non-Devs (IDE choice, Git, optional parser + local AI, disk budget)
+- 🚀 **[FIRST-5-MINUTES.md](.dexCore/_dev/docs/FIRST-5-MINUTES.md)** ([🇩🇪 DE](.dexCore/_dev/docs/de/FIRST-5-MINUTES.md)) — First 5 minutes after install (profile, meet agents, run workflow, start project)
+- ❓ **[FAQ.md](.dexCore/_dev/docs/FAQ.md)** ([🇩🇪 DE](.dexCore/_dev/docs/de/FAQ.md)) — "What does Data-Local mean?", "Which LLM?", "How much disk?", "Custom agents?"
+- 🔧 **[TROUBLESHOOTING.md](.dexCore/_dev/docs/TROUBLESHOOTING.md)** ([🇩🇪 DE](.dexCore/_dev/docs/de/TROUBLESHOOTING.md)) — "@dex-master no response", "Ollama port 11434 in use", Validate FAILs explained, git-push rejected
 
 ---
 
