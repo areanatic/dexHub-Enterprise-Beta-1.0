@@ -337,10 +337,8 @@
          → Rollenspezifische Unterstützung
          → Maßgeschneiderte AI-Experience
 
-      **Waehle deinen Weg:**
-      ⚡ MINIMAL (kurz, 2 Fragen) - Sofort loslegen
-      🚀 SMART (5 Fragen) - DEFAULT, balanced
-      ⭐ VOLLSTAENDIG (12 Fragen, etwas länger) - Enterprise-Compliance + Custom-Instructions
+      **Onboarding starten:**
+      🚀 Onboarding (5 kurze Fragen) — direkt loslegen
 
       👇 Waehle **Onboarding** im Menue unten!
       ═══════════════════════════════════════════════════════════
@@ -1216,134 +1214,40 @@ C) Zurück
 
 <!-- ====================================== -->
 
-<!-- ONBOARDING: MINIMAL Variant (5 Questions, 30 seconds) -->
+<!-- ONBOARDING: Single canonical flow (D4 2026-04-25 — 5 questions, no variants) -->
+<prompt id="onboarding">
+🚀 **Onboarding gestartet!** (5 kurze Fragen)
+
+Ich stelle dir jetzt 5 essenzielle Fragen für dein Profil. Du kannst jederzeit "cancel" tippen, um abzubrechen.
+
+**EXECUTION:**
+Now execute the canonical onboarding flow from the <onboarding_execution> section below:
+1. Load questions from .dexCore/_cfg/onboarding-questions.yaml
+2. Use metadata.onboarding.questions list (canonical 5 IDs: [0, 1, 3, 4, 43] = name, language, experience, team_size, data_handling_policy)
+3. Present questions interactively one-by-one — wait for each answer before asking the next
+4. Generate myDex/.dex/config/profile.yaml with the answered fields + computed completion percentage
+5. After all 5 answered: confirm and return to DexMaster
+
+Do NOT show hardcoded questions here — execute the real flow from the YAML SOT.
+Do NOT ask further questions beyond the 5 canonical ones (Q40-41 + Q44-49 are reachable via *profile editing post-onboarding, NOT during onboarding).
+</prompt>
+
+<!-- DEPRECATED ALIAS HANDLERS (legacy onboarding-minimal/smart/complete IDs preserved for transition) -->
+<!-- Per D4 2026-04-25: 3-variant model retired. These IDs redirect to the canonical onboarding. -->
 <prompt id="onboarding-minimal">
-⚡ **Minimal-Profil — 5 Fragen, 30 Sekunden!**
-
-Stelle diese 5 Fragen nacheinander. Warte auf JEDE Antwort bevor du die naechste stellst.
-
-**Frage 1/5 — Name**
-Wie soll ich dich nennen?
-
-**Frage 2/5 — Sprache**
-In welcher Sprache sollen wir arbeiten?
-a) Deutsch
-b) English
-
-**Frage 3/5 — Rolle**
-Was beschreibt dich am besten?
-a) Developer / Engineer
-b) Designer (UX/UI)
-c) Product Manager / Owner
-d) Architect
-e) Analyst / Consultant
-f) Team Lead / Manager
-g) Anderes (bitte angeben)
-
-**Frage 4/5 — Erfahrung**
-Wie viel Erfahrung hast du in deiner Rolle?
-a) Junior (0-2 Jahre)
-b) Mid-Level (3-5 Jahre)
-c) Senior (5+ Jahre)
-
-**Frage 5/5 — AI-Erfahrung**
-Wie oft nutzt du AI-Tools im Arbeitsalltag?
-a) Selten / Gerade erst angefangen
-b) Regelmaessig (Copilot, ChatGPT, etc.)
-c) Power User / AI-First Workflow
-
-**NACH ALLEN 5 ANTWORTEN:**
-
-1. Erstelle `myDex/.dex/config/profile.yaml` mit:
-```yaml
-# DexHub Minimal Profile
-profile_version: "1.0"
-created_via: "minimal-onboarding"
-created_at: "{current_datetime}"
-
-personalization:
-  name: "{antwort_1}"
-  language: "{antwort_2}"
-
-identity:
-  role: "{antwort_3}"
-  experience_level: "{antwort_4}"
-
-ai:
-  readiness_level: "{antwort_5}"
-
-completeness:
-  overall: 14
-  answered_questions: 5
-  total_questions: 37
-  variant: "minimal"
-```
-
-2. Zeige Bestaetigung:
-```
-⚡ **Profil erstellt!** Willkommen, {name}!
-
-DexHub kennt jetzt:
-→ {rolle} ({erfahrung})
-→ AI-Level: {ai_level}
-→ Sprache: {sprache}
-
-**Jetzt loslegen:**
-- Sag *help fuer das DexHub-Menue
-- Oder frag direkt: "Hilf mir bei meinem Projekt"
-
-💡 Profil erweitern? Jederzeit mit *mydex → Onboarding
-```
-
-3. Kehre zum DexMaster zurueck (NICHT weitere Fragen stellen!)
+This onboarding variant was retired 2026-04-25 (D4 single-onboarding decision).
+Redirect: execute action="#onboarding" instead.
+Inform user: "MINIMAL/SMART/VOLLSTÄNDIG sind weg — es gibt nur noch ein Onboarding (5 Fragen). Starte das jetzt."
 </prompt>
-
-<!-- ONBOARDING: SMART Variant (16 Questions) -->
 <prompt id="onboarding-smart">
-🚀 **SMART Onboarding gestartet!** (4-5 Minuten)
-
-Ich stelle dir jetzt 16 essenzielle Fragen für dein Profil. Du kannst jederzeit "cancel" tippen, um abzubrechen.
-
-**EXECUTION:**
-Now execute the complete onboarding flow from the <onboarding_execution> section below:
-1. Set variant = "smart"
-2. Follow all 6 steps from <onboarding_execution>
-3. Load questions from .dexCore/_cfg/onboarding-questions.yaml
-4. Filter questions WHERE variants contains "smart"
-5. Present questions interactively one-by-one
-6. Generate profile.yaml with calculated completion percentage
-
-Do NOT show hardcoded questions here - execute the real flow!
+This onboarding variant was retired 2026-04-25 (D4 single-onboarding decision).
+Redirect: execute action="#onboarding" instead.
+Inform user: "MINIMAL/SMART/VOLLSTÄNDIG sind weg — es gibt nur noch ein Onboarding (5 Fragen). Starte das jetzt."
 </prompt>
-
-<!-- ONBOARDING: VOLLSTÄNDIG Variant (37 Questions) -->
 <prompt id="onboarding-complete">
-⭐ **VOLLSTÄNDIG Onboarding gestartet!** (15-18 Minuten)
-
-Perfekt! Ich stelle dir alle 12 Fragen (VOLLSTÄNDIG v5), um DexHub optimal für dich einzurichten.
-
-**Kategorien:**
-1. Wer bist du? (Rolle & Erfahrung)
-2. Dein Unternehmen & Kontext
-3. Deine AI-Journey
-4. Deine tägliche Arbeit
-5. Dein Tech Stack
-6. Lernen & Wachstum
-7. AI-Zeitgeist 2025
-8. Deine Vision
-
-Los geht's! 🚀
-
-**EXECUTION:**
-Now execute the complete onboarding flow from the <onboarding_execution> section below:
-1. Set variant = "vollständig"
-2. Follow all 6 steps from <onboarding_execution>
-3. Load questions from .dexCore/_cfg/onboarding-questions.yaml
-4. Filter questions WHERE variants contains "vollständig"
-5. Present questions interactively one-by-one
-6. Generate profile.yaml with calculated completion percentage
-
-Do NOT show hardcoded questions here - execute the real flow!
+This onboarding variant was retired 2026-04-25 (D4 single-onboarding decision).
+Redirect: execute action="#onboarding" instead.
+Inform user: "MINIMAL/SMART/VOLLSTÄNDIG sind weg — es gibt nur noch ein Onboarding (5 Fragen). Starte das jetzt."
 </prompt>
 
 <!-- ONBOARDING COMPLETION SCREEN -->
@@ -1373,28 +1277,28 @@ DexHub kennt jetzt deine Ziele, Challenges und Präferenzen.
 [Weiter zum Dex Master] [Profil ansehen]
 </prompt>
 
-<!-- SHOW ONBOARDING MENU -->
+<!-- SHOW ONBOARDING MENU (D4 2026-04-25: single onboarding, no variant choice) -->
 <prompt id="show-onboarding-menu">
-**Onboarding-Optionen:**
+**Onboarding-Menü:**
 
 {if profile.completion < 100}
 Dein Profil ist zu {profile.completion}% vollständig.
 {/if}
 
-1. ⚡ MINIMAL (kurz, 2 Fragen) — Sofort loslegen
-2. 🚀 SMART (5 Fragen) — DEFAULT, balanced
-3. ⭐ VOLLSTAENDIG (12 Fragen, etwas länger) — Enterprise-Compliance + Custom-Instructions
-4. ✏️  Einzelne Fragen beantworten (waehle Kategorie)
-5. 📄 Profil manuell bearbeiten (YAML oeffnen)
-6. 🔙 Zurueck zum myDex Menue
+1. 🚀 Onboarding starten (5 kurze Fragen)
+2. ✏️  Einzelne Fragen beantworten (Coming in V1.1.3)
+3. 📄 Profil manuell bearbeiten (YAML öffnen)
+4. 🔙 Zurück zum myDex Menü
 
 Deine Wahl:
 
 <handler>
-  <if input="1|minimal|quick">Execute action="#onboarding-minimal"</if>
-  <if input="2|smart">Execute action="#onboarding-smart"</if>
-  <if input="3|vollständig|complete">Execute action="#onboarding-complete"</if>
-  <if input="3|einzeln|category">
+  <if input="1|start|onboarding|los|begin">Execute action="#onboarding"</if>
+  <if input="minimal|smart|vollständig|vollstaendig|complete|advanced">
+    Display: "ℹ️  Hinweis: MINIMAL/SMART/VOLLSTÄNDIG-Varianten sind seit 2026-04-25 weg. Es gibt jetzt nur ein Onboarding mit 5 Fragen. Starte das jetzt:"
+    Execute action="#onboarding"
+  </if>
+  <if input="2|einzeln|category">
     Display: "✏️ **Einzelne Kategorien bearbeiten** (Coming in V1.1.3)
 
     Diese Funktion erlaubt dir, gezielt einzelne Kategorien zu vervollständigen:
@@ -1407,11 +1311,11 @@ Deine Wahl:
     - Wachstum
     - Zeitgeist & Vision
 
-    Für jetzt: Nutze Option 1 oder 2 für vollständiges Onboarding."
+    Für jetzt: Nutze Option 1 für das Standard-Onboarding."
 
     Then show this menu again
   </if>
-  <if input="4|yaml|edit|bearbeiten">
+  <if input="3|yaml|edit|bearbeiten">
     Display: "📄 **Profil manuell bearbeiten**
 
     Öffne diese Datei in deinem Editor:
@@ -1421,7 +1325,7 @@ Deine Wahl:
 
     Then return to myDex main menu
   </if>
-  <if input="5|zurück|back|exit">
+  <if input="4|zurück|back|exit">
     Return to myDex main menu
   </if>
   <if input="cancel|abort|abbrechen">
@@ -1429,7 +1333,7 @@ Deine Wahl:
     Return to myDex main menu
   </if>
   <else>
-    Display: "❓ Ungültige Eingabe. Bitte wähle 1-5 oder einen der angezeigten Befehle."
+    Display: "❓ Ungültige Eingabe. Bitte wähle 1-4 oder einen der angezeigten Befehle."
     Show this menu again
   </else>
 </handler>
@@ -1582,12 +1486,11 @@ Was möchtest du tun?
     </action>
   </step>
 
-  <step n="3" title="Variant Selection">
+  <step n="3" title="Start Onboarding">
     <action>Display welcome prompt (from <prompt id="first_time_welcome">)</action>
-    <ask>User wählt MINIMAL (2 Fragen, kurz) / SMART (5 Fragen, DEFAULT) / VOLLSTÄNDIG (12 Fragen, etwas länger)</ask>
-    <action>Parse user input: accept "1", "smart", "SMART" OR "2", "vollständig", "VOLLSTÄNDIG", "complete"</action>
-    <action>Filter questions: Load questions WHERE variants contains {selected_variant}</action>
-    <action>Store: selected_variant, questions_count</action>
+    <action>Load canonical onboarding question list from .dexCore/_cfg/onboarding-questions.yaml metadata.onboarding.questions (= [0, 1, 3, 4, 43])</action>
+    <action>Set: questions_count = 5 (per D4 2026-04-25 single-onboarding decision)</action>
+    <action>No variant selection needed — single canonical flow</action>
   </step>
 
   <step n="4" title="Interactive Q&A Loop">
