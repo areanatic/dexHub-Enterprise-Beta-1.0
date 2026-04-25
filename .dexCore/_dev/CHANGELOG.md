@@ -36,16 +36,12 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
   Copilot fallback to prompt-text documented.
 - **Agent renames (E3+E4):** TestArch Pro → Kalpana (Test Automation
   Architect), Atlas → Yamuna (Knowledge Reconstruction Expert). Technical
-  commands @testarch-pro / @atlas preserved for backward-compat. Attribution
-  to Kalpana Vedagiri (commit 1f656b3) + Yamuna Boopathi (commit 05c2091)
-  in persona files + CONTRIBUTORS.md. agent-manifest.csv displayNames
-  updated (matches Mona pattern).
+  commands @testarch-pro / @atlas preserved for backward-compat.
+  agent-manifest.csv displayNames updated (matches Mona pattern).
 - **README:** count-disambiguation note (46 Copilot activations vs 43
   source personas vs 14 dxm agents — all correct, each in its scope);
   install-URL typo fixed (dexhub-ea-beta → dexHub-Enterprise-Beta-1.0);
   Getting-Started-Docs block linking the 4 new Non-Dev docs.
-- **CONTRIBUTORS.md:** Kalpana Vedagiri full section (was placeholder)
-  with INTEGRATED_VERIFIED status + forward-looking rename note.
 
 ### Removed in session 10 (P0-I Option A — Onboarding Consolidation)
 - `onboarding.smart_v4_3_1` (enabled → removed, referenced archived YAML)
