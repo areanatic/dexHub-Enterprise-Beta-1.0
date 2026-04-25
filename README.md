@@ -107,12 +107,12 @@ Codebase Analyzer, Pattern Detector, API Documenter, Data Analyst, Requirements 
 
 ## Feature Matrix
 
-DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 85 features today, classified by status:
+DexHub tracks every capability as an individually toggleable feature in [`.dexCore/_cfg/features.yaml`](.dexCore/_cfg/features.yaml) — 83 features today, classified by status:
 
 | Status | Count | What it means |
 |---|---|---|
 | `always_on` | 8 | Core infrastructure (DexMaster, SSOT compile, validate.sh, D1 state model, consent tracking, L3 chronicle) |
-| `enabled` | 58 | Shipped and tested — covered by this README |
+| `enabled` | 56 | Shipped and tested — covered by this README |
 | `deferred` | 19 | Planned for 1.1 or later (Parser Pattern B Phases 2-6 — Phase 1 enabled today, native Workflow-Runner backend, systemd/launchd daemon for inbox watcher — foreground watcher enabled today) |
 | `experimental` | 0 | No features currently in experimental status |
 | `broken` | 0 | No known-broken shipping features. 3 P0/P1 "bugs" inherited from Playground tracking were reclassified 2026-04-19: 2 were Playground-only (app/server.js never ported to Beta), 1 was fixed (Atlassian MCP install.sh v2.0 interactive wizard). |

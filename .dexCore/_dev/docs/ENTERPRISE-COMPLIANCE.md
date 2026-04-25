@@ -54,16 +54,14 @@ Status of this meta-toggle itself: `deferred`, phase `future`. **The matrix belo
 
 | Feature | Compliance | Notes |
 |---|---|---|
-| `onboarding.smart_v5` | ok | Questions + answers → local profile.yaml (5-Q default flow) |
-| `onboarding.vollstandig_v5` | ok | Same (12-Q enterprise-compliance + custom instructions variant) |
-| `onboarding.minimal_v5` | ok | Same (2-Q language + data-handling consent only) |
+| `onboarding.standard` | ok | The single canonical onboarding (5 questions). Answers → local profile.yaml |
 | `onboarding.data_handling_gate` | ok | P0 enterprise-compliance question (Q43) populates `company.data_handling_policy` |
 | `onboarding.inferred_layer_b` | ok | Deferred (1.1) — repo scanner for auto-inference |
 | `onboarding.progressive_layer_c` | ok | Deferred (1.1) — event-triggered questions |
 
 > v4.3 flows archived 2026-04-22 (see `.dexCore/_archive/onboarding-v4.3-2026-04-22/`).
-> The previous `smart_v4_3`, `vollstandig_v4_3` and `legacy_path_preserved` features
-> were removed in P0-I Option A consolidation; *mydex-advanced now routes to v5 VOLLSTÄNDIG.
+> 3-variant model (MINIMAL/SMART/VOLLSTÄNDIG) collapsed to single `onboarding.standard` 2026-04-25 (D4).
+> Q40-41 + Q44-49 (formerly part of VOLLSTÄNDIG) remain in `onboarding-questions.yaml` and are reachable via *profile editing after onboarding completes.
 
 ### Agents
 

@@ -104,26 +104,15 @@ onboarding:
   #   - onboarding.legacy_path_preserved   *mydex-advanced command preserving v4.3 flow
   # v4.3 YAML archived to .dexCore/_archive/onboarding-v4.3-2026-04-22/
   # with SHA256SUMS.txt + MANIFEST.md. Restore procedure documented there.
-  # counts_block: total 87→84, enabled 60→57. Details in counts: section at EOF.
   #
-  # Historical note (2026-04-21): onboarding.minimal_v4_3 was also removed —
-  # the variant never existed in v4.3 YAML (only smart + vollständig). The
-  # minimal variant is v5-only, registered below as onboarding.minimal_v5.
-  - id: onboarding.minimal_v5
-    name: "MINIMAL onboarding v5.0 (2 questions, ~30s)"
-    description: "Bare-minimum variant: language + data_handling_policy consent. For experienced users who just want to unblock the rest of the system. Defined in .dexCore/_cfg/onboarding-questions.yaml (questions: [1, 43]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet."
-    status: enabled
-    phase: 5.1.b
-    enterprise_compliance: ok
-    requires: []
-    depends_on: [core.dexmaster_orchestrator, onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions.yaml
-    tests: []
-    validation_notes: "Variant key 'minimal_v5' confirmed present in .dexCore/_cfg/onboarding-questions.yaml with questions [1, 43] (language + data_handling_policy). Earlier features.yaml entry 'minimal_v4_3' referenced a variant that never existed in v4.3 YAML — renamed to minimal_v5 during 2026-04-21 registry audit."
-
-  - id: onboarding.smart_v5
-    name: "SMART onboarding v5.0 (5 questions, 60-90 sec)"
-    description: "3-layer model DEFAULT onboarding flow. Layer A asked explicitly. Q43 data_handling_policy is P0 enterprise gate. mydex-agent R1-routing now targets this YAML by default."
+  # NOTE: Two more features removed 2026-04-25 session 11 D4 (single-onboarding consolidation):
+  #   - onboarding.minimal_v5              user directive 2026-04-25: "Es gibt nur ein Onboarding"
+  #   - onboarding.vollstandig_v5          same — VOLLSTÄNDIG-only fields move to *profile post-onboarding
+  # onboarding.smart_v5 RENAMED → onboarding.standard. Single canonical 5-question flow.
+  # See SESSION_END_2026_04_25_PART2_DECISIONS_RESOLVED_EXECUTION_GO.md for D4 decision rationale.
+  - id: onboarding.standard
+    name: "Onboarding (5 questions, single canonical flow)"
+    description: "The single canonical onboarding flow (per user direktive 2026-04-25 D4). 5 questions: name, language, experience, team_size, data_handling_policy. Q43 data_handling_policy is the P0 enterprise gate. Defined in .dexCore/_cfg/onboarding-questions.yaml (metadata.onboarding.questions: [0, 1, 3, 4, 43]). Q40-41 + Q44-49 (formerly part of VOLLSTÄNDIG variant) remain in YAML and are reachable via *profile editing after onboarding completes — they are no longer part of the onboarding flow itself. Mandatory-onboarding gate is a planned 1.0.1+ feature."
     status: enabled
     phase: 5.1.b
     enterprise_compliance: ok
@@ -134,22 +123,9 @@ onboarding:
       - tests/e2e/01-onboarding-smart.test.sh
       - tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
     validated_at: "2026-04-20"
-    validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Content correct. Cosmetic drift (variant-label mislabeled as v4.3.1) patched same day via mydex-agent R5-metadata rule + profile.yaml.example defaults — re-verification pending live re-run."
+    validation_notes: "Questions asked in correct order (Q0/Q1/Q3/Q4/Q43) + profile.yaml generated with schema v1.2 populated fields. Live walkthrough 18/18 PASS confirmed pre-D4. Variant-rationalization 2026-04-25: collapsed from 3-variant model (MINIMAL/SMART/VOLLSTÄNDIG) to single 'onboarding.standard' (formerly onboarding.smart_v5 — same 5 questions, no variants)."
     known_issues:
-      - "FIXED 2026-04-20 (live re-verification pending): variant-label cosmetic drift — agent was copying profile.yaml.example's v4.3.1 defaults into output. Patched via (a) new CRITICAL rule R5-metadata in mydex-agent.md with explicit loaded-YAML→variant/version/count mapping table, (b) profile.yaml.example onboarding block defaults changed to v5.0/smart_v5/5 with the mapping table as comment. Kernel-level enforcement not possible (agent writes via prompt); next live run will confirm prompt sticks."
       - "Produces profile v1.2 (with company.* + consents[]); v1.0/v1.1 profiles remain valid"
-
-  - id: onboarding.vollstandig_v5
-    name: "VOLLSTÄNDIG onboarding v5.0 (12 questions, 3-5 min)"
-    description: "SMART v5 + 7 enterprise compliance fields (Q43-Q49) + custom instructions (Q40-41). Active via *mydex variant selection. Defined in .dexCore/_cfg/onboarding-questions.yaml (vollstandig_v5 variant: questions [0, 1, 3, 4, 43, 44, 45, 46, 47, 48, 49, 40, 41]). Agent-driven via mydex-agent; no behavioral CLAUDE_E2E_LIVE test yet — structural existence is what we verify today."
-    status: enabled
-    phase: 5.1.b
-    enterprise_compliance: ok
-    requires: []
-    depends_on: [core.dexmaster_orchestrator, onboarding.smart_v5]
-    docs: .dexCore/_cfg/onboarding-questions.yaml
-    tests: []
-    validation_notes: "Variant key 'vollstandig_v5' confirmed present in .dexCore/_cfg/onboarding-questions.yaml. Structural verification only; multi-turn walkthrough test via CLAUDE_E2E_LIVE_WALKTHROUGH=1 is deferred to session 6+ (opt-in cost ~\\$3-5 per live run)."
 
   - id: onboarding.inferred_layer_b
     name: "Layer B: Inferred-and-confirmed profile (repo scanner)"
@@ -158,7 +134,7 @@ onboarding:
     phase: 5.2
     enterprise_compliance: ok
     requires: []
-    depends_on: [onboarding.smart_v5]
+    depends_on: [onboarding.standard]
     docs: .dexCore/_cfg/onboarding-questions.yaml (inferred_layer_b_candidates section)
     tests: []
 
@@ -169,7 +145,7 @@ onboarding:
     phase: 5.2
     enterprise_compliance: ok
     requires: []
-    depends_on: [onboarding.smart_v5]
+    depends_on: [onboarding.standard]
     docs: .dexCore/_cfg/onboarding-questions.yaml (progressive_disclosure_triggers section)
     tests: []
 
@@ -180,16 +156,16 @@ onboarding:
     phase: 5.1.b
     enterprise_compliance: ok
     requires: []
-    depends_on: [onboarding.smart_v5, meta.features_yaml]
+    depends_on: [onboarding.standard, meta.features_yaml]
     docs: .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md §3
     tests: []
     known_issues:
       - "Question is asked and stored; feature-filter that consumes it (Enterprise Mode Filter) is Tier 3 pending"
 
-  # onboarding.legacy_path_preserved REMOVED 2026-04-22 session 10 P0-I Option A
-  # — depended on vollstandig_v4_3 which was also removed; the *mydex-advanced
-  # engagement path to v4.3 is no longer offered. v5 VOLLSTÄNDIG remains as the
-  # advanced variant via *mydex-advanced (routes to onboarding.vollstandig_v5).
+  # onboarding.legacy_path_preserved REMOVED 2026-04-22 (P0-I Option A).
+  # *mydex-advanced + *mydex-minimal aliases REMOVED 2026-04-25 (D4 single-onboarding):
+  # all aliases now route to onboarding.standard (the single 5-question flow).
+  # mydex-agent.md handles deprecated aliases with a one-line redirect note.
 
 # ─────────────────────────────────────────────────────────────────────────
 # AGENT SYSTEM — Pack-based, user-togglable
@@ -1037,7 +1013,7 @@ quality:
     phase: 5.1.c-tier5
     enterprise_compliance: cloud_with_consent
     requires: [claude-code, ruby]
-    depends_on: [quality.e2e_harness, onboarding.smart_v5]
+    depends_on: [quality.e2e_harness, onboarding.standard]
     docs: tests/e2e/02-onboarding-walkthrough.test.sh + tests/e2e/README.md
     tests:
       - tests/e2e/integrations/claude-code/02-onboarding-walkthrough.test.sh
@@ -1094,7 +1070,7 @@ quality:
     phase: 5.1.c-tier5.5
     enterprise_compliance: cloud_with_consent
     requires: [claude-code]
-    depends_on: [quality.walkthrough_multi_turn, onboarding.smart_v5]
+    depends_on: [quality.walkthrough_multi_turn, onboarding.standard]
     docs: tests/e2e/06-onboarding-existing-profile.test.sh + tests/e2e/README.md
     tests:
       - tests/e2e/integrations/claude-code/06-onboarding-existing-profile.test.sh
@@ -1109,7 +1085,7 @@ quality:
     phase: 5.1.c-tier5.2
     enterprise_compliance: cloud_with_consent
     requires: [claude-code, ruby]
-    depends_on: [quality.walkthrough_multi_turn, onboarding.smart_v5, onboarding.data_handling_gate]
+    depends_on: [quality.walkthrough_multi_turn, onboarding.standard, onboarding.data_handling_gate]
     docs: tests/e2e/03-onboarding-smart-v5-full-walk.test.sh + tests/e2e/README.md
     tests:
       - tests/e2e/integrations/claude-code/03-onboarding-smart-v5-full-walk.test.sh
@@ -1117,7 +1093,7 @@ quality:
     validation_notes: "18/18 assertions green on first proper run (after permission-mode fix, see note 1). Profile produced: version=1.2, name=Alex, language=de, experience=intermediate (derived from 3-7), team_size=solo, data_handling_policy=cloud_llm_allowed, consents=[]."
     known_issues:
       - "Note 1 (solved 2026-04-20): claude -p default permission-mode blocks Write without tty. Runner now passes --permission-mode acceptEdits + --add-dir for the opt-in walkthrough tests. Structural tests unaffected."
-      - "Note 2 (observed 2026-04-20, not blocking): agent loaded v4.3.1 variant metadata (onboarding.version='v4.3.1') even when user said 'SMART Onboarding' — suggests mydex-agent R1-routing to v5.0 default is unreliable in headless mode. Answered questions were correct; variant-labeling is cosmetic. Investigate under onboarding.smart_v5 known_issues."
+      - "Note 2 (observed 2026-04-20, not blocking): agent loaded v4.3.1 variant metadata (onboarding.version='v4.3.1') even when user said 'SMART Onboarding' — suggests mydex-agent R1-routing to v5.0 default is unreliable in headless mode. Answered questions were correct; variant-labeling is cosmetic. Investigate under onboarding.standard known_issues."
       - "VOLLSTÄNDIG v5 (12 answers) and legacy v4.3.1 (42 answers) walkthroughs are Tier 5.3 / 5.4 follow-ups."
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -1334,14 +1310,19 @@ roadmap:
 # COUNTS (auto-updated at each registry change)
 # ─────────────────────────────────────────────────────────────────────────
 counts:
-  total: 85
+  total: 83
   by_status:
     always_on: 8
-    enabled: 58
+    enabled: 56
     disabled: 0
     deferred: 19
     broken: 0
     experimental: 0
+  # Updated 2026-04-25 session 11 D4 (single-onboarding consolidation):
+  # Removed onboarding.minimal_v5 + onboarding.vollstandig_v5; renamed
+  # onboarding.smart_v5 → onboarding.standard. User direktive: "Es gibt nur
+  # ein Onboarding, keine minimale oder große." VOLLSTÄNDIG-only fields move
+  # to *profile post-onboarding. total 85→83, enabled 58→56.
   # Updated 2026-04-22 session 10 Phase 7 (C6 Drift-Check):
   # - quality.validate_sh_§28_copilot_drift NEW enabled (5.1.debt)
   #   Copilot-activation ↔ source-persona drift guard (46 stubs verified).
