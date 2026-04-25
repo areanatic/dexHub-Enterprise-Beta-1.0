@@ -49,7 +49,7 @@ Mit optionaler lokaler KI:
 | Basis | nur DexHub + Kreuzberg für PDFs | **~300 MB** |
 | Einsteiger-KI | + Ollama mit `moondream` (kleines Vision-Modell) + `nomic-embed-text` | **~2.5 GB** |
 | Sweet-Spot | + Ollama mit `llava:7b` | **~5.5 GB** |
-| Power-User | + Ollama mit `llama3.2-vision:11b` | **~8.5 GB** |
+| Power-User | + Ollama mit `llama3.2-vision` | **~8.5 GB** |
 | Max | alle Vision-Modelle | **~15 GB** |
 
 Platzsparer-Tipp: Du kannst **ein** Vision-Modell installieren und andere später nachladen (`ollama pull X`) oder entfernen (`ollama rm X`).
@@ -64,7 +64,7 @@ Kurze Empfehlung:
 |---|---|---|
 | 8 GB RAM, kein GPU | `moondream` (1.7 GB, 1.8B Parameter) | Schnell genug auf CPU. Für Screenshots + einfache PDFs ausreichend. |
 | 16 GB RAM | `llava:7b` (4.7 GB, 7B Parameter) | Ollama-Default. Solider Allrounder. Diagramme, UI, OCR leicht. |
-| 16+ GB RAM oder dedicated GPU | `llama3.2-vision:11b` (7.8 GB, 11B Parameter) | Beste Qualität für Text-in-Bild (OCR-nah). Langsamer auf CPU. |
+| 16+ GB RAM oder dedicated GPU | `llama3.2-vision` (7.8 GB, 11B Parameter) | Beste Qualität für Text-in-Bild (OCR-nah). Langsamer auf CPU. |
 
 Installieren: `ollama pull <name>`. Probieren: `@dex-master *inbox` mit einem Test-Bild.
 
