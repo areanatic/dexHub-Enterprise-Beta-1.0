@@ -123,7 +123,7 @@ identity:
 company:
   data_handling_policy: "cloud_llm_allowed"
 onboarding:
-  variant: "smart_v5"
+  variant: "standard"
   version: "v5.0"
   started_at: "2026-01-15T10:00:00Z"
   completed_at: "2026-01-15T10:05:00Z"

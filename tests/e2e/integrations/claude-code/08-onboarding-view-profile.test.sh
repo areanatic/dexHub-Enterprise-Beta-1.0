@@ -92,7 +92,7 @@ identity:
 company:
   data_handling_policy: "cloud_llm_allowed"
 onboarding:
-  variant: "smart_v5"
+  variant: "standard"
   version: "v5.0"
   questions_answered: 5
   questions_skipped: 0
