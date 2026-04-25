@@ -11,7 +11,7 @@
 
 An AI development framework built on three ideas:
 
-**Structure over chat.** Instead of prompting from scratch, you work with 20+ AI agents that carry domain expertise and follow proven workflows. They have names — Jana for analysis, Alex for architecture, Steffi for code, Mona for UX, Martin for product — because they act as team members, not tools.
+**Structure over chat.** Instead of prompting from scratch, you work with 46 specialized AI agents that carry domain expertise and follow proven workflows. They have names — Jana for analysis, Alex for architecture, Steffi for code, Mona for UX, Martin for product — because they act as team members, not tools.
 
 **Knowledge that stays.** DexHub includes a knowledge meta-layer that captures decisions, session logs, and project context directly in your repository. When a colleague joins or you revisit a project months later, the reasoning is there — not buried in someone's chat history.
 
@@ -117,7 +117,19 @@ DexHub tracks every capability as an individually toggleable feature in [`.dexCo
 | `experimental` | 0 | No features currently in experimental status |
 | `broken` | 0 | No known-broken shipping features. 3 P0/P1 "bugs" inherited from Playground tracking were reclassified 2026-04-19: 2 were Playground-only (app/server.js never ported to Beta), 1 was fixed (Atlassian MCP install.sh v2.0 interactive wizard). |
 
-**Honest label for Beta 1.0 scope:** DexHub core framework (SSOT compile, agent boundary state model, onboarding variants, guardrails, 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh 27-section quality gate) **plus the L2 Knowledge Tank** (SQLite-backed, hybrid keyword+semantic search via optional Ollama, enterprise-compliance gate) **and the Document Parser arc** (router + kreuzberg/ollama-vlm/pattern-a-vector-text/pattern-b-phase1-overview backends + capabilities probe + inbox auto-parse + inbox watcher for continuous processing + Desktop-shortcut setup — end-to-end usable for text/PDF/Office/image via `*inbox`). **Still deferred to 1.1+:** Parser Pattern B Phases 2-6 (cluster-detect, hi-res crops, per-cluster VLM, synthesis, verify — Phase 1 overview shipped 2026-04-21), native Workflow-Runner execution backend, watcher daemon mode (systemd/launchd — foreground watcher enabled today). See `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining plan.
+**Honest label for Beta 1.0 scope:**
+
+**Shipped today:**
+- **Core framework** — SSOT compile, agent boundary state model, onboarding variants (MINIMAL/SMART/VOLLSTÄNDIG), 9 guardrails (G1-G9), 46 agent definitions, 46 workflow YAMLs, 12 skills, GitHub/Figma connector wizards, validate.sh 28-section quality gate.
+- **L2 Knowledge Tank** — SQLite-backed, hybrid keyword + semantic search via optional Ollama, enterprise-compliance gate.
+- **Document Parser arc** — router + kreuzberg / ollama-vlm / pattern-a-vector-text / pattern-b-phase1-overview backends + capabilities probe + inbox auto-parse + inbox watcher (foreground) + Desktop-shortcut setup — end-to-end usable for text / PDF / Office / image via `*inbox`.
+
+**Deferred to 1.1+:**
+- Parser Pattern B Phases 2-6 (cluster-detect, hi-res crops, per-cluster VLM, synthesis, verify) — Phase 1 overview shipped 2026-04-21.
+- Native Workflow-Runner execution backend (workflows ship as guided templates today).
+- Watcher daemon mode (systemd/launchd) — foreground watcher enabled today.
+
+See `.dexCore/_dev/planning/` and [bugs.md](.dexCore/_dev/todos/bugs.md) for the remaining plan.
 
 ---
 
