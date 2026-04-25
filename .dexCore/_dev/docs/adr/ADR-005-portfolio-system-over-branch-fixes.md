@@ -12,7 +12,7 @@ On 2026-04-14 the user discovered that `feature/ollama-settings-wysiwyg` — the
 The initial proposed fix (Option A+, 2026-04-15 morning) was a branch rename + migration-branch-split. A 4-agent research pass (ecosystem map, voice/voxtral, DexHub agents, industry patterns) returned findings that reframed the problem:
 - **35 projects/workstreams** exist in the ecosystem. None are indexed anywhere.
 - **6 cold clones** sit in `~/Downloads/`, uncataloged. Block 2 later revealed 1 with unique commits.
-- **6 azamani1 colleague branches** exist with 3 external contributors (Yamuna, Rainer, kavedagi) whose work underpins DexHub core rules.
+- **6 azamani1 colleague branches** exist with multiple external contributors whose work underpins DexHub core rules.
 - **MEMORY.md (688 lines) was being truncated** on session load — the "central index" was unreliable.
 
 The user's framing: *"Ich habe langsam den Überblick verloren. Also ich weiß nicht mal, was, wo, wie, wann und so weiter."*
@@ -38,7 +38,7 @@ Phase 3 of the Beta Migration (Beta clone + port) is **blocked** until Layer 4 c
 **Positive:**
 - The next kitchen-sink is prevented structurally, not culturally. Lefthook + branch discipline = machine-enforced.
 - Future sessions can re-orient in 5 minutes by reading workstreams.csv instead of grep-ing 141 memory files.
-- The Beta community-branch vision becomes executable because contributors (Yamuna, Rainer, kavedagi) are now visible in the portfolio.
+- The Beta community-branch vision becomes executable because external contributions are now tracked in the portfolio.
 - Honest framing: the user lost overview. The fix is tooling, not willpower.
 
 **Negative / accepted:**

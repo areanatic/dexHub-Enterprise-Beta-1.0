@@ -31,7 +31,7 @@ These 8 ADRs capture the frozen decisions from Phase 0 through Layer 1 of the De
 | [ADR-005](ADR-005-portfolio-system-over-branch-fixes.md) | Build a portfolio system instead of fixing individual branches | 2026-04-15 | accepted | Treat the kitchen-sink as a symptom; fix the missing portfolio layer first. |
 | [ADR-006](ADR-006-ssot-compile-step-for-instructions.md) | SSOT compile step for multi-platform AI instructions | 2026-04-13 | accepted | Single source of truth + build script; no hand-sync across Claude/Copilot/Cursor. |
 | [ADR-007](ADR-007-kitchen-sink-branch-as-historical-artifact.md) | `feature/ollama-settings-wysiwyg` stays as historical artifact | 2026-04-15 | accepted | Rename not delete at Layer 4; preserve forensic history forever. |
-| [ADR-008](ADR-008-colleague-contributor-recognition.md) | DexHub has multiple contributors; document and credit them | 2026-04-15 | accepted | Solo-dev framing was wrong; Yamuna/Rainer/kavedagi contributions are tracked + credited. |
+| [ADR-008](ADR-008-colleague-contributor-recognition.md) | DexHub has multiple contributors; document and credit them | 2026-04-15 / superseded 2026-04-25 | superseded | Original decision (named-contributor discoverability) reversed by 2026-04-25 release-policy review. Canonical authorship now in git history; persona-names preserved. |
 
 ---
 
