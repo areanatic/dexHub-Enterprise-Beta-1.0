@@ -233,35 +233,35 @@ What would you like to do?
 
       DexHub is your **AI-powered development platform**. Build with specialized AI agents, share solutions across your organization, and create a Knowledge Hub where expertise compounds instead of vanishes.
 
-      **40+ expert agents** ready to work:
+      **46 expert agents** ready to work:
       - Business Analyst Jana for PRDs
       - Architect Alex for system design
       - UX Expert Mona for user experience
-      - Test Architect Murat for test strategies
-      - ...and 39 more specialists
+      - Test Architect Kalpana for test strategies
+      - ...and 42 more specialists
 
       **Build your own:** Use DexBuilder to create custom agents in plain language — no coding required.
 
       ---
 
-      ## What's Included (EA-2.0 Beta)
+      ## What's Included (Beta 1.0)
 
-      **40+ Specialized Agents** across 5 modules:
+      **46 Specialized Agents** across 5 modules:
       - Type *list-agents to see all agents with their specializations
 
-      **40+ Structured Workflows:**
+      **46 Structured Workflows:**
       - Analysis → Planning → Solutioning → Implementation
       - Type *list-workflows to explore all available workflows
 
-      **7 Copilot Skills** for lazy-loaded knowledge:
+      **12 Copilot Skills** for lazy-loaded knowledge:
       - DexHub core, guardrails, chronicle system
       - DHL Design System (components, brand, accessibility, layout)
 
-      **18 Copilot Agent Files** with model routing:
+      **46 Copilot Agent Files** with model routing:
       - GPT-4o (free) for navigation, premium models for deep analysis
 
       **myDex - Your Personal Workspace:**
-      - 30-second profile setup (5 questions)
+      - Kurzes Profile-Setup (5 Fragen — ein Augenblick)
       - AI remembers your preferences, stack, working style
       - All projects organized in one place
       - Type *mydex to set up your workspace
@@ -312,10 +312,10 @@ What would you like to do?
 
       ## Current Version
 
-      **DexHub Enterprise Alpha 2.0 Beta**
-      - 40+ specialized agents across 5 modules (18 with Copilot agent files)
-      - 40+ production workflows
-      - 7 Copilot Skills for lazy-loaded knowledge
+      **DexHub Enterprise Beta 1.0**
+      - 46 specialized agents across 5 modules (43 source personas + 3 onboarding wizards = 46 Copilot activations)
+      - 46 production workflows
+      - 12 Copilot Skills for lazy-loaded knowledge
       - Git-native workspace architecture
       - Data-local privacy (working data on disk; engine + connectors opt-in per config)
       - GitHub Copilot native with model routing
@@ -343,7 +343,7 @@ What would you like to do?
       ## Want More Details?
 
       📖 **Full Story with Use Cases:**
-      Read the complete README in the project root: [DexHub Alpha Repository](README.md)
+      Read the complete README in the project root: [DexHub Enterprise Beta 1.0](README.md)
 
       🚀 **Start Building:**
       - See all agents → *list-agents
