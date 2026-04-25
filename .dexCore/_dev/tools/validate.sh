@@ -579,23 +579,12 @@ else
   fail "Onboarding questions file MISSING"
 fi
 
-# Check MINIMAL onboarding exists in mydex-agent
-if grep -q "onboarding-minimal" .dexCore/core/agents/mydex-agent.md 2>/dev/null; then
-  pass "MINIMAL onboarding variant defined"
+# Check canonical onboarding prompt exists in mydex-agent (single path, no variants — 2026-04-25)
+# Pattern matches: onboarding (canonical post-D4) OR onboarding-smart/onboarding-minimal/onboarding-complete (transition state across D4 atomic commits)
+if grep -qE 'prompt id="onboarding[-"]' .dexCore/core/agents/mydex-agent.md 2>/dev/null; then
+  pass "Canonical onboarding prompt defined (single flow per 2026-04-25 D4 decision; legacy variant IDs tolerated during transition)"
 else
-  fail "MINIMAL onboarding variant MISSING"
-fi
-
-if grep -q "onboarding-smart" .dexCore/core/agents/mydex-agent.md 2>/dev/null; then
-  pass "SMART onboarding variant defined"
-else
-  fail "SMART onboarding variant MISSING"
-fi
-
-if grep -q "onboarding-complete" .dexCore/core/agents/mydex-agent.md 2>/dev/null; then
-  pass "VOLLSTAENDIG onboarding variant defined"
-else
-  fail "VOLLSTAENDIG onboarding variant MISSING"
+  fail "Canonical onboarding prompt MISSING" "Expected <prompt id=\"onboarding\"> (canonical) or <prompt id=\"onboarding-...\"> (transitional) in mydex-agent.md"
 fi
 
 # ==================== SECTION 17: Guardrail Pattern Enforcement ====================

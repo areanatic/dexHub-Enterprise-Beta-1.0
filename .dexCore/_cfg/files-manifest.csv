@@ -1,5 +1,5 @@
 type,name,module,path,hash
-"csv","agent-manifest","_cfg",".dexCore/_cfg/agent-manifest.csv","dfdb5e775cd7e39c520a82436601c623ab69e3544d929d12e79841e9350f21a0"
+"csv","agent-manifest","_cfg",".dexCore/_cfg/agent-manifest.csv","ccea6d757697ae23b87badf0c6040c895da22376076584258a02687730ec9867"
 "csv","task-manifest","_cfg",".dexCore/_cfg/task-manifest.csv","46f98b1753914dc6193c9ca8b6427fadc9a6d71747cdc8f5159792576c004b60"
 "csv","workflow-manifest","_cfg",".dexCore/_cfg/workflow-manifest.csv","5491cdd748e117b7d0ca76eab8f036a7efdd20dc69970fffd001cb0444bd5b21"
 "yaml","manifest","_cfg",".dexCore/_cfg/manifest.yaml","ab5566eb3062602bae88f0f96551e43382957e3218187000681d0fe22e0737b0"

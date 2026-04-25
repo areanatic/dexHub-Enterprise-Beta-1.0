@@ -1,7 +1,13 @@
 #!/bin/bash
-# DexHub E2E Test 01 — Onboarding SMART variant
-# Validates: onboarding-questions.yaml defines a functional 21-question SMART path
+# DexHub E2E Test 01 — Canonical Onboarding (5 questions)
+# Validates: onboarding-questions.yaml defines a single canonical onboarding
+# path (5 questions: name, language, experience, team_size, data_handling_policy)
 # that produces a valid profile.yaml structure when walked through.
+#
+# History:
+#   - v4.3.x: 3 variants (MINIMAL/SMART/VOLLSTÄNDIG) with 2/16/42 questions
+#   - 2026-04-25 D4: collapsed to ONE onboarding flow (5 questions). Single
+#                    metadata.onboarding block in YAML; no variants.
 #
 # Phase 5.0: This test validates the STRUCTURE of the onboarding definition.
 # Phase 5.1.a: Adds LIVE claude-runner assertions (opt-in via CLAUDE_E2E_LIVE=1).
@@ -15,7 +21,7 @@ source "$HARNESS/assertion-lib.sh"
 source "$HARNESS/claude-runner.sh"
 
 ensure_beta_root
-test_banner "01 Onboarding SMART (21 questions)"
+test_banner "01 Canonical Onboarding (5 questions)"
 
 ONBOARDING_YAML=".dexCore/_cfg/onboarding-questions.yaml"
 PROFILE_EXAMPLE="myDex/.dex/config/profile.yaml.example"
@@ -26,10 +32,10 @@ assert_yaml_valid "$ONBOARDING_YAML" "Onboarding YAML is valid"
 assert_file_exists "$PROFILE_EXAMPLE" "Profile example template present"
 assert_yaml_valid "$PROFILE_EXAMPLE" "Profile example is valid YAML"
 
-# 2. SMART variant explicitly defined
-assert_file_contains "$ONBOARDING_YAML" "smart:" "SMART variant defined in YAML"
-assert_file_contains "$ONBOARDING_YAML" "vollständig" "VOLLSTÄNDIG variant defined"
-assert_file_contains "$ONBOARDING_YAML" "minimal" "MINIMAL variant defined"
+# 2. Single canonical onboarding block defined (no variants per D4 2026-04-25)
+assert_file_contains "$ONBOARDING_YAML" "onboarding:" "Canonical onboarding block defined in YAML"
+assert_file_contains "$ONBOARDING_YAML" "question_count: 5" "Onboarding question_count = 5"
+assert_file_contains "$ONBOARDING_YAML" "post_onboarding:" "post_onboarding block defined (former VOLLSTÄNDIG fields → *profile editing)"
 
 # Select YAML parser: prefer ruby (built-in), fall back to python3 + yaml
 YAML_TOOL=""
@@ -44,37 +50,36 @@ if [ -z "$YAML_TOOL" ]; then
 else
   pass "YAML parser available ($YAML_TOOL)"
 
-  # 3. SMART variant question list count
+  # 3. Canonical onboarding question list count = exactly 5 (per D4 2026-04-25)
   if [ "$YAML_TOOL" = "ruby" ]; then
-    SMART_QUESTIONS=$(ruby -ryaml -e "
+    ONBOARDING_QUESTIONS=$(ruby -ryaml -e "
 data = YAML.load_file('$ONBOARDING_YAML')
-puts (data.dig('metadata', 'variants', 'smart', 'questions') || []).length
+puts (data.dig('metadata', 'onboarding', 'questions') || []).length
 " 2>/dev/null)
   else
-    SMART_QUESTIONS=$(python3 -c "
+    ONBOARDING_QUESTIONS=$(python3 -c "
 import yaml
 data = yaml.safe_load(open('$ONBOARDING_YAML'))
-print(len(data.get('metadata', {}).get('variants', {}).get('smart', {}).get('questions', [])))
+print(len(data.get('metadata', {}).get('onboarding', {}).get('questions', [])))
 " 2>/dev/null)
   fi
 
-  # v4.3.1: SMART is 18 (Q40-42 removed, per holistic review 2026-04-19)
-  # v5.0 draft: SMART will be 5 (3-layer model) — test will be updated when v5.0 activates
-  if [ -n "$SMART_QUESTIONS" ] && [ "$SMART_QUESTIONS" -ge 5 ] && [ "$SMART_QUESTIONS" -le 25 ]; then
-    pass "SMART variant has $SMART_QUESTIONS questions (expected 18 in v4.3.1 / 5 in v5.0)"
+  # 2026-04-25 D4: canonical onboarding has exactly 5 questions (Q0/Q1/Q3/Q4/Q43)
+  if [ "$ONBOARDING_QUESTIONS" = "5" ]; then
+    pass "Canonical onboarding has exactly 5 questions"
   else
-    fail "SMART variant question count unexpected" "Got: '$SMART_QUESTIONS'"
+    fail "Onboarding question count unexpected" "Got: '$ONBOARDING_QUESTIONS' (expected 5)"
   fi
 
-  # 4. Every SMART question has required fields
+  # 4. Every onboarding question has required fields
   if [ "$YAML_TOOL" = "ruby" ]; then
     MISSING_FIELDS=$(ruby -ryaml -e "
 data = YAML.load_file('$ONBOARDING_YAML')
-smart_ids = data.dig('metadata', 'variants', 'smart', 'questions') || []
+onboarding_ids = data.dig('metadata', 'onboarding', 'questions') || []
 questions = {}
 (data['questions'] || []).each { |q| questions[q['id']] = q }
 missing = []
-smart_ids.each do |qid|
+onboarding_ids.each do |qid|
   unless questions[qid]
     missing << \"id=#{qid} not in questions\"
     next
@@ -90,10 +95,10 @@ puts missing.empty? ? 'OK' : missing.join(\"\\n\")
     MISSING_FIELDS=$(python3 -c "
 import yaml
 data = yaml.safe_load(open('$ONBOARDING_YAML'))
-smart_ids = data.get('metadata', {}).get('variants', {}).get('smart', {}).get('questions', [])
+onboarding_ids = data.get('metadata', {}).get('onboarding', {}).get('questions', [])
 questions = {q['id']: q for q in data.get('questions', [])}
 missing = []
-for qid in smart_ids:
+for qid in onboarding_ids:
     if qid not in questions:
         missing.append(f'id={qid} not in questions'); continue
     q = questions[qid]
@@ -104,9 +109,9 @@ print('\n'.join(missing) if missing else 'OK')
   fi
 
   if [ "$MISSING_FIELDS" = "OK" ] || [ -z "$MISSING_FIELDS" ]; then
-    pass "Every SMART question has text_de, text_en, type, profile_path"
+    pass "Every onboarding question has text_de, text_en, type, profile_path"
   else
-    fail "SMART questions incomplete" "$(echo "$MISSING_FIELDS" | head -3 | tr '\n' '; ')"
+    fail "Onboarding questions incomplete" "$(echo "$MISSING_FIELDS" | head -3 | tr '\n' '; ')"
   fi
 
   # 5. Profile path references map to profile.yaml.example
@@ -123,10 +128,10 @@ def get_nested(d, path)
   end
   true
 end
-smart_ids = (data.dig('metadata', 'variants', 'smart', 'questions') || []).to_set rescue (data.dig('metadata', 'variants', 'smart', 'questions') || [])
+onboarding_ids = (data.dig('metadata', 'onboarding', 'questions') || []).to_set rescue (data.dig('metadata', 'onboarding', 'questions') || [])
 invalid = []
 (data['questions'] || []).each do |q|
-  next unless smart_ids.include?(q['id'])
+  next unless onboarding_ids.include?(q['id'])
   path = q['profile_path']
   next if path.nil? || path.empty?
   invalid << \"q#{q['id']}: #{path}\" unless get_nested(example, path)
@@ -145,10 +150,10 @@ def get_nested(d, path):
         if not isinstance(cur, dict) or p not in cur: return False
         cur = cur[p]
     return True
-smart_ids = set(data.get('metadata', {}).get('variants', {}).get('smart', {}).get('questions', []))
+onboarding_ids = set(data.get('metadata', {}).get('onboarding', {}).get('questions', []))
 invalid = []
 for q in data.get('questions', []):
-    if q['id'] not in smart_ids: continue
+    if q['id'] not in onboarding_ids: continue
     path = q.get('profile_path', '')
     if not path: continue
     if not get_nested(example, path):
@@ -158,7 +163,7 @@ print('\n'.join(invalid) if invalid else 'OK')
   fi
 
   if [ "$INVALID_PATHS" = "OK" ] || [ -z "$INVALID_PATHS" ]; then
-    pass "All SMART profile_paths map to profile.yaml.example structure"
+    pass "All onboarding profile_paths map to profile.yaml.example structure"
   else
     # Known issue: schema drift between profile-schema and profile-example
     # Report as WARNING not fail — user has FIX-PLAN-PROFILE-SCHEMA.md in drafts
@@ -171,7 +176,8 @@ fi
 # 6. myDex agent is the designated orchestrator
 assert_file_exists ".dexCore/core/agents/mydex-agent.md" "myDex agent present"
 assert_file_contains ".dexCore/core/agents/mydex-agent.md" "onboarding-questions.yaml" "myDex agent references onboarding-questions.yaml"
-assert_file_contains ".dexCore/core/agents/mydex-agent.md" "42" "myDex agent knows 42-question count"
+# Note: 42-question count assertion dropped 2026-04-25 (D4 — single 5-question onboarding,
+# no more 42-question reference in the agent prompts).
 
 # 7. Onboarding entrypoint reachable from DexMaster
 assert_file_contains ".dexCore/core/agents/dex-master.md" "mydex-agent" "DexMaster menu routes to myDex agent"
