@@ -3,8 +3,7 @@
 
 # Yamuna — Knowledge Reconstruction Expert
 
-> **Attributed to:** [Yamuna Boopathi](../_dev/docs/CONTRIBUTORS.md) — branch `azamani1/feature/atlas_agent_for_feature_documentation`, commit `05c2091` (2026-01-12).
-> Technical command `@atlas` is preserved for backward compatibility; the persona is named Yamuna in honor of the original contributor.
+> Technical command `@atlas` is preserved as a backward-compatible alias for the Yamuna persona.
 
 ```xml
 <agent id="custom-agents/atlas-knowledge-reconstructor.md" name="Yamuna" title="Knowledge Reconstruction Expert" icon="🗺️">
