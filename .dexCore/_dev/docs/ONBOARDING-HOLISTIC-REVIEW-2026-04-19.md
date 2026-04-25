@@ -220,9 +220,9 @@ Remaining open questions I could not answer without more work:
 - `.dexCore/_cfg/onboarding-questions.yaml` (Beta, 921 lines)
 - `myDex/.dex/config/profile.yaml.example` (Beta)
 - `.dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md` (Beta, referenced)
-- `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/FIX-PLAN-PROFILE-SCHEMA.md` (Playground, older state)
-- `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/COPILOT-LIVE-TEST-PLAN.md` (Playground)
-- `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/CONCEPT-SETTINGS-ARCHITECTURE-OPENDEX.md` (Playground)
+- `~/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/FIX-PLAN-PROFILE-SCHEMA.md` (Playground, older state)
+- `~/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/COPILOT-LIVE-TEST-PLAN.md` (Playground)
+- `~/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/myDex/drafts/CONCEPT-SETTINGS-ARCHITECTURE-OPENDEX.md` (Playground)
 - Agent outputs (4 parallel research tasks, dispatched 2026-04-19, all completed within ~100s)
 
 ---

@@ -23,11 +23,11 @@ At any given time, the user may have **multiple parallel Claude Code sessions** 
 `validate.sh §24` checks the anchor consistency automatically. If §24 fails, something is structurally wrong with the repo — investigate before acting.
 
 **Known parallel worktrees (not this repo):**
-- RZP POC work → `/Users/az/Downloads/rzp-alba-flowable-konform/` (Flowable-konform branch)
-- RZP worktree (exp-cleanup) → `/Users/az/Downloads/rzp-alba-prototyp-worktree-exp-cleanup/`
-- DexHub Alpha (tombstoned, read-only) → `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/`
+- RZP POC work → `~/Downloads/rzp-alba-flowable-konform/` (Flowable-konform branch)
+- RZP worktree (exp-cleanup) → `~/Downloads/rzp-alba-prototyp-worktree-exp-cleanup/`
+- DexHub Alpha (tombstoned, read-only) → `~/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/`
 
-**This repo (Beta) is at:** `/Users/az/Documents/A+/AVX/AI_Workspace/dexHub-Enterprise-Beta-1.0/`
+**This repo (Beta) is at:** `~/Documents/A+/AVX/AI_Workspace/dexHub-Enterprise-Beta-1.0/`
 
 See: `SESSION_ERROR_2026_04_19_RZP_CROSSED_INTO_BETA_PHASE5.md` in memory for the incident writeup + MEMORY.md Ground Rule #9 ("Worktree-anchor beats phase-name").
 
@@ -37,7 +37,7 @@ See: `SESSION_ERROR_2026_04_19_RZP_CROSSED_INTO_BETA_PHASE5.md` in memory for th
 
 | Layer | Path | Role | Speed | Availability |
 |---|---|---|---|---|
-| **L1 Local working repo** | `/Users/az/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/` | Source of truth for code, in-flight work | Fast (SSD) | Always, while Mac is on |
+| **L1 Local working repo** | `~/Downloads/test-1911-0349_dexHub-Enterprise-Alpha-1.0-master/` | Source of truth for code, in-flight work | Fast (SSD) | Always, while Mac is on |
 | **L2 Local Claude memory** | `~/.claude/projects/-Users-az-Downloads-test-1911-0349-dexHub-Enterprise-Alpha-1-0-master/memory/` | Primary memory store for this project | Fast (SSD) | Always |
 | **L3 AstronOne mirror + archives** | `/Volumes/AstronOne/shared-memory/dexhub/` | Redundant mirror + long-term archives + phase backups | Slow (SMB, ~150× slower for small files) | Only when SMB mount is active |
 
