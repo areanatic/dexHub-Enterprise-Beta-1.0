@@ -13,7 +13,7 @@ In deinem IDE-Chat:
 @mydex hi
 ```
 
-Du wirst durch **SMART v5** geführt — **5 Fragen, ca. 60–90 Sekunden**:
+Du wirst durch **SMART v5** geführt — **5 kurze Fragen** (ein Augenblick):
 
 1. **Wie möchtest du angesprochen werden?** (dein Name)
 2. **Bevorzugte Sprache?** (Deutsch / English / Bilingual)
@@ -23,8 +23,8 @@ Du wirst durch **SMART v5** geführt — **5 Fragen, ca. 60–90 Sekunden**:
 
 Deine Antworten landen in `myDex/.dex/config/profile.yaml`. Nur lokal auf deinem Rechner. Kannst du später jederzeit ändern: `@mydex` → Menüpunkt `*mydex-profile`.
 
-> **Du willst tiefer?** `@mydex` → Menüpunkt `*mydex-advanced` → VOLLSTÄNDIG v5 (12 Fragen, ~3 Min) mit zusätzlichen Enterprise-Compliance-Feldern + Custom-Instructions.
-> **Du willst schneller?** `@mydex` → Menüpunkt `*mydex-minimal` → MINIMAL v5 (2 Fragen, 30 Sek) — nur Sprache + Data-Handling.
+> **Du willst tiefer?** `@mydex` → Menüpunkt `*mydex-advanced` → VOLLSTÄNDIG v5 (12 Fragen) mit zusätzlichen Enterprise-Compliance-Feldern + Custom-Instructions.
+> **Du willst schneller?** `@mydex` → Menüpunkt `*mydex-minimal` → MINIMAL v5 (2 Fragen) — nur Sprache + Data-Handling.
 
 ---
 
