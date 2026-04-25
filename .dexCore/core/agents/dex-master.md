@@ -189,6 +189,7 @@
     <item cmd="*mydex" exec="{project-root}/.dexCore/core/agents/mydex-agent.md">🏠 Your personal workspace (*mydex)</item>
     <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents) — filtered by enabled packs (see *packs)</item>
     <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 46 structured workflows (*list-workflows)</item>
+    <item cmd="*list-skills" action="#list-skills-overview">🧠 Skill Library (*list-skills) — 12 lazy-loaded knowledge packs</item>
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
     <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
     <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
@@ -537,6 +538,36 @@ What would you like to do?
         3. Show all `broken` (known bugs; with priority P0/P1 from features.yaml)
       Announce .dexCore/_dev/docs/ENTERPRISE-COMPLIANCE.md as the compliance companion doc.
       If features.yaml is missing: report error + do NOT fabricate a list.
+    </prompt>
+
+    <prompt id="list-skills-overview">
+      Display the structured skill overview to the user in {communication_language}.
+
+      DexHub ships **12 lazy-loaded knowledge packs (Skills)** that Copilot can pull in on-demand. Skills are not agents — they're focused knowledge documents that get loaded when relevant. Source-of-truth: `.github/skills/` directory.
+
+      Render this overview as a numbered table grouped by category:
+
+      ## DexHub Core Knowledge (4 skills)
+      1. **dexhub-core** — Platform fundamentals, architecture, ground rules
+      2. **dexhub-about** — Project description, vision, attribution
+      3. **dexhub-architecture** — Directory layout, module structure, file conventions
+      4. **dexhub-platform-awareness** — Cross-platform compile (Copilot / Claude / Ollama / Cursor)
+
+      ## DexHub Operations (4 skills)
+      5. **dexhub-guardrails** — G1-G9 safety rules with examples
+      6. **dexhub-chronicle** — 3-tier documentation system (CHANGELOG / chronicle/ / INDEX)
+      7. **dexhub-devmode** — Bug/feature/issue reporting flow (no vendor lock-in)
+      8. **dexhub-integrations** — MCP connectors (Atlassian / GitHub / Figma) overview
+
+      ## DHL Design System (4 skills)
+      9. **dhl-ui-components** — Component library (40+ components, props, examples)
+      10. **dhl-brand-foundations** — Tokens, colors, typography, spacing
+      11. **dhl-layout-patterns** — Grid, responsive patterns, common layouts
+      12. **dhl-accessibility** — WCAG 2.2 AA compliance patterns
+
+      Footer:
+      "💡 Skills load lazily when relevant. Type a question and Copilot pulls the right skill in. To see a specific skill's content: `cat .github/skills/<skill-name>/SKILL.md`."
+      "Want to extend? Skills are markdown files — add `.github/skills/your-skill/SKILL.md` with frontmatter (name, description, category)."
     </prompt>
 
     <prompt id="show-enterprise-mode-status">
