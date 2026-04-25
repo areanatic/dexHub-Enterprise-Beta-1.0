@@ -12,10 +12,10 @@
 - **nexus-voice-server** — NEXUS FastAPI WebSocket voice server on Mac Mini, R3 done. DexHub voice.js cross-over target.
 - **nexusgram-telegram-bot** — NEXUS Telegram bot (@AstronOneBot). Known uncommitted + session-resume hang.
 - **memory-bridge-v4-nexus** — authoritative Memory Bridge implementation in NEXUS. DexHub Memory Bridge is downstream.
-- **security-guardian-rainer** — Rainer Muth's Security Guardian. VERIFIED integrated in Playground (`.dexCore/_cfg/project-guards.yaml` + `guardian-check.xml` both exist).
-- **atlas-agent-yamuna** — Yamuna Boopathi's Atlas agent. VERIFIED integrated (`atlas-knowledge-reconstructor.md`).
-- **custom-agent-discovery-yamuna** — Yamuna's BUG-012 auto-discovery mechanism. Partially integrated; no dedicated file found.
-- **test-automation-agent-kavedagi** — kavedagi's test automation agent. NOT integrated in current Playground.
+- **security-guardian** — Security Guardian (external contributor; renamed from `security-guardian-rainer` 2026-04-25 per release-policy). VERIFIED integrated in Playground (`.dexCore/_cfg/project-guards.yaml` + `guardian-check.xml` both exist).
+- **atlas-agent** — Atlas agent (external contributor; renamed from `atlas-agent-yamuna` 2026-04-25). VERIFIED integrated (`atlas-knowledge-reconstructor.md`, persona: Yamuna).
+- **custom-agent-discovery** — BUG-012 auto-discovery mechanism (external contribution; renamed from `custom-agent-discovery-yamuna` 2026-04-25). Partially integrated; no dedicated file found.
+- **testarch-pro-agent** — Test automation agent (external contribution; slug renamed 2026-04-25 per release-policy). NOT integrated in current Playground (status as of 2026-04-15 audit).
 - **dexmaster-meta-layer-origin** — foundational commit `c79d6cf` from colleague-branch lineage. Live in SHARED.md; attribution missing.
 - **colleague-branches-azamani1** — replaces v1's `azamani1-colleague-branches` row with updated content post-investigation.
 - **cold-clone-bkp181125-dev-mode-v2** — 🔴 has unique commit `0205cf1` Dev-Mode v2.0 NOT in current Playground.
@@ -59,7 +59,7 @@ These rows have status fields that are still session estimates, not user-confirm
 
 1. `.dexCore/_cfg/project-guards.yaml` exists and matches Rainer's intent → `security-guardian-rainer` status → `INTEGRATED_VERIFIED`
 2. `.dexCore/custom-agents/atlas-knowledge-reconstructor.md` exists → `atlas-agent-yamuna` status → `INTEGRATED_VERIFIED`
-3. No test_automation agent file found in `.dexCore/` → `test-automation-agent-kavedagi` status → `NOT_INTEGRATED`
+3. No test_automation agent file found in `.dexCore/` → `testarch-pro-agent` (slug renamed 2026-04-25) status → `NOT_INTEGRATED`
 4. Custom agent discovery references in workflow files but no dedicated mechanism → `custom-agent-discovery-yamuna` status → `PARTIALLY_INTEGRATED`
 
 ---
@@ -70,4 +70,4 @@ Initial 19-row portfolio. Agent 1 output during Ecosystem Reckoning research pas
 
 ---
 
-**Next version:** v3 will likely add forward-merge plans for `test-automation-agent-kavedagi`, resolve `custom-agent-discovery-yamuna` partial state, and replace user-confirm flags with actual user decisions. Not in Layer 1 scope.
+**Next version:** v3 will likely add forward-merge plans for `testarch-pro-agent`, resolve `custom-agent-discovery` partial state, and replace user-confirm flags with actual user decisions. Not in Layer 1 scope.
