@@ -157,8 +157,11 @@ if [ "$VERIFY" = "1" ]; then
       if (cd "$SCRATCH" && bash tests/e2e/run-all.sh --enterprise) >/tmp/build-enterprise-e2e.log 2>&1; then
         echo -e "  ${GREEN}E2E --enterprise PASS in stripped bundle${NC}"
       else
-        echo -e "  ${YELLOW}E2E --enterprise had failures in stripped bundle${NC}" >&2
+        echo -e "  ${RED}E2E --enterprise had failures in stripped bundle — release-claim cannot say 'verify green'${NC}" >&2
         echo -e "  Log: /tmp/build-enterprise-e2e.log" >&2
+        echo -e "  Last 20 lines:" >&2
+        tail -20 /tmp/build-enterprise-e2e.log >&2
+        exit 3
       fi
     fi
   else
