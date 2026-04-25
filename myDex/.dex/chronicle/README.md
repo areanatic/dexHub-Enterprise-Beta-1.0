@@ -31,10 +31,11 @@ Each file: `YYYY-MM-DD.md` (one per day, appended if multiple sessions)
 
 - User says `*save`, `*exit`, "Session speichern", or similar
 - DexMaster creates a summary of the session
-- If auto-save already captured everything, chronicle adds narrative context
+- If CONTEXT.md was updated during the session (agent-driven), chronicle adds narrative context on top
 
-## Automatic vs Manual
+## Agent-driven vs Manual
 
-Auto-save (CONTEXT.md) runs silently after every task.
+CONTEXT.md updates are **agent-driven** during state transitions — DexMaster decides when to write (state changes, agent activations, *save commands). It is NOT a background service that runs after every task. Honest convention per SHARED.md §DexMemory.
+
 Chronicle is optional — it provides the detailed "story" of a session.
-If you close VS Code without `*save`, no chronicle is written, but CONTEXT.md has all essential state.
+If you close VS Code without `*save`, no chronicle is written. CONTEXT.md state reflects only the last agent-driven write.
