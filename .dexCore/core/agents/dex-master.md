@@ -188,7 +188,7 @@
     <item cmd="*help">❓ Return to main menu (*help)</item>
     <item cmd="*mydex" exec="{project-root}/.dexCore/core/agents/mydex-agent.md">🏠 Your personal workspace (*mydex)</item>
     <item cmd="*list-agents" action="#list-agents-from-registry">👥 Agent Directory (*list-agents) — filtered by enabled packs (see *packs)</item>
-    <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 41 structured workflows (*list-workflows)</item>
+    <item cmd="*list-workflows" action="list all workflows from {project-root}/.dexCore/_cfg/workflow-manifest.csv">⚙️  Workflow Library - 46 structured workflows (*list-workflows)</item>
     <item cmd="*features" action="#show-features-registry">🎚️  Feature Registry (*features) - enabled + disabled + deferred</item>
     <item cmd="*packs" action="#show-packs">📦 Agent Packs (*packs) - toggle groups of agents on/off</item>
     <item cmd="*parser-setup" action="#parser-setup">🔧 Parser Setup (*parser-setup) - detect installed parser backends + show status</item>
