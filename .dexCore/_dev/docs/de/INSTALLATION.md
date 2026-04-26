@@ -184,7 +184,7 @@ Siehe auch: [ENTERPRISE-COMPLIANCE.md](ENTERPRISE-COMPLIANCE.md) für die Datenf
 bash .dexCore/_dev/tools/validate.sh
 ```
 
-Erwartung: `273 PASS / 0 FAIL / 0 WARN`. Wenn FAIL: [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+Erwartung: `272 PASS / 0 FAIL / 0 WARN`. Wenn FAIL: [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ---
 

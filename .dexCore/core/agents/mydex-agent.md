@@ -11,12 +11,11 @@
 > does it on a given session is a function of whether the LLM follows the spec.
 >
 > **Spec is defined for:**
-> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v5.0, 3-layer model: SMART / VOLLSTÄNDIG / MINIMAL). v4.3 flows archived 2026-04-22 to `.dexCore/_archive/onboarding-v4.3-2026-04-22/`.
+> - Onboarding question flows in `.dexCore/_cfg/onboarding-questions.yaml` (v5.0, **single canonical 5-question flow** — SMART v5). 3-variant model (SMART/VOLLSTÄNDIG/MINIMAL) retired 2026-04-25; all aliases redirect to canonical SMART v5. v4.3 flows archived 2026-04-22 to `.dexCore/_archive/onboarding-v4.3-2026-04-22/`.
 > - Profile generation against `myDex/.dex/config/profile.yaml.example` template (schema v1.1)
 > - Onboarding routing (v5.0 is the only path as of Beta 1.0):
->   - `*mydex` or `*onboarding` → SMART v5 (5 questions, DEFAULT)
->   - `*mydex-advanced` → VOLLSTÄNDIG v5 (12 questions, enterprise-compliance + custom instructions)
->   - `*mydex-minimal` → MINIMAL v5 (2 questions, language + data-handling consent only)
+>   - `*mydex` or `*onboarding` → canonical SMART v5 (5 questions, DEFAULT)
+>   - `*mydex-advanced` / `*mydex-minimal` → **deprecated aliases** — redirect to canonical SMART v5 with deprecation note
 > - Welcome + completion prompts, bilingual DE/EN
 > - Integration hooks for project-manager and dex-master
 >
