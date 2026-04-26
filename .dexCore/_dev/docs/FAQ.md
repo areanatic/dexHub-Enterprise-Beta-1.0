@@ -67,7 +67,7 @@ DexHub ships with 28 E2E tests (`tests/e2e/*.test.sh`) covering ~702 individual 
 bash tests/e2e/run-all.sh
 ```
 
-Plus a structural quality gate (`bash .dexCore/_dev/tools/validate.sh` — 273 PASS / 0 FAIL / 0 WARN expected).
+Plus a structural quality gate (`bash .dexCore/_dev/tools/validate.sh` — 272 PASS / 0 FAIL / 0 WARN expected).
 
 The features registry (`.dexCore/_cfg/features.yaml`) declares which test covers each feature. 7 enabled features have `tests:[]` — those are documented as test-coverage gaps with `known_issues` and planned for 1.0.1+.
 
@@ -101,7 +101,7 @@ Local LLM + no connectors = fully offline.
 
 ## Is this open source?
 
-Apache 2.0 license. Source code is at https://github.com/areanatic/dexHub-Enterprise-Beta-1.0 (currently in private development, will be made public after Beta validation).
+Apache 2.0 license. Source code is at https://github.com/areanatic/dexHub-Enterprise-Beta-1.0.
 
 The vision is "Internal Open-Source / Enterprise Community" — collaborative development, not vendor product. Contributions welcome via standard fork/PR flow.
 
