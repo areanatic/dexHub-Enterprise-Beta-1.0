@@ -105,12 +105,13 @@ If you want to drag PDFs / Office files / images into DexHub via `*inbox`:
 
 ```bash
 # macOS
-brew install pdftotext  # built-in PDF text extraction
-brew install --cask kreuzberg  # multi-format parser
+brew install poppler              # gets pdftotext (PDF text extraction)
+brew install kreuzberg-dev/tap/kreuzberg  # multi-format parser
 
 # Linux
 sudo apt install poppler-utils  # gets pdftotext
-# kreuzberg via pip or container — see https://kreuzberg.dev
+# kreuzberg via install script — see https://kreuzberg.dev
+curl -fsSL https://raw.githubusercontent.com/kreuzberg-dev/kreuzberg/main/scripts/install.sh | bash
 ```
 
 Verify: `*parser-setup` in DexMaster shows installed backends.
@@ -121,7 +122,7 @@ Verify: `*parser-setup` in DexMaster shows installed backends.
 
 ```bash
 bash .dexCore/_dev/tools/validate.sh
-# Expected: 273 PASS / 0 FAIL / 0 WARN
+# Expected: 272 PASS / 0 FAIL / 0 WARN
 ```
 
 If green: you're set up. Continue with [First 5 Minutes](FIRST-5-MINUTES.md).

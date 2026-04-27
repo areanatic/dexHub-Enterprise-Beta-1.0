@@ -265,7 +265,7 @@ Bei echten Konflikten: manuell lösen — **niemals `--force` ohne Review**.
 Siehe Ground Rule #4 + #10 in CLAUDE.md. DexHub's `origin` zeigt auf **areanatic** (safe). Falls du einen andren Remote hinzugefügt hast und dorthin gepusht hast:
 1. Source-of-truth-Repo (areanatic) sauber halten
 2. Falschen Remote entfernen: `git remote remove <name>`
-3. Bei `git.dhl.com/azamani1`: das ist tombstoned — nichts mehr dorthin pushen
+3. Bei einem tombstoned Enterprise-Remote: nichts mehr dorthin pushen — prüfe `git remote -v` und entferne den unerwünschten Remote
 
 ---
 
@@ -292,4 +292,4 @@ cp -R ../dexHub-Enterprise-Beta-1.0/myDex ./
 - IDE + OS
 - Symptom + was du erwartet hast
 
-Internes Kontakt bei DHL / ITS: Arash Zamani.
+Öffne ein GitHub Issue im Repo oder nutze Dev-Mode: `@dex-master *dev-mode` → `*bug`.

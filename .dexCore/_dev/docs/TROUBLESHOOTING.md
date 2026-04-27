@@ -215,7 +215,7 @@ If you want the agent to remember something explicitly, ask it to save to one of
 bash .dexCore/_dev/tools/validate.sh
 ```
 
-273 PASS / 0 FAIL / 0 WARN = your installation is structurally sound.
+272 PASS / 0 FAIL / 0 WARN = your installation is structurally sound.
 
 For semantic issues (agent says X but reality is Y), check:
 ```bash
