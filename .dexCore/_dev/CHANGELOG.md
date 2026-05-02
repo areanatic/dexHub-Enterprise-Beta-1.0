@@ -2,6 +2,16 @@
 
 > Development changelog for DexHub Enterprise Beta
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [1.0.1] — 2026-04-27 (Public Hygiene Patch)
 
 Public hygiene patch for the public Beta repo. This release consists of
