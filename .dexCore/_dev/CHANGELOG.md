@@ -2,40 +2,98 @@
 
 > Development changelog for DexHub Enterprise Beta
 
-## [Unreleased] — 2026-04-25 (Session 11 D4 — Onboarding Consolidation)
-
-### Removed (3-variant onboarding model)
-- `onboarding.minimal_v5` (was enabled — 2 questions: language + data-handling)
-- `onboarding.vollstandig_v5` (was enabled — 12 questions: SMART + 7 enterprise + 2 custom-instruction)
-- `*mydex-minimal` and `*mydex-advanced` deprecated aliases (still routed by mydex-agent.md handlers, redirect to single onboarding with deprecation note)
-
-### Renamed
-- `onboarding.smart_v5` → `onboarding.standard` (in features.yaml + ENTERPRISE-COMPLIANCE.md + PLATFORM-POLICY.md + 4 quality.walkthrough_* depends_on chains)
-
-### Changed
-- `onboarding-questions.yaml` metadata: `variants` block (3 variants) → `onboarding` block (single canonical: `question_count: 5, questions: [0, 1, 3, 4, 43]`). Plus new `post_onboarding` block listing Q40-41 + Q44-49 as fields reachable via *profile editing.
-- `mydex-agent.md`: 3 prompt blocks (`onboarding-minimal/smart/complete`) → 1 canonical `<prompt id="onboarding">`. Legacy IDs preserved as redirect-stubs that inform user "MINIMAL/SMART/VOLLSTÄNDIG sind weg" + execute the canonical onboarding.
-- `mydex-agent.md` `show-onboarding-menu`: 6-item variant-choice menu → 4-item simple menu (Onboarding starten / Einzelne Fragen Coming-V1.1.3 / YAML edit / Back).
-- `mydex-agent.md` `<onboarding_execution>` Step 3: "Variant Selection" → "Start Onboarding" (loads `metadata.onboarding.questions` from YAML, no variant filter).
-- `validate.sh` §16: 3 hardcoded greps for variant prompt-IDs → 1 grep matching `prompt id="onboarding[-"]` (tolerates canonical + legacy IDs).
-- `tests/e2e/01-onboarding-smart.test.sh`: banner + assertions adapted to single-onboarding YAML structure (resolves prior YAML-navigation breakage that caused this test to be one of the 5 failing E2E).
-- Public docs (README, myDex/README, FIRST-5-MIN, dex-master `*about`, SKILL.md): all variant-choice references replaced with single-onboarding language.
-- Internal docs (ONBOARDING-DESIGN, PLATFORM-POLICY): updated to reference single canonical flow; ONBOARDING-DESIGN preserves variant model as historical context with explicit superseded-banner.
-- features.yaml `counts:` block: total 85 → 83, enabled 58 → 56 (-2 enabled features removed).
-
-### Migration (existing profiles)
-- Existing profiles with `onboarding.variant: "smart_v5"` (or `"minimal_v5"` / `"vollstandig_v5"`) remain valid — schema does not enum-restrict the variant field. Future profile writes use `"standard"`.
-
-### Why
-User direktive 2026-04-25: *"Es gibt nur ein Onboarding, keine minimale oder große. Mach es und dann bist du angeboardet."* Mandatory-onboarding gate is a planned 1.0.1+ feature.
-
 ## [1.0.0] — 2026-04-22 🎉 First public Beta 1.0 release
 
 Session 10 ships 13 atomic commits closing Phase 1 + Phase 3-7 of the
 pre-release plan. All 274 validate.sh checks green; enterprise bundle
 build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 
-### Added in session 10
+The [1.0.0] release combines work from three workstreams:
+1. Pre-1.0 hardening (sessions 1-7, 2026-04-02 → 2026-04-21) — L2 Knowledge Tank, Document Parser Arc, Platform & Quality Infrastructure
+2. Session 10 — Public Beta 1.0 finishing (2026-04-22 → 2026-04-26) — Non-Dev docs, messaging cleanup, agent renames
+3. Session 11 D4 (2026-04-25) — Onboarding consolidation (3-variant → single canonical)
+
+---
+
+### Pre-1.0 hardening (post-EB-1.0, 2026-04-02 → 2026-04-21)
+
+#### Added — L2 Knowledge Tank (closed 2026-04-21 session 5)
+- SQLite-backed tank with `l2-init.sh`, `l2-ingest.sh`, `l2-query.sh`
+- Optional semantic search via Ollama embeddings (`l2-embed.sh` +
+  `l2-detect-backend.sh` + `l2-status.sh`)
+- Hybrid keyword+semantic ranking (`--keyword-only` / `--hybrid` /
+  `--semantic-only` / `--alpha`)
+- Enterprise compliance gate with `POLICY-BLOCK:` audit rows in
+  `ingest_runs`
+- L1 Wiki scaffold (pattern doc + 3 templates)
+
+#### Added — Document Parser Arc (closed 2026-04-22 session 8)
+- Parser router (`parse-route.sh`) + MIME detection (`detect-mime.sh`)
+- 4 backend adapters:
+  - `pattern_a_vector_text` (poppler pdftotext, text-layer PDFs)
+  - `pattern_b_phase1_overview` (raster → VLM overview description,
+    first of 6 phases; 2-6 deferred to 1.1)
+  - `kreuzberg` (brew install optional — 91+ formats)
+  - `ollama_vlm` (local VLM via llama3.2-vision / llava / moondream etc.)
+- Capabilities probe (`capabilities-probe.sh`) with auto-probe-on-stale
+- Inbox auto-parse orchestrator (`*inbox` menu) — drop file → L2 tank
+- Inbox watcher (`*inbox-watch`) — fswatch / inotify / poll auto-select,
+  foreground process (daemon mode deferred to 1.1)
+- Inbox desktop-shortcut setup (`*inbox-setup`) — macOS symlink /
+  Linux .desktop / Windows .lnk scaffold (live-verify deferred)
+
+#### Added — Platform & Quality Infrastructure
+- Agent Packs (`packs.sh` + 3 manifests + `*packs` / `*enable-pack` /
+  `*disable-pack` DexMaster menu)
+- Saved Consent Tracking (profile schema v1.2, `*consents` /
+  `*revoke-consent`)
+- SMART v5.0 onboarding + live walkthrough test
+- `validate.sh` 22 → **27 sections**:
+  - §23 feature registry consistency (single source of truth)
+  - §24 session-anchor (worktree-identity guard, post-2026-04-19 incident)
+  - §25 README ↔ features.yaml counts consistency
+  - §26 counts_block ↔ actual registry consistency
+  - §27 test-file shell-syntax validity (`bash -n` on all test paths)
+- Enterprise-bundle build script with `--verify` mode
+- Feature registry schema with 6 status buckets + enterprise_compliance
+  + depends_on + known_issues
+
+#### Changed (pre-1.0 hardening)
+- Agent count: 43 → 46 Copilot `.agent.md` files
+- Workflow count: 45 → 46 structured workflows
+- Build-for-enterprise strips `.claude/` + `tests/e2e/integrations/` +
+  `.dexcore-session-anchor` + `LEARNINGS-CLAUDE-CODE-REMOVABILITY.md`
+
+#### Fixed (pre-1.0 hardening)
+- 2026-04-13 Flowable MCP deep discovery (paused, pending Mirjam role
+  decision)
+- 2026-04-17 Agent Boundary state model + D1 Layer-1/2 persistence
+- 2026-04-19 Tier 0-4 cleanup: 3 Playground-only "broken" features
+  removed + 1 fixed (Atlassian MCP install.sh v2.0 wizard). broken
+  count 6 → 0.
+- 2026-04-19 Onboarding SMART v4.3.1 → v5.0 default, v4.3.1 via
+  `*mydex-advanced`
+- 2026-04-19 Session-anchor mechanism (worktree-identity validation
+  after cross-repo incident)
+- 2026-04-22 session 7 CI-red streak: XDG env-var unset discipline
+  across test-27 XDG cases
+- 2026-04-22 session 8 Pattern B Phase 1 hardening: 0-byte PNG guard +
+  VLM sub-adapter exit-code capture + --require test coverage on
+  ready boxes
+
+#### Registry status at end of pre-1.0 hardening (2026-04-21, intermediate)
+- 87 total features: 7 always_on / 61 enabled / 0 disabled / 19
+  deferred / 0 broken / 0 experimental
+- validate: 273 / 0 / 0
+- E2E: 703 dev / 704 CI-sim / 680 enterprise
+- build-for-enterprise --verify: PASS
+- HEAD: `d5ba4b4` on origin/main (areanatic)
+
+---
+
+### Session 10 — Public Beta 1.0 finishing (2026-04-22 → 2026-04-26)
+
+#### Added in session 10
 - `.dexCore/_dev/docs/INSTALLATION.md` — step-by-step for Non-Devs (DE)
 - `.dexCore/_dev/docs/FIRST-5-MINUTES.md` — guided first-use tour (DE)
 - `.dexCore/_dev/docs/FAQ.md` — 15+ Non-Dev questions (DE)
@@ -50,7 +108,7 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 - Section: DEPRECATED_PHRASES in validate.sh §21 extended with
   "100% Local-First" + "100% local, no cloud APIs" (future drift guard)
 
-### Changed in session 10
+#### Changed in session 10
 - **Messaging (P0-H):** "100% Local-First" → "Data-Local, LLM-of-Your-Choice"
   across SHARED.md + regenerated CLAUDE.md + copilot-instructions.md +
   2 skill files + dex-master + mydex-agent + myDex/README. Honest framing:
@@ -70,7 +128,7 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
   install-URL typo fixed (dexhub-ea-beta → dexHub-Enterprise-Beta-1.0);
   Getting-Started-Docs block linking the 4 new Non-Dev docs.
 
-### Removed in session 10 (P0-I Option A — Onboarding Consolidation)
+#### Removed in session 10 (P0-I Option A — Onboarding Consolidation)
 - `onboarding.smart_v4_3_1` (enabled → removed, referenced archived YAML)
 - `onboarding.vollstandig_v4_3` (enabled → removed)
 - `onboarding.legacy_path_preserved` (enabled → removed, depended on above)
@@ -84,7 +142,7 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 - Enterprise bundle strip-list extended: `.dexCore/_dev/portfolio/` +
   `.dexCore/_dev/docs/adr/` no longer ship with the enterprise bundle
 
-### Live-verified in session 10 (DF3, partial — 2 of 7 paths)
+#### Live-verified in session 10 (DF3, partial — 2 of 7 paths)
 - CLAUDE_E2E_LIVE_EMBED=1 on test 17 → 21/21 PASS
   Real 768-dim vectors from nomic-embed-text, idempotent, require-backend
 - CLAUDE_E2E_LIVE_EMBED=1 on test 18 → 20/20 PASS
@@ -92,7 +150,45 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 - Status of other 5 paths (KREUZBERG / VLM / PATTERN_A / WALKTHROUGH /
   INBOX_SETUP) documented in LIVE-VERIFICATION.md
 
-### Deferred to 1.1 (with explicit specs in ROADMAP-1.1.md)
+---
+
+### Session 11 D4 — Onboarding Consolidation (2026-04-25, late-stage 1.0 cleanup)
+
+> **Note (2026-05-03 forensik):** D4 commits `8308e37` → `683f5b5` are
+> ancestors of `v1.0.0`, so this work shipped as part of 1.0.0 — NOT as
+> v1.0.1. Earlier `[Unreleased]` placement of this content was a
+> CHANGELOG-discipline drift that this commit repairs.
+
+#### Removed (3-variant onboarding model)
+- `onboarding.minimal_v5` (was enabled — 2 questions: language + data-handling)
+- `onboarding.vollstandig_v5` (was enabled — 12 questions: SMART + 7 enterprise + 2 custom-instruction)
+- `*mydex-minimal` and `*mydex-advanced` deprecated aliases (still routed by mydex-agent.md handlers, redirect to single onboarding with deprecation note)
+
+#### Renamed (D4)
+- `onboarding.smart_v5` → `onboarding.standard` (in features.yaml + ENTERPRISE-COMPLIANCE.md + PLATFORM-POLICY.md + 4 quality.walkthrough_* depends_on chains)
+
+#### Changed (D4)
+- `onboarding-questions.yaml` metadata: `variants` block (3 variants) → `onboarding` block (single canonical: `question_count: 5, questions: [0, 1, 3, 4, 43]`). Plus new `post_onboarding` block listing Q40-41 + Q44-49 as fields reachable via *profile editing.
+- `mydex-agent.md`: 3 prompt blocks (`onboarding-minimal/smart/complete`) → 1 canonical `<prompt id="onboarding">`. Legacy IDs preserved as redirect-stubs that inform user "MINIMAL/SMART/VOLLSTÄNDIG sind weg" + execute the canonical onboarding.
+- `mydex-agent.md` `show-onboarding-menu`: 6-item variant-choice menu → 4-item simple menu (Onboarding starten / Einzelne Fragen Coming-V1.1.3 / YAML edit / Back).
+- `mydex-agent.md` `<onboarding_execution>` Step 3: "Variant Selection" → "Start Onboarding" (loads `metadata.onboarding.questions` from YAML, no variant filter).
+- `validate.sh` §16: 3 hardcoded greps for variant prompt-IDs → 1 grep matching `prompt id="onboarding[-"]` (tolerates canonical + legacy IDs).
+- `tests/e2e/01-onboarding-smart.test.sh`: banner + assertions adapted to single-onboarding YAML structure (resolves prior YAML-navigation breakage that caused this test to be one of the 5 failing E2E).
+- Public docs (README, myDex/README, FIRST-5-MIN, dex-master `*about`, SKILL.md): all variant-choice references replaced with single-onboarding language.
+- Internal docs (ONBOARDING-DESIGN, PLATFORM-POLICY): updated to reference single canonical flow; ONBOARDING-DESIGN preserves variant model as historical context with explicit superseded-banner.
+- features.yaml `counts:` block: total 85 → 83, enabled 58 → 56 (-2 enabled features removed).
+
+#### Migration (existing profiles)
+- Existing profiles with `onboarding.variant: "smart_v5"` (or `"minimal_v5"` / `"vollstandig_v5"`) remain valid — schema does not enum-restrict the variant field. Future profile writes use `"standard"`.
+
+#### Why (D4)
+User direktive 2026-04-25: *"Es gibt nur ein Onboarding, keine minimale oder große. Mach es und dann bist du angeboardet."* Mandatory-onboarding gate is a planned 1.0.1+ feature.
+
+---
+
+### Deferred to 1.1 (with explicit specs in ROADMAP-1.1.md, plus broader roadmap honesty)
+
+#### From session 10 closing
 - G1 Guided-Install Wizard (interactive install helper)
 - O1 Copilot Token Quick-Win (SHARED.md compression + skills extraction)
 - F1-F4 Project Migration Agents (Drop-In, Pull-Repo, Push-Repo, Per-
@@ -100,64 +196,7 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 - Living-Docs Pattern (automated drift-detection code ↔ docs)
 - O2/O3/O4/DF1/DF2/DF4/DF5 polish items
 
-### Registry state at 1.0 release
-- **85 features total** (8 always_on + 58 enabled + 19 deferred + 0 broken + 0 experimental)
-- **43 source agent personas** · **46 Copilot activations** · **46 workflows** · **12 skills**
-- **28 validate.sh sections** (27 + new §28 Copilot drift-check)
-- **274 validate.sh checks PASS** · **0 FAIL** · **0 WARN**
-
----
-
-## [Unreleased] — post-EB-1.0 hardening (2026-04-02 → 2026-04-21)
-
-### Added — L2 Knowledge Tank (closed 2026-04-21 session 5)
-- SQLite-backed tank with `l2-init.sh`, `l2-ingest.sh`, `l2-query.sh`
-- Optional semantic search via Ollama embeddings (`l2-embed.sh` +
-  `l2-detect-backend.sh` + `l2-status.sh`)
-- Hybrid keyword+semantic ranking (`--keyword-only` / `--hybrid` /
-  `--semantic-only` / `--alpha`)
-- Enterprise compliance gate with `POLICY-BLOCK:` audit rows in
-  `ingest_runs`
-- L1 Wiki scaffold (pattern doc + 3 templates)
-
-### Added — Document Parser Arc (closed 2026-04-22 session 8)
-- Parser router (`parse-route.sh`) + MIME detection (`detect-mime.sh`)
-- 4 backend adapters:
-  - `pattern_a_vector_text` (poppler pdftotext, text-layer PDFs)
-  - `pattern_b_phase1_overview` (raster → VLM overview description,
-    first of 6 phases; 2-6 deferred to 1.1)
-  - `kreuzberg` (brew install optional — 91+ formats)
-  - `ollama_vlm` (local VLM via llama3.2-vision / llava / moondream etc.)
-- Capabilities probe (`capabilities-probe.sh`) with auto-probe-on-stale
-- Inbox auto-parse orchestrator (`*inbox` menu) — drop file → L2 tank
-- Inbox watcher (`*inbox-watch`) — fswatch / inotify / poll auto-select,
-  foreground process (daemon mode deferred to 1.1)
-- Inbox desktop-shortcut setup (`*inbox-setup`) — macOS symlink /
-  Linux .desktop / Windows .lnk scaffold (live-verify deferred)
-
-### Added — Platform & Quality Infrastructure
-- Agent Packs (`packs.sh` + 3 manifests + `*packs` / `*enable-pack` /
-  `*disable-pack` DexMaster menu)
-- Saved Consent Tracking (profile schema v1.2, `*consents` /
-  `*revoke-consent`)
-- SMART v5.0 onboarding + live walkthrough test
-- `validate.sh` 22 → **27 sections**:
-  - §23 feature registry consistency (single source of truth)
-  - §24 session-anchor (worktree-identity guard, post-2026-04-19 incident)
-  - §25 README ↔ features.yaml counts consistency
-  - §26 counts_block ↔ actual registry consistency
-  - §27 test-file shell-syntax validity (`bash -n` on all test paths)
-- Enterprise-bundle build script with `--verify` mode
-- Feature registry schema with 6 status buckets + enterprise_compliance
-  + depends_on + known_issues
-
-### Changed
-- Agent count: 43 → 46 Copilot `.agent.md` files
-- Workflow count: 45 → 46 structured workflows
-- Build-for-enterprise strips `.claude/` + `tests/e2e/integrations/` +
-  `.dexcore-session-anchor` + `LEARNINGS-CLAUDE-CODE-REMOVABILITY.md`
-
-### Deferred (roadmap honesty — 19 features flagged)
+#### From pre-1.0 hardening (broader roadmap honesty — 19 features flagged)
 - Pattern B Phases 2-6 (cluster-detect, hi-res crops, per-cluster VLM,
   synthesis, verify)
 - Native Workflow-Runner execution backend
@@ -173,30 +212,15 @@ build + verify green; live-verified EMBED + HYBRID (41 live assertions).
 - Profile auto-detect from repo + lazy-gating question (5.2)
 - Knowledge ingestion + RAG (5.2.d)
 
-### Fixed
-- 2026-04-13 Flowable MCP deep discovery (paused, pending Mirjam role
-  decision)
-- 2026-04-17 Agent Boundary state model + D1 Layer-1/2 persistence
-- 2026-04-19 Tier 0-4 cleanup: 3 Playground-only "broken" features
-  removed + 1 fixed (Atlassian MCP install.sh v2.0 wizard). broken
-  count 6 → 0.
-- 2026-04-19 Onboarding SMART v4.3.1 → v5.0 default, v4.3.1 via
-  `*mydex-advanced`
-- 2026-04-19 Session-anchor mechanism (worktree-identity validation
-  after cross-repo incident)
-- 2026-04-22 session 7 CI-red streak: XDG env-var unset discipline
-  across test-27 XDG cases
-- 2026-04-22 session 8 Pattern B Phase 1 hardening: 0-byte PNG guard +
-  VLM sub-adapter exit-code capture + --require test coverage on
-  ready boxes
+---
 
-### Registry status at close (2026-04-21)
-- 87 total features: 7 always_on / 61 enabled / 0 disabled / 19
-  deferred / 0 broken / 0 experimental
-- validate: 273 / 0 / 0
-- E2E: 703 dev / 704 CI-sim / 680 enterprise
-- build-for-enterprise --verify: PASS
-- HEAD: `d5ba4b4` on origin/main (areanatic)
+### Registry state at 1.0 release
+- **85 features total** (8 always_on + 58 enabled + 19 deferred + 0 broken + 0 experimental)
+- **43 source agent personas** · **46 Copilot activations** · **46 workflows** · **12 skills**
+- **28 validate.sh sections** (27 + new §28 Copilot drift-check)
+- **274 validate.sh checks PASS** · **0 FAIL** · **0 WARN**
+
+---
 
 ## [EB-1.0] — 2026-04-01
 
