@@ -2,7 +2,22 @@
 
 > Development changelog for DexHub Enterprise Beta
 
-## [1.0.0] — 2026-04-22 🎉 First public Beta 1.0 release
+## [1.0.1] — 2026-04-27 (Public Hygiene Patch)
+
+Public hygiene patch for the public Beta repo. This release consists of
+`f3f7aee` plus merge commit `ba74156`.
+
+### Fixed
+- Purged DE G8 violations in FAQ/TROUBLESHOOTING: no DHL/ITS pairing and no internal git URL.
+- Corrected validate.sh count drift from 273 to 272 across docs.
+- Corrected Homebrew commands: poppler provides `pdftotext`; Kreuzberg uses the upstream tap.
+- Removed stale private-development claim now that the repo is public.
+- Aligned `mydex-agent.md` header with canonical SMART v5 onboarding.
+- Redacted `workstreams.csv` surname and role tag from the Flowable workstream.
+- Corrected FAQ E2E count to 32 total tests: 26 core plus 6 integration.
+- Superseded PR #1 (`forensic-audit-repository-claims`) with the same public-hygiene fixes plus the workstreams and E2E-count follow-ups.
+
+## [1.0.0] — 2026-04-26 🎉 First public Beta 1.0 release
 
 Session 10 ships 13 atomic commits closing Phase 1 + Phase 3-7 of the
 pre-release plan. All 274 validate.sh checks green; enterprise bundle
